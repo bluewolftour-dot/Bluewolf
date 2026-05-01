@@ -1,8 +1,19 @@
+import { normalizeCmsImageList, normalizeCmsImagePath, normalizeCmsTourImages } from "@/lib/cms-image";
+
 export type Locale = "ko" | "ja" | "en";
 export type CommunityTab = "all" | "review" | "mate" | "qna";
 export type Region = "south" | "central" | "north" | "west";
-export type Theme = "desert" | "family" | "premium" | "adventure";
+export type Theme = string;
 export type DurationType = "short" | "long";
+export type TourTagColorKey =
+    | "rose"
+    | "slate"
+    | "blue"
+    | "sky"
+    | "emerald"
+    | "amber"
+    | "violet"
+    | "cyan";
 
 export type Tour = {
     id: number;
@@ -18,6 +29,7 @@ export type Tour = {
     title: Record<Locale, string>;
     desc: Record<Locale, string>;
     tags: Record<Locale, string[]>;
+    tagColors?: Record<Locale, Record<string, TourTagColorKey>>;
     duration: Record<Locale, string>;
     highlights: Record<Locale, string[]>;
 };
@@ -26,6 +38,15 @@ export type CommunityComment = {
     author: string;
     text: string;
     date: string;
+};
+
+export type CommunityNotice = {
+    id: number;
+    title: string;
+    summary: string;
+    date: string;
+    href?: string;
+    important?: boolean;
 };
 
 export type CommunityItem = {
@@ -56,7 +77,34 @@ export type HeroSlide = {
     title: string;
     desc: string;
     image: string;
+    href?: string;
 };
+
+function normalizeSlidesByLocale(source: Record<Locale, HeroSlide[]>) {
+    return Object.fromEntries(
+        Object.entries(source).map(([locale, items]) => [
+            locale,
+            items.map((item) => ({
+                ...item,
+                image: normalizeCmsImagePath(item.image),
+            })),
+        ])
+    ) as Record<Locale, HeroSlide[]>;
+}
+
+function normalizeCommunityByLocale(source: Record<Locale, CommunityItem[]>) {
+    return Object.fromEntries(
+        Object.entries(source).map(([locale, items]) => [
+            locale,
+            items.map((item) => ({
+                ...item,
+                photos: item.photos
+                    ? normalizeCmsImageList(item.photos, item.photos.length || 1)
+                    : undefined,
+            })),
+        ])
+    ) as Record<Locale, CommunityItem[]>;
+}
 
 export const copy = {
     ko: {
@@ -304,7 +352,7 @@ export const copy = {
     },
 } as const;
 
-export const tours: Tour[] = [
+export const tours: Tour[] = ([
     {
         id: 1,
         region: "south",
@@ -773,9 +821,9 @@ export const tours: Tour[] = [
             en: ["Altai Mountains", "Air Transfer", "Eagle Culture", "Kazakh Nomads"],
         },
     },
-];
+] as Tour[]).map(normalizeCmsTourImages);
 
-export const slides: Record<Locale, HeroSlide[]> = {
+export const slides: Record<Locale, HeroSlide[]> = normalizeSlidesByLocale({
     ko: [
         {
             eyebrow: "고비 사막 시그니처",
@@ -836,7 +884,7 @@ export const slides: Record<Locale, HeroSlide[]> = {
             image: "/images/hero-khuvsgul.jpg",
         },
     ],
-};
+});
 
 export const faq = {
     ko: [
@@ -856,7 +904,7 @@ export const faq = {
     ],
 } as const;
 
-export const community: Record<Locale, CommunityItem[]> = {
+export const community: Record<Locale, CommunityItem[]> = normalizeCommunityByLocale({
     ko: [
         {
             id: 1, type: "review", author: "김지수", date: "2025-07-12", likes: 24,
@@ -889,7 +937,7 @@ export const community: Record<Locale, CommunityItem[]> = {
             text: "처음 몽골 여행을 블루울프와 함께했는데 정말 잘한 선택이었습니다. 짧은 일정이지만 몽골의 매력을 충분히 느낄 수 있었어요.",
             comments: [
                 { author: "신미래", text: "입문자에게 적합한 코스인가요?", date: "2025-05-21" },
-                { author: "이준호", text: "네! 처음 가시는 분들께 강추드려요 😊", date: "2025-05-21" },
+                { author: "이준호", text: "네! 처음 가시는 분들께 강추드려요.", date: "2025-05-21" },
             ],
         },
         {
@@ -903,7 +951,7 @@ export const community: Record<Locale, CommunityItem[]> = {
             id: 6, type: "mate", author: "강민준", date: "2025-07-20", likes: 8,
             tourTitle: "고비 사막 5박 6일", travelDate: "2025-08-15",
             maxPeople: 4, currentPeople: 2, travelRegion: "남부",
-            text: "8월 15일 고비 사막 5박 6일 같이 가실 분 찾습니다! 현재 2명 확정이고 2명 더 모집 중이에요. 20~30대 환영합니다. 오픈채팅방 참여 원하시면 댓글 달아주세요 😊",
+            text: "8월 15일 고비 사막 5박 6일 같이 가실 분 찾습니다! 현재 2명 확정이고 2명 더 모집 중이에요. 20~30대 환영합니다. 오픈채팅방 참여 원하시면 댓글 달아주세요.",
             comments: [
                 { author: "정예린", text: "저 참여하고 싶어요! 연락처 공유해주실 수 있나요?", date: "2025-07-21" },
             ],
@@ -944,7 +992,7 @@ export const community: Record<Locale, CommunityItem[]> = {
             answered: true,
             text: "몽골 여행 시 비자가 필요한가요? 한국 여권으로 무비자 입국이 가능한지 궁금합니다.",
             comments: [
-                { author: "BlueWolf", text: "안녕하세요! 한국 여권 소지자는 몽골 입국 시 30일 무비자 체류가 가능합니다. 여권 유효기간이 6개월 이상 남아있어야 하니 확인해 주세요 😊", date: "2025-07-19" },
+                { author: "BlueWolf", text: "안녕하세요! 한국 여권 소지자는 몽골 입국 시 30일 무비자 체류가 가능합니다. 여권 유효기간이 6개월 이상 남아있어야 하니 확인해 주세요.", date: "2025-07-19" },
             ],
         },
         {
@@ -1019,7 +1067,7 @@ export const community: Record<Locale, CommunityItem[]> = {
             id: 6, type: "mate", author: "カン・ミンジュン", date: "2025-07-20", likes: 8,
             tourTitle: "ゴビ砂漠 5泊6日", travelDate: "2025-08-15",
             maxPeople: 4, currentPeople: 2, travelRegion: "南部",
-            text: "8月15日ゴビ砂漠ツアー同行者募集！現在2名確定、あと2名募集中。20〜30代歓迎。一緒に行きたい方はコメントください😊",
+            text: "8月15日ゴビ砂漠ツアー同行者募集！現在2名確定、あと2名募集中。20〜30代歓迎。一緒に行きたい方はコメントください。",
             comments: [],
         },
         {
@@ -1055,7 +1103,7 @@ export const community: Record<Locale, CommunityItem[]> = {
             answered: true,
             text: "モンゴル旅行にビザは必要ですか？日本のパスポートでビザなしで入国できますか？",
             comments: [
-                { author: "BlueWolf", text: "日本のパスポートでモンゴルへは30日間ビザなしで入国できます。パスポートの残存有効期間が6か月以上あることをご確認ください😊", date: "2025-07-19" },
+                { author: "BlueWolf", text: "日本のパスポートでモンゴルへは30日間ビザなしで入国できます。パスポートの残存有効期間が6か月以上あることをご確認ください。", date: "2025-07-19" },
             ],
         },
         {
@@ -1130,7 +1178,7 @@ export const community: Record<Locale, CommunityItem[]> = {
             id: 6, type: "mate", author: "Kevin", date: "2025-07-20", likes: 8,
             tourTitle: "Gobi Desert 5N6D", travelDate: "2025-08-15",
             maxPeople: 4, currentPeople: 2, travelRegion: "South",
-            text: "Looking for 2 more people for the Aug 15 Gobi Desert tour! Currently 2 confirmed, looking for 2 more. 20s-30s welcome. Drop a comment if you're interested 😊",
+            text: "Looking for 2 more people for the Aug 15 Gobi Desert tour! Currently 2 confirmed, looking for 2 more. 20s-30s welcome. Drop a comment if you're interested.",
             comments: [
                 { author: "Rachel", text: "I'd love to join! Can you share contact details?", date: "2025-07-21" },
             ],
@@ -1168,7 +1216,7 @@ export const community: Record<Locale, CommunityItem[]> = {
             answered: true,
             text: "Do I need a visa to travel to Mongolia? Can South Korean passport holders enter visa-free?",
             comments: [
-                { author: "BlueWolf", text: "Korean passport holders can stay in Mongolia for up to 30 days without a visa. Please make sure your passport has at least 6 months of validity remaining 😊", date: "2025-07-19" },
+                { author: "BlueWolf", text: "Korean passport holders can stay in Mongolia for up to 30 days without a visa. Please make sure your passport has at least 6 months of validity remaining.", date: "2025-07-19" },
             ],
         },
         {
@@ -1200,6 +1248,99 @@ export const community: Record<Locale, CommunityItem[]> = {
             comments: [
                 { author: "BlueWolf", text: "Supermarkets and some restaurants in Ulaanbaatar accept cards, but cash (Tugrik) is essential for rural travel. We recommend exchanging USD→Tugrik at the airport or city exchange offices.", date: "2025-07-02" },
             ],
+        },
+    ],
+});
+
+export const communityNotices: Record<Locale, CommunityNotice[]> = {
+    ko: [
+        {
+            id: 1,
+            title: "동행 모집 글 작성 전 일정과 출발일을 꼭 확인해주세요",
+            summary: "동행 모집 게시글에는 투어명, 출발일, 모집 인원, 연락 가능한 방법을 함께 적어주시면 매칭이 훨씬 빨라집니다.",
+            date: "2026-03-30",
+            important: true,
+        },
+        {
+            id: 2,
+            title: "자주 묻는 질문은 FAQ에서 먼저 확인하실 수 있어요",
+            summary: "비자, 결제, 준비물, 환불 규정 같은 기본 문의는 FAQ에 정리되어 있어 빠르게 확인하실 수 있습니다.",
+            date: "2026-03-28",
+            href: "/faq",
+        },
+        {
+            id: 3,
+            title: "성수기 출발 일정은 조기 마감될 수 있어요",
+            summary: "여름 시즌 인기 상품은 빠르게 마감될 수 있으니 여행 기간이 정해졌다면 미리 예약 가능 여부를 확인해주세요.",
+            date: "2026-03-24",
+            href: "/tours",
+        },
+        {
+            id: 4,
+            title: "상담 문의는 커뮤니티보다 문의 페이지가 더 빨라요",
+            summary: "견적, 단체 문의, 맞춤 일정 상담은 문의 페이지를 이용하시면 운영팀이 더 빠르게 확인해드립니다.",
+            date: "2026-03-20",
+            href: "/contact",
+        },
+    ],
+    ja: [
+        {
+            id: 1,
+            title: "同行募集の投稿前に日程と出発日をご確認ください",
+            summary: "ツアー名、出発日、募集人数、連絡方法を一緒に書いていただくとマッチングがよりスムーズになります。",
+            date: "2026-03-30",
+            important: true,
+        },
+        {
+            id: 2,
+            title: "よくある質問はFAQで先に確認できます",
+            summary: "ビザ、決済、持ち物、返金規定などの基本的な案内はFAQで素早く確認できます。",
+            date: "2026-03-28",
+            href: "/faq",
+        },
+        {
+            id: 3,
+            title: "繁忙期の出発日は早めに締め切られる場合があります",
+            summary: "夏の人気ツアーは早く満席になることがあるため、旅行期間が決まっている場合は早めの確認をおすすめします。",
+            date: "2026-03-24",
+            href: "/tours",
+        },
+        {
+            id: 4,
+            title: "個別相談はお問い合わせページの方が早くご案内できます",
+            summary: "見積もり、団体旅行、オーダーメイド相談はお問い合わせページから送っていただくと運営チームがより早く確認できます。",
+            date: "2026-03-20",
+            href: "/contact",
+        },
+    ],
+    en: [
+        {
+            id: 1,
+            title: "Please confirm your itinerary and departure date before posting",
+            summary: "For companion posts, include the tour name, departure date, group size, and a contact method to improve matching.",
+            date: "2026-03-30",
+            important: true,
+        },
+        {
+            id: 2,
+            title: "You can check common questions in the FAQ first",
+            summary: "Core topics like visas, payment, packing, and refund policy are already organized in the FAQ.",
+            date: "2026-03-28",
+            href: "/faq",
+        },
+        {
+            id: 3,
+            title: "Peak season departures may close earlier than expected",
+            summary: "Popular summer routes can sell out quickly, so please check availability early if your travel dates are already fixed.",
+            date: "2026-03-24",
+            href: "/tours",
+        },
+        {
+            id: 4,
+            title: "For custom planning, the contact page is the fastest route",
+            summary: "For quotes, group trips, and custom itinerary requests, please use the contact page so our team can respond more quickly.",
+            date: "2026-03-20",
+            href: "/contact",
         },
     ],
 };

@@ -1,7 +1,8 @@
 ﻿import Image from "next/image";
 import { CalendarPicker } from "@/components/ui/CalendarPicker";
 import { Dropdown } from "@/components/ui/Dropdown";
-import { copy, tours, type Locale, type Tour } from "@/lib/bluewolf-data";
+import { copy, type Locale, type Tour } from "@/lib/bluewolf-data";
+import { useCmsTours } from "@/lib/use-cms-tours";
 import { formatPrice } from "@/lib/bluewolf-utils";
 
 type CopyValue = (typeof copy)[Locale];
@@ -10,9 +11,9 @@ const inputClass =
     "h-12 sm:h-14 rounded-2xl border px-4 sm:px-5 text-[15px] sm:text-[16px] font-semibold outline-none transition focus:border-blue-300 focus:ring-4 focus:ring-blue-50";
 
 const primaryButton =
-    "group relative overflow-hidden rounded-2xl bg-blue-600 px-4 py-3 font-bold text-white shadow-[0_10px_24px_rgba(37,99,235,0.22)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-500 sm:px-5 sm:py-4";
+    "group relative overflow-hidden rounded-2xl bg-blue-600 px-4 py-3 font-bold text-white shadow-[0_10px_24px_rgba(37,99,235,0.22)] transition-all duration-300 hover:bg-blue-500 sm:px-5 sm:py-4";
 const secondaryButton =
-    "group relative overflow-hidden rounded-2xl px-4 py-3 font-bold transition-all duration-300 hover:-translate-y-0.5 sm:px-5 sm:py-4";
+    "group relative overflow-hidden rounded-2xl px-4 py-3 font-bold transition-all duration-300 sm:px-5 sm:py-4";
 
 const overlaySpan =
     "pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.22),transparent_60%)]";
@@ -50,6 +51,7 @@ export function BookingSection({
     setPaymentDone: (value: boolean) => void;
     isDark: boolean;
 }) {
+    const { tourItems: tours } = useCmsTours();
     const scheduleLabel = {
         ko: "일정",
         ja: "日程",

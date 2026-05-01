@@ -8,7 +8,10 @@ export function ScrollRestorer() {
     const prevPathname = useRef(pathname);
     const isPopRef = useRef(false);
     const pathnameRef = useRef(pathname);
-    pathnameRef.current = pathname;
+
+    useEffect(() => {
+        pathnameRef.current = pathname;
+    }, [pathname]);
 
     // 스크롤 할 때마다 현재 위치 저장 (debounce)
     useEffect(() => {

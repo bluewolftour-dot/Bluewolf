@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { BluewolfScrollArea } from "@/components/ui/BluewolfScrollArea";
 
 export type SelectOption = {
     value: string | number;
@@ -9,7 +10,7 @@ export type SelectOption = {
 
 type DropdownProps = {
     value: string | number;
-    options: SelectOption[];
+    options: readonly SelectOption[];
     onChange: (value: string) => void;
     className?: string;
     isDark?: boolean;
@@ -58,11 +59,11 @@ export function Dropdown({
             }`
         }`;
 
-    const menuClass = `absolute left-0 right-0 top-[calc(100%+10px)] z-30 overflow-hidden rounded-2xl border p-2 shadow-[0_18px_40px_rgba(15,23,42,0.10)] ${isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"
+    const menuClass = `absolute left-0 right-0 top-[calc(100%+10px)] z-[80] overflow-hidden rounded-2xl border shadow-[0_18px_40px_rgba(15,23,42,0.10)] ${isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"
         }`;
 
     return (
-        <div ref={ref} className={`relative ${className}`}>
+        <div ref={ref} className={`relative ${open ? "z-[90]" : "z-10"} ${className}`}>
             <button type="button" onClick={() => setOpen((v) => !v)} className={triggerClass}>
                 {selected.label}
                 <span className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2">
@@ -79,28 +80,30 @@ export function Dropdown({
 
             {open && (
                 <div className={`${menuClass} apple-pop-in`}>
-                    {options.map((option) => {
-                        const active = String(option.value) === String(value);
+                    <BluewolfScrollArea className="max-h-[296px] p-2 pr-7">
+                        {options.map((option) => {
+                            const active = String(option.value) === String(value);
 
-                        return (
-                            <button
-                                key={String(option.value)}
-                                type="button"
-                                onClick={() => {
-                                    onChange(String(option.value));
-                                    setOpen(false);
-                                }}
-                                className={`flex w-full rounded-xl px-4 py-3 text-left text-[16px] font-semibold transition-colors duration-150 ${active
-                                        ? "bg-blue-600 text-white"
-                                        : isDark
-                                            ? "text-slate-200 hover:bg-slate-800"
-                                            : "text-slate-700 hover:bg-slate-100"
-                                    }`}
-                            >
-                                {option.label}
-                            </button>
-                        );
-                    })}
+                            return (
+                                <button
+                                    key={String(option.value)}
+                                    type="button"
+                                    onClick={() => {
+                                        onChange(String(option.value));
+                                        setOpen(false);
+                                    }}
+                                    className={`flex w-full rounded-xl px-4 py-3 text-left text-[16px] font-semibold transition-colors duration-150 ${active
+                                            ? "bg-blue-600 text-white"
+                                            : isDark
+                                                ? "text-slate-200 hover:bg-slate-800"
+                                                : "text-slate-700 hover:bg-slate-100"
+                                        }`}
+                                >
+                                    {option.label}
+                                </button>
+                            );
+                        })}
+                    </BluewolfScrollArea>
                 </div>
             )}
         </div>

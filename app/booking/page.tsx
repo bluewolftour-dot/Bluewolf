@@ -1,33 +1,23 @@
-"use client";
+﻿"use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { tours } from "@/lib/bluewolf-data";
+import { useSearchParams } from "next/navigation";
+import { withLocaleQuery } from "@/lib/locale-routing";
 import { formatPrice } from "@/lib/bluewolf-utils";
+import { type Locale } from "@/lib/bluewolf-data";
+import { type CrmBookingRecord } from "@/lib/cms-crm-db";
 import { PageShell, usePage } from "@/components/layout/PageShell";
 import { Dropdown } from "@/components/ui/Dropdown";
 
-/* ─── Mock booking data (demo) ─────────────────────────── */
-const DEMO_BOOKING = {
-    bookingNo: "BW-2025-0042",
-    tour: tours[0],
-    departDate: "2025-08-15",
-    guests: 2,
-    name: "홍길동",
-    phone: "010-1234-5678",
-    createdAt: "2025-03-20",
-    status: "confirmed" as "confirmed" | "pending" | "cancelled",
-};
-
-/* ─── Static multilingual data ─────────────────────────── */
-const text = {
+const copy = {
     ko: {
         badge: "예약 관리",
         title: "예약 확인 · 취소",
         desc: "예약 번호와 예약자 이름을 입력하면 예약 내역을 확인하고 취소를 신청할 수 있습니다.",
         bookingNo: "예약 번호",
-        bookingNoPlaceholder: "예: BW-2025-0042",
+        bookingNoPlaceholder: "예: BW-20260413-6137",
         nameLabel: "예약자 이름",
         namePlaceholder: "홍길동",
         searchBtn: "조회하기",
@@ -45,6 +35,8 @@ const text = {
         createdLabel: "예약 접수일",
         statusConfirmed: "예약 확정",
         statusPending: "승인 대기",
+        statusPaid: "결제 완료",
+        statusCompleted: "여행 완료",
         statusCancelled: "취소 완료",
         cancelBtn: "취소 신청",
         detailBtn: "상품 상세보기",
@@ -59,85 +51,82 @@ const text = {
             ["출발 7일 미만", "환불 불가"],
         ] as [string, string][],
         cancelReasonLabel: "취소 사유",
-        cancelReasons: [
-            "개인 사정",
-            "일정 변경",
-            "건강 문제",
-            "여행지 변경",
-            "비용 문제",
-            "기타",
-        ],
+        cancelReasons: ["개인 사정", "일정 변경", "건강 문제", "여행지 변경", "비용 문제", "기타"],
         cancelMemoLabel: "추가 메모 (선택)",
         cancelMemoPlaceholder: "취소와 관련한 추가 내용을 적어주세요.",
         submitBtn: "취소 신청 완료",
         backBtn: "돌아가기",
         doneTitle: "취소 신청이 접수되었습니다",
-        doneDesc: "영업일 기준 1~2일 내에 확인 후 환불 안내를 드립니다.\n취소 신청 내역은 이메일 또는 문자로 발송됩니다.",
+        doneDesc: "영업일 기준 1~2일 이내에 확인 후 환불 안내를 드립니다.\n취소 신청 내역은 이메일 또는 문자로 발송됩니다.",
         doneBack: "처음으로 돌아가기",
-        guests: (n: number) => `${n}명`,
-        person: "인",
+        loginRequiredCancel: "예약 취소는 로그인한 회원 본인 예약에서만 요청할 수 있습니다.",
+        guests: (count: number) => `${count}명`,
+        fallbackTitle: "맞춤 여행 플랜",
     },
     ja: {
         badge: "予約管理",
-        title: "予約確認・取消",
+        title: "予約確認・キャンセル",
         desc: "予約番号と予約者名を入力すると、予約内容の確認とキャンセル申請ができます。",
         bookingNo: "予約番号",
-        bookingNoPlaceholder: "例: BW-2025-0042",
+        bookingNoPlaceholder: "例: BW-20260413-6137",
         nameLabel: "予約者名",
-        namePlaceholder: "山田太郎",
+        namePlaceholder: "山田 太郎",
         searchBtn: "照会する",
         notFoundTitle: "予約が見つかりません",
-        notFoundDesc: "予約番号とお名前を再度ご確認ください。",
+        notFoundDesc: "予約番号とお名前をもう一度確認してください。",
         bookingInfo: "予約情報",
         bookingNoLabel: "予約番号",
-        tourLabel: "ツアー",
+        tourLabel: "旅行商品",
         departLabel: "出発日",
         guestsLabel: "人数",
         statusLabel: "予約状態",
-        totalLabel: "旅行合計金額",
-        depositLabel: "支払済予約金",
+        totalLabel: "旅行総額",
+        depositLabel: "支払い済み予約金",
         remainLabel: "残金",
         createdLabel: "予約受付日",
         statusConfirmed: "予約確定",
         statusPending: "承認待ち",
-        statusCancelled: "キャンセル済",
+        statusPaid: "決済完了",
+        statusCompleted: "旅行完了",
+        statusCancelled: "キャンセル完了",
         cancelBtn: "キャンセル申請",
         detailBtn: "商品詳細を見る",
-        cancelTitle: "予約キャンセル申請",
+        cancelTitle: "キャンセル申請",
         policyTitle: "返金規定",
         policyHeaders: ["キャンセル時点", "返金額"],
         policyRows: [
-            ["出発30日以上前", "全額返金"],
-            ["出発20〜29日前", "予約金を除き返金"],
-            ["出発10〜19日前", "旅行料金の50%返金"],
-            ["出発7〜9日前", "旅行料金の30%返金"],
+            ["出発30日前以上", "全額返金"],
+            ["出発20〜29日前", "予約金を除いて返金"],
+            ["出発10〜19日前", "旅行代金の50%返金"],
+            ["出発7〜9日前", "旅行代金の30%返金"],
             ["出発7日未満", "返金不可"],
         ] as [string, string][],
         cancelReasonLabel: "キャンセル理由",
-        cancelReasons: ["個人都合", "日程変更", "健康上の問題", "目的地変更", "費用の問題", "その他"],
-        cancelMemoLabel: "追記事項（任意）",
-        cancelMemoPlaceholder: "キャンセルに関する追加情報をご記入ください。",
-        submitBtn: "キャンセル申請を完了",
+        cancelReasons: ["個人都合", "日程変更", "健康上の理由", "目的地変更", "費用の問題", "その他"],
+        cancelMemoLabel: "追加メモ（任意）",
+        cancelMemoPlaceholder: "キャンセルに関する追加内容をご記入ください。",
+        submitBtn: "キャンセル申請を送信",
         backBtn: "戻る",
         doneTitle: "キャンセル申請を受け付けました",
-        doneDesc: "営業日1〜2日以内に確認の上、返金案内をお送りします。\nキャンセル内容はメールまたはSMSで送信されます。",
+        doneDesc: "1〜2営業日以内に確認し、返金案内をお送りします。\n申請内容はメールまたはSMSで送信されます。",
         doneBack: "最初に戻る",
-        guests: (n: number) => `${n}名`,
-        person: "名",
+        loginRequiredCancel: "キャンセルはログイン済み会員本人の予約からのみ申請できます。",
+        guests: (count: number) => `${count}名`,
+        fallbackTitle: "カスタム旅行プラン",
     },
     en: {
         badge: "Booking Management",
         title: "Booking Lookup & Cancellation",
-        desc: "Enter your booking number and name to view your booking details or request a cancellation.",
-        bookingNo: "Booking Number",
-        bookingNoPlaceholder: "e.g. BW-2025-0042",
-        nameLabel: "Lead Traveler Name",
+        desc: "Enter your booking number and lead traveler name to view your booking or request cancellation.",
+        bookingNo: "Booking number",
+        bookingNoPlaceholder: "e.g. BW-20260413-6137",
+        nameLabel: "Lead traveler name",
         namePlaceholder: "John Doe",
         searchBtn: "Look up",
         notFoundTitle: "No booking found",
-        notFoundDesc: "Please check your booking number and name and try again.",
-        bookingInfo: "Booking Details",
-        bookingNoLabel: "Booking No.",
+        notFoundDesc: "Please check your booking number and name, then try again.",
+        bookingInfo: "Booking details",
+        bookingNoLabel: "Booking number",
         tourLabel: "Tour",
         departLabel: "Departure",
         guestsLabel: "Guests",
@@ -148,332 +137,329 @@ const text = {
         createdLabel: "Booked on",
         statusConfirmed: "Confirmed",
         statusPending: "Pending",
+        statusPaid: "Paid",
+        statusCompleted: "Completed",
         statusCancelled: "Cancelled",
         cancelBtn: "Request cancellation",
         detailBtn: "View tour details",
-        cancelTitle: "Cancellation Request",
-        policyTitle: "Refund Policy",
+        cancelTitle: "Cancellation request",
+        policyTitle: "Refund policy",
         policyHeaders: ["Cancellation timing", "Refund amount"],
         policyRows: [
             ["30+ days before departure", "Full refund"],
-            ["20–29 days before", "Refund minus deposit"],
-            ["10–19 days before", "50% refund"],
-            ["7–9 days before", "30% refund"],
+            ["20-29 days before", "Refund minus deposit"],
+            ["10-19 days before", "50% refund"],
+            ["7-9 days before", "30% refund"],
             ["Under 7 days", "No refund"],
         ] as [string, string][],
         cancelReasonLabel: "Reason for cancellation",
         cancelReasons: ["Personal reasons", "Schedule change", "Health issue", "Change of destination", "Budget concerns", "Other"],
         cancelMemoLabel: "Additional notes (optional)",
-        cancelMemoPlaceholder: "Please share any additional details about your cancellation.",
+        cancelMemoPlaceholder: "Share any additional details about your cancellation.",
         submitBtn: "Submit cancellation",
         backBtn: "Go back",
         doneTitle: "Cancellation request received",
-        doneDesc: "We will process your request within 1–2 business days and send a refund confirmation.\nDetails will be sent via email or SMS.",
+        doneDesc: "We will review it within 1-2 business days and send refund guidance.\nDetails will be sent by email or SMS.",
         doneBack: "Back to start",
-        guests: (n: number) => `${n} guests`,
-        person: "person",
+        loginRequiredCancel: "Please log in and cancel from your own member booking list.",
+        guests: (count: number) => `${count} guests`,
+        fallbackTitle: "Custom travel plan",
     },
-};
+} satisfies Record<Locale, Record<string, unknown>>;
 
-/* ─── State types ───────────────────────────────────────── */
 type SearchState = "idle" | "found" | "not-found" | "cancel-form" | "cancel-done";
 
-/* ─── Shared style helpers ──────────────────────────────── */
-const card = (isDark: boolean) =>
-    `rounded-[24px] border p-5 sm:rounded-[28px] sm:p-7 transition-colors duration-300 ${
-        isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"
-    }`;
+type BookingCopy = typeof copy.ko;
 
-
-const inputClass = (isDark: boolean) =>
-    `h-12 sm:h-14 w-full rounded-2xl border px-4 sm:px-5 text-[15px] sm:text-[16px] font-semibold outline-none transition-[border-color,box-shadow,background-color] duration-700 ease-in-out focus:border-blue-400 focus:ring-4 ${
-        isDark
-            ? "border-white/10 bg-slate-950 text-slate-100 focus:ring-blue-900/30 focus:bg-slate-900 placeholder:text-slate-500"
-            : "border-slate-200 bg-slate-50 text-slate-900 focus:ring-blue-50 focus:bg-white placeholder:text-slate-400"
-    }`;
-
-const labelClass = (isDark: boolean) =>
-    `text-sm font-extrabold ${isDark ? "text-slate-100" : "text-slate-800"}`;
-
-const mutedClass = (isDark: boolean) =>
-    `text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`;
-
-const primaryBtn =
-    "group relative overflow-hidden rounded-2xl bg-blue-600 px-6 py-3 sm:py-3.5 font-bold text-white shadow-[0_10px_24px_rgba(37,99,235,0.22)] transition-[transform,background-color,box-shadow] duration-700 ease-in-out hover:-translate-y-[3px] hover:bg-blue-500 hover:shadow-[0_14px_28px_rgba(37,99,235,0.32)] active:scale-[0.99] active:translate-y-0";
-
-const ghostBtn = (isDark: boolean) =>
-    `group relative overflow-hidden rounded-2xl border px-6 py-3 sm:py-3.5 font-bold transition-[transform,background-color,border-color] duration-700 ease-in-out hover:-translate-y-[3px] active:scale-[0.97] active:translate-y-0 ${
-        isDark
-            ? "border-white/10 bg-slate-800 text-slate-100 hover:bg-slate-700"
-            : "border-slate-200 bg-white text-slate-800 hover:bg-slate-50"
-    }`;
-
-const dangerBtn =
-    "group relative overflow-hidden rounded-2xl border border-red-200 bg-red-50 px-6 py-3 sm:py-3.5 font-bold text-red-600 transition-[transform,background-color] duration-700 ease-in-out hover:-translate-y-[3px] hover:bg-red-100 active:scale-[0.97] active:translate-y-0";
-
-const shineSpan =
-    "pointer-events-none absolute inset-y-0 left-[-30%] w-[40%] -skew-x-12 bg-gradient-to-r from-transparent via-white/35 to-transparent opacity-0 transition-[left,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:left-[120%] group-hover:opacity-100";
-
-/* ─── Status badge ──────────────────────────────────────── */
-function StatusBadge({ status, tx }: { status: string; tx: (typeof text)["ko"] }) {
-    const map = {
-        confirmed: { label: tx.statusConfirmed, cls: "bg-emerald-100 text-emerald-700 border-emerald-200" },
-        pending: { label: tx.statusPending, cls: "bg-amber-100 text-amber-700 border-amber-200" },
-        cancelled: { label: tx.statusCancelled, cls: "bg-red-100 text-red-600 border-red-200" },
+function getStatusLabel(status: string, text: BookingCopy) {
+    const labels: Record<string, string> = {
+        confirmed: text.statusConfirmed,
+        pending: text.statusPending,
+        paid: text.statusPaid,
+        completed: text.statusCompleted,
+        cancelled: text.statusCancelled,
     };
-    const item = map[status as keyof typeof map] ?? map.pending;
+    return labels[status] ?? status;
+}
+
+function getStatusClass(status: string) {
+    if (status === "cancelled") return "border-red-200 bg-red-100 text-red-600";
+    if (status === "paid" || status === "completed") return "border-emerald-200 bg-emerald-100 text-emerald-700";
+    if (status === "confirmed") return "border-blue-200 bg-blue-100 text-blue-700";
+    return "border-amber-200 bg-amber-100 text-amber-700";
+}
+
+function StatusBadge({ status, text }: { status: string; text: BookingCopy }) {
     return (
-        <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-black ${item.cls}`}>
-            {item.label}
+        <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-black ${getStatusClass(status)}`}>
+            {getStatusLabel(status, text)}
         </span>
     );
 }
 
-/* ─── Main content ──────────────────────────────────────── */
+const cardClass = (isDark: boolean) =>
+    `rounded-[24px] border p-5 transition-colors duration-300 sm:rounded-[28px] sm:p-7 ${
+        isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"
+    }`;
+
+const inputClass = (isDark: boolean) =>
+    `h-12 w-full rounded-2xl border px-4 text-[15px] font-semibold outline-none transition sm:h-14 sm:px-5 sm:text-[16px] ${
+        isDark
+            ? "border-white/10 bg-slate-950 text-slate-100 placeholder:text-slate-500 focus:border-blue-400"
+            : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-blue-300"
+    }`;
+
+const labelClass = (isDark: boolean) => `text-sm font-extrabold ${isDark ? "text-slate-100" : "text-slate-800"}`;
+const mutedClass = (isDark: boolean) => `text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`;
+const primaryButtonClass = "rounded-2xl bg-blue-600 px-6 py-3 font-bold text-white transition hover:bg-blue-500 sm:py-3.5";
+const dangerButtonClass = "rounded-2xl border border-red-200 bg-red-50 px-6 py-3 font-bold text-red-600 transition hover:bg-red-100 sm:py-3.5";
+const ghostButtonClass = (isDark: boolean) =>
+    `rounded-2xl border px-6 py-3 font-bold transition sm:py-3.5 ${
+        isDark ? "border-white/10 bg-slate-800 text-slate-100 hover:bg-slate-700" : "border-slate-200 bg-white text-slate-800 hover:bg-slate-50"
+    }`;
+
+function getBookingTitle(booking: CrmBookingRecord | null, locale: Locale, text: BookingCopy) {
+    if (!booking) return text.fallbackTitle;
+    return booking.tour?.title[locale] || booking.customTitle || text.fallbackTitle;
+}
+
 function BookingLookupContent() {
     const { lang, isDark } = usePage();
-    const tx = text[lang];
-
-    const [bookingNo, setBookingNo] = useState("");
-    const [name, setName] = useState("");
+    const searchParams = useSearchParams();
+    const text = copy[lang];
+    const initialBookingNo = searchParams.get("bookingNo")?.trim() ?? "";
+    const initialName = searchParams.get("name")?.trim() ?? "";
+    const [bookingNo, setBookingNo] = useState(initialBookingNo);
+    const [name, setName] = useState(initialName);
     const [state, setState] = useState<SearchState>("idle");
+    const [booking, setBooking] = useState<CrmBookingRecord | null>(null);
     const [cancelReason, setCancelReason] = useState("");
     const [cancelMemo, setCancelMemo] = useState("");
 
-    const booking = DEMO_BOOKING;
-    const tour = booking.tour;
-    const totalPrice = tour.price * booking.guests;
-    const depositPrice = tour.deposit * booking.guests;
-    const remain = totalPrice - depositPrice;
+    const title = getBookingTitle(booking, lang, text);
+    const totalPrice = booking?.totalAmount ?? 0;
+    const depositPrice = booking?.depositAmount ?? 0;
+    const remain = Math.max(0, totalPrice - depositPrice);
 
-    function handleSearch(e: React.SyntheticEvent) {
-        e.preventDefault();
-        if (!bookingNo.trim() || !name.trim()) return;
-        // Demo: any input shows the mock booking
+    async function lookupBooking(targetBookingNo: string, targetName: string) {
+        const response = await fetch(
+            `/api/crm/bookings/search?bookingNo=${encodeURIComponent(targetBookingNo)}&name=${encodeURIComponent(targetName)}`,
+            { cache: "no-store" }
+        );
+
+        if (!response.ok) {
+            setBooking(null);
+            setState("not-found");
+            return;
+        }
+
+        const data = (await response.json()) as { booking: CrmBookingRecord };
+        setBooking(data.booking);
         setState("found");
+    }
+
+    const autoLookupRef = useRef("");
+    useEffect(() => {
+        if (!initialBookingNo || !initialName) return;
+
+        const key = `${initialBookingNo}|${initialName}`;
+        if (autoLookupRef.current === key) return;
+        autoLookupRef.current = key;
+
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        void lookupBooking(initialBookingNo, initialName);
+    }, [initialBookingNo, initialName]);
+
+    async function handleSearch(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        if (!bookingNo.trim() || !name.trim()) return;
+        await lookupBooking(bookingNo.trim(), name.trim());
     }
 
     function handleReset() {
         setBookingNo("");
         setName("");
+        setBooking(null);
         setCancelReason("");
         setCancelMemo("");
         setState("idle");
     }
 
-    function handleCancelSubmit(e: React.SyntheticEvent) {
-        e.preventDefault();
-        setState("cancel-done");
+    async function handleCancelSubmit(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        if (!booking) return;
+
+        const response = await fetch("/api/crm/bookings/mine/cancel", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                bookingNo: booking.bookingNo,
+                cancelReason,
+                cancelMemo,
+            }),
+        });
+
+        if (response.status === 401) {
+            window.alert(text.loginRequiredCancel);
+            return;
+        }
+
+        if (response.ok) {
+            const data = (await response.json()) as { booking: CrmBookingRecord };
+            setBooking(data.booking);
+            setState("cancel-done");
+            return;
+        }
+
+        setState("not-found");
     }
 
     return (
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-5 sm:gap-6">
-            {/* ── Page heading ── */}
             <div>
                 <span className="inline-flex items-center rounded-full bg-blue-600/10 px-3 py-1 text-xs font-black text-blue-600">
-                    {tx.badge}
+                    {text.badge}
                 </span>
-                <h1
-                    className={`mt-3 text-3xl font-black tracking-tight sm:text-4xl ${
-                        isDark ? "text-white" : "text-slate-900"
-                    }`}
-                >
-                    {tx.title}
+                <h1 className={`mt-3 text-3xl font-black tracking-tight sm:text-4xl ${isDark ? "text-white" : "text-slate-900"}`}>
+                    {text.title}
                 </h1>
-                <p className={`mt-2 text-sm leading-7 sm:text-base ${mutedClass(isDark)}`}>{tx.desc}</p>
+                <p className={`mt-2 text-sm leading-7 sm:text-base ${mutedClass(isDark)}`}>{text.desc}</p>
             </div>
 
-            {/* ── Lookup form ── */}
-            <div className={card(isDark)}>
+            <section className={cardClass(isDark)}>
                 <form onSubmit={handleSearch} className="grid gap-4">
                     <div className="grid gap-4 sm:grid-cols-2">
                         <label className="grid gap-2">
-                            <span className={labelClass(isDark)}>{tx.bookingNo}</span>
+                            <span className={labelClass(isDark)}>{text.bookingNo}</span>
                             <input
                                 value={bookingNo}
-                                onChange={(e) => setBookingNo(e.target.value)}
-                                placeholder={tx.bookingNoPlaceholder}
+                                onChange={(event) => setBookingNo(event.target.value)}
+                                placeholder={text.bookingNoPlaceholder}
                                 className={inputClass(isDark)}
                             />
                         </label>
                         <label className="grid gap-2">
-                            <span className={labelClass(isDark)}>{tx.nameLabel}</span>
+                            <span className={labelClass(isDark)}>{text.nameLabel}</span>
                             <input
                                 value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                placeholder={tx.namePlaceholder}
+                                onChange={(event) => setName(event.target.value)}
+                                placeholder={text.namePlaceholder}
                                 className={inputClass(isDark)}
                             />
                         </label>
                     </div>
-                    <button type="submit" className={`${primaryBtn} w-full`}>
-                        <span className={shineSpan} />
-                        <span className="relative z-10">{tx.searchBtn}</span>
+                    <button type="submit" className={`${primaryButtonClass} w-full`}>
+                        {text.searchBtn}
                     </button>
                 </form>
-            </div>
+            </section>
 
-            {/* ── Not found ── */}
-            {state === "not-found" && (
-                <div
-                    className={`flex flex-col items-center gap-3 rounded-[24px] border py-10 text-center ${
-                        isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"
-                    }`}
-                    style={{ animation: "apple-pop-in 300ms cubic-bezier(0.22,1,0.36,1) both" }}
-                >
-                    <span className="text-4xl">🔍</span>
-                    <p className={`text-base font-black ${isDark ? "text-white" : "text-slate-900"}`}>
-                        {tx.notFoundTitle}
-                    </p>
-                    <p className={mutedClass(isDark)}>{tx.notFoundDesc}</p>
-                </div>
-            )}
+            {state === "not-found" ? (
+                <section className={`${cardClass(isDark)} text-center`}>
+                    <p className={`text-base font-black ${isDark ? "text-white" : "text-slate-900"}`}>{text.notFoundTitle}</p>
+                    <p className={`mt-2 ${mutedClass(isDark)}`}>{text.notFoundDesc}</p>
+                </section>
+            ) : null}
 
-            {/* ── Booking result ── */}
-            {(state === "found" || state === "cancel-form") && (
-                <div
-                    className={card(isDark)}
-                    style={{ animation: "apple-pop-in 320ms cubic-bezier(0.22,1,0.36,1) both" }}
-                >
-                    {/* Tour image */}
-                    <div className="relative mb-5 overflow-hidden rounded-[20px]" style={{ aspectRatio: "16/7" }}>
-                        <Image
-                            src={tour.heroImage}
-                            alt={tour.title[lang]}
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, 672px"
-                        />
+            {booking && (state === "found" || state === "cancel-form") ? (
+                <section className={cardClass(isDark)}>
+                    <div className="relative mb-5 overflow-hidden rounded-[20px]" style={{ aspectRatio: "16 / 7" }}>
+                        {booking.tour ? (
+                            <Image
+                                src={booking.tour.heroImage}
+                                alt={title}
+                                fill
+                                className="object-cover"
+                                sizes="(max-width: 768px) 100vw, 672px"
+                            />
+                        ) : (
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-700 via-blue-600 to-sky-500" />
+                        )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
-                        <div className="absolute bottom-3 left-3 flex flex-wrap gap-2">
-                            {tour.tags[lang].slice(0, 3).map((tag) => (
-                                <span
-                                    key={tag}
-                                    className="rounded-full border border-white/25 bg-white/14 px-2.5 py-1 text-xs font-extrabold text-white backdrop-blur-sm"
-                                >
-                                    {tag}
-                                </span>
-                            ))}
-                        </div>
                         <div className="absolute right-3 top-3">
-                            <StatusBadge status={booking.status} tx={tx} />
+                            <StatusBadge status={booking.status} text={text} />
                         </div>
                     </div>
 
-                    {/* Section heading */}
-                    <h2
-                        className={`text-lg font-black tracking-tight sm:text-xl ${
-                            isDark ? "text-white" : "text-slate-900"
-                        }`}
-                    >
-                        {tx.bookingInfo}
+                    <h2 className={`text-lg font-black tracking-tight sm:text-xl ${isDark ? "text-white" : "text-slate-900"}`}>
+                        {text.bookingInfo}
                     </h2>
-
-                    {/* Info rows */}
                     <div className={`mt-4 divide-y rounded-[20px] border ${isDark ? "divide-white/5 border-white/10 bg-slate-950" : "divide-slate-100 border-slate-200 bg-slate-50"}`}>
                         {[
-                            [tx.bookingNoLabel, booking.bookingNo],
-                            [tx.tourLabel, tour.title[lang]],
-                            [tx.departLabel, booking.departDate],
-                            [tx.guestsLabel, tx.guests(booking.guests)],
-                            [tx.createdLabel, booking.createdAt],
+                            [text.bookingNoLabel, booking.bookingNo],
+                            [text.tourLabel, title],
+                            [text.departLabel, booking.departDate || "-"],
+                            [text.guestsLabel, text.guests(booking.guests)],
+                            [text.statusLabel, getStatusLabel(booking.status, text)],
+                            [text.createdLabel, booking.createdAt],
                         ].map(([label, value]) => (
                             <div key={label} className="flex items-center justify-between gap-3 px-4 py-3 sm:px-5">
                                 <span className={`text-sm font-semibold ${mutedClass(isDark)}`}>{label}</span>
-                                <span className={`text-sm font-black text-right ${isDark ? "text-slate-100" : "text-slate-900"}`}>
-                                    {value}
-                                </span>
+                                <span className={`text-right text-sm font-black ${isDark ? "text-slate-100" : "text-slate-900"}`}>{value}</span>
                             </div>
                         ))}
                     </div>
 
-                    {/* Price breakdown */}
                     <div className={`mt-4 rounded-[20px] border p-4 sm:p-5 ${isDark ? "border-white/10 bg-slate-950" : "border-slate-200 bg-slate-50"}`}>
-                        {[
-                            { label: tx.totalLabel, value: formatPrice(totalPrice), bold: false },
-                            { label: tx.depositLabel, value: formatPrice(depositPrice), bold: false },
-                        ].map(({ label, value }) => (
-                            <div key={label} className={`flex items-center justify-between py-2 text-sm font-bold ${isDark ? "text-slate-300" : "text-slate-600"}`}>
-                                <span>{label}</span>
-                                <span>{value}</span>
-                            </div>
-                        ))}
-                        <div
-                            className={`mt-2 flex items-center justify-between border-t pt-3 text-base font-black ${
-                                isDark ? "border-white/10 text-white" : "border-slate-300 text-slate-900"
-                            }`}
-                        >
-                            <span>{tx.remainLabel}</span>
+                        <div className={`flex items-center justify-between py-2 text-sm font-bold ${isDark ? "text-slate-300" : "text-slate-600"}`}>
+                            <span>{text.totalLabel}</span>
+                            <span>{formatPrice(totalPrice)}</span>
+                        </div>
+                        <div className={`flex items-center justify-between py-2 text-sm font-bold ${isDark ? "text-slate-300" : "text-slate-600"}`}>
+                            <span>{text.depositLabel}</span>
+                            <span>{formatPrice(depositPrice)}</span>
+                        </div>
+                        <div className={`mt-2 flex items-center justify-between border-t pt-3 text-base font-black ${isDark ? "border-white/10 text-white" : "border-slate-300 text-slate-900"}`}>
+                            <span>{text.remainLabel}</span>
                             <span className="text-blue-600">{formatPrice(remain)}</span>
                         </div>
                     </div>
 
-                    {/* Action buttons */}
-                    {state === "found" && booking.status !== "cancelled" && (
+                    {state === "found" && booking.status !== "cancelled" ? (
                         <div className="mt-5 flex flex-wrap gap-3">
                             <button
-                                onClick={() => { setCancelReason(tx.cancelReasons[0]); setState("cancel-form"); }}
-                                className={dangerBtn}
+                                type="button"
+                                onClick={() => {
+                                    setCancelReason(text.cancelReasons[0]);
+                                    setState("cancel-form");
+                                }}
+                                className={dangerButtonClass}
                             >
-                                <span className={shineSpan} />
-                                <span className="relative z-10">{tx.cancelBtn}</span>
+                                {text.cancelBtn}
                             </button>
-                            <Link href={`/tours/${tour.id}`} className={ghostBtn(isDark)}>
-                                <span className="relative z-10">{tx.detailBtn}</span>
-                            </Link>
+                            {booking.tour ? (
+                                <Link href={withLocaleQuery(`/tours/${booking.tour.id}`, lang)} className={ghostButtonClass(isDark)}>
+                                    {text.detailBtn}
+                                </Link>
+                            ) : null}
                         </div>
-                    )}
-                </div>
-            )}
+                    ) : null}
+                </section>
+            ) : null}
 
-            {/* ── Cancellation form ── */}
-            {state === "cancel-form" && (
-                <div
-                    className={card(isDark)}
-                    style={{ animation: "apple-pop-in 300ms cubic-bezier(0.22,1,0.36,1) both" }}
-                >
+            {booking && state === "cancel-form" ? (
+                <section className={cardClass(isDark)}>
                     <h2 className={`text-lg font-black tracking-tight sm:text-xl ${isDark ? "text-white" : "text-slate-900"}`}>
-                        {tx.cancelTitle}
+                        {text.cancelTitle}
                     </h2>
-
-                    {/* Refund policy table */}
                     <div className="mt-4">
-                        <p className={`mb-3 text-sm font-extrabold ${isDark ? "text-slate-200" : "text-slate-700"}`}>
-                            {tx.policyTitle}
-                        </p>
+                        <p className={`mb-3 text-sm font-extrabold ${isDark ? "text-slate-200" : "text-slate-700"}`}>{text.policyTitle}</p>
                         <div className={`overflow-hidden rounded-[18px] border ${isDark ? "border-white/10" : "border-slate-200"}`}>
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className={isDark ? "bg-slate-800" : "bg-slate-100"}>
-                                        {tx.policyHeaders.map((h) => (
-                                            <th
-                                                key={h}
-                                                className={`px-4 py-2.5 text-left font-black ${
-                                                    isDark ? "text-slate-200" : "text-slate-700"
-                                                }`}
-                                            >
-                                                {h}
+                                        {text.policyHeaders.map((heading) => (
+                                            <th key={heading} className={`px-4 py-2.5 text-left font-black ${isDark ? "text-slate-200" : "text-slate-700"}`}>
+                                                {heading}
                                             </th>
                                         ))}
                                     </tr>
                                 </thead>
                                 <tbody className={`divide-y ${isDark ? "divide-white/5" : "divide-slate-100"}`}>
-                                    {tx.policyRows.map(([timing, refund], i) => (
-                                        <tr key={i} className={isDark ? "bg-slate-950" : "bg-white"}>
-                                            <td className={`px-4 py-3 font-semibold ${isDark ? "text-slate-300" : "text-slate-600"}`}>
-                                                {timing}
-                                            </td>
-                                            <td
-                                                className={`px-4 py-3 font-black ${
-                                                    refund.includes("불가") || refund.includes("No refund") || refund.includes("返金不可")
-                                                        ? "text-red-500"
-                                                        : refund.includes("전액") || refund.includes("Full") || refund.includes("全額")
-                                                        ? "text-emerald-600"
-                                                        : isDark ? "text-slate-200" : "text-slate-800"
-                                                }`}
-                                            >
-                                                {refund}
-                                            </td>
+                                    {text.policyRows.map(([timing, refund]) => (
+                                        <tr key={timing} className={isDark ? "bg-slate-950" : "bg-white"}>
+                                            <td className={`px-4 py-3 font-semibold ${isDark ? "text-slate-300" : "text-slate-600"}`}>{timing}</td>
+                                            <td className="px-4 py-3 font-black">{refund}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -481,77 +467,51 @@ function BookingLookupContent() {
                         </div>
                     </div>
 
-                    {/* Cancellation form */}
                     <form onSubmit={handleCancelSubmit} className="mt-5 grid gap-4">
                         <div className="grid gap-2">
-                            <span className={labelClass(isDark)}>{tx.cancelReasonLabel}</span>
+                            <span className={labelClass(isDark)}>{text.cancelReasonLabel}</span>
                             <Dropdown
-                                value={cancelReason || tx.cancelReasons[0]}
-                                options={tx.cancelReasons.map((r) => ({ value: r, label: r }))}
-                                onChange={(v) => setCancelReason(v)}
+                                value={cancelReason || text.cancelReasons[0]}
+                                options={text.cancelReasons.map((reason) => ({ value: reason, label: reason }))}
+                                onChange={setCancelReason}
                                 isDark={isDark}
                             />
                         </div>
-
                         <label className="grid gap-2">
-                            <span className={labelClass(isDark)}>{tx.cancelMemoLabel}</span>
+                            <span className={labelClass(isDark)}>{text.cancelMemoLabel}</span>
                             <textarea
                                 value={cancelMemo}
-                                onChange={(e) => setCancelMemo(e.target.value)}
-                                placeholder={tx.cancelMemoPlaceholder}
+                                onChange={(event) => setCancelMemo(event.target.value)}
+                                placeholder={text.cancelMemoPlaceholder}
                                 rows={3}
-                                className={`w-full rounded-2xl border px-4 py-3 text-[15px] font-semibold outline-none transition-[border-color,box-shadow,background-color] duration-700 ease-in-out focus:border-blue-400 focus:ring-4 resize-none ${
+                                className={`w-full resize-none rounded-2xl border px-4 py-3 text-[15px] font-semibold outline-none transition ${
                                     isDark
-                                        ? "border-white/10 bg-slate-950 text-slate-100 focus:ring-blue-900/30 focus:bg-slate-900 placeholder:text-slate-500"
-                                        : "border-slate-200 bg-slate-50 text-slate-900 focus:ring-blue-50 focus:bg-white placeholder:text-slate-400"
+                                        ? "border-white/10 bg-slate-950 text-slate-100 placeholder:text-slate-500 focus:border-blue-400"
+                                        : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-blue-300"
                                 }`}
                             />
                         </label>
-
                         <div className="flex flex-wrap gap-3">
-                            <button type="submit" className={`${primaryBtn} !bg-red-600 !shadow-[0_10px_24px_rgba(220,38,38,0.22)] hover:!bg-red-500 hover:!shadow-[0_14px_28px_rgba(220,38,38,0.32)]`}>
-                                <span className={shineSpan} />
-                                <span className="relative z-10">{tx.submitBtn}</span>
+                            <button type="submit" className="rounded-2xl bg-red-600 px-6 py-3 font-bold text-white transition hover:bg-red-500 sm:py-3.5">
+                                {text.submitBtn}
                             </button>
-                            <button
-                                type="button"
-                                onClick={() => setState("found")}
-                                className={ghostBtn(isDark)}
-                            >
-                                <span className="relative z-10">{tx.backBtn}</span>
+                            <button type="button" onClick={() => setState("found")} className={ghostButtonClass(isDark)}>
+                                {text.backBtn}
                             </button>
                         </div>
                     </form>
-                </div>
-            )}
+                </section>
+            ) : null}
 
-            {/* ── Cancellation complete ── */}
-            {state === "cancel-done" && (
-                <div
-                    className={`flex flex-col items-center gap-4 rounded-[24px] border py-12 text-center ${
-                        isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"
-                    }`}
-                    style={{ animation: "apple-pop-in 320ms cubic-bezier(0.22,1,0.36,1) both" }}
-                >
-                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-                        <svg className="h-8 w-8 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                    </div>
-                    <div>
-                        <p className={`text-xl font-black ${isDark ? "text-white" : "text-slate-900"}`}>
-                            {tx.doneTitle}
-                        </p>
-                        <p className={`mt-2 max-w-sm text-sm leading-7 whitespace-pre-line ${mutedClass(isDark)}`}>
-                            {tx.doneDesc}
-                        </p>
-                    </div>
-                    <button onClick={handleReset} className={primaryBtn}>
-                        <span className={shineSpan} />
-                        <span className="relative z-10">{tx.doneBack}</span>
+            {state === "cancel-done" ? (
+                <section className={`${cardClass(isDark)} text-center`}>
+                    <p className={`text-xl font-black ${isDark ? "text-white" : "text-slate-900"}`}>{text.doneTitle}</p>
+                    <p className={`mt-2 whitespace-pre-line text-sm leading-7 ${mutedClass(isDark)}`}>{text.doneDesc}</p>
+                    <button type="button" onClick={handleReset} className={`mt-5 ${primaryButtonClass}`}>
+                        {text.doneBack}
                     </button>
-                </div>
-            )}
+                </section>
+            ) : null}
         </div>
     );
 }

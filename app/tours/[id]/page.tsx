@@ -1,12 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { tours } from "@/lib/bluewolf-data";
+import { withLocaleQuery } from "@/lib/locale-routing";
+import { useCmsTour } from "@/lib/use-cms-tours";
+import { useCmsTourOptions } from "@/lib/use-cms-tour-options";
+import { useCmsTourThemes } from "@/lib/use-cms-tour-themes";
+import { type LocalizedTourOption } from "@/lib/cms-tour-options";
 import { formatPrice } from "@/lib/bluewolf-utils";
 import { PageShell, usePage } from "@/components/layout/PageShell";
+import { CheckIcon, XIcon } from "@/components/ui/SafeIcons";
+import { useBodyScrollLock } from "@/components/ui/useBodyScrollLock";
+import { type OptionKey } from "@/components/tours/tours-customize-data";
 
 type Tab = "intro" | "itinerary" | "includes" | "terms";
 
@@ -60,26 +68,229 @@ const tabLabels: Record<Tab, Record<string, string>> = {
     terms: { ko: "이용약관", ja: "利用規約", en: "Terms" },
 };
 
+function useAnimatedNumber(value: number, duration = 420) {
+    const [displayValue, setDisplayValue] = useState(value);
+    const previousValueRef = useRef(value);
+
+    useEffect(() => {
+        let frameId = 0;
+        const startValue = previousValueRef.current;
+        const startedAt = performance.now();
+
+        const tick = (now: number) => {
+            const progress = Math.min((now - startedAt) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            setDisplayValue(Math.round(startValue + (value - startValue) * eased));
+            if (progress < 1) frameId = window.requestAnimationFrame(tick);
+        };
+
+        previousValueRef.current = value;
+        frameId = window.requestAnimationFrame(tick);
+        return () => window.cancelAnimationFrame(frameId);
+    }, [duration, value]);
+
+    return displayValue;
+}
+
+function OptionInfoModal({
+    option,
+    isDark,
+    closeLabel,
+    optionUnitLabel,
+    galleryLabel,
+    showImages,
+    onClose,
+}: {
+    option: LocalizedTourOption;
+    isDark: boolean;
+    closeLabel: string;
+    optionUnitLabel: string;
+    galleryLabel: string;
+    showImages: boolean;
+    onClose: () => void;
+}) {
+    useBodyScrollLock(true);
+
+    useEffect(() => {
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") onClose();
+        };
+
+        window.addEventListener("keydown", onKeyDown);
+
+        return () => {
+            window.removeEventListener("keydown", onKeyDown);
+        };
+    }, [onClose]);
+
+    if (typeof document === "undefined") return null;
+
+    return createPortal(
+        <div className="fixed bottom-0 left-0 right-0 top-0 z-[90] flex h-dvh w-screen items-end justify-center bg-slate-950/55 backdrop-blur-md sm:items-center">
+            <button
+                type="button"
+                aria-label={closeLabel}
+                onClick={onClose}
+                className="absolute inset-0"
+            />
+            <div
+                className={`relative z-10 w-full max-w-xl rounded-t-[28px] border p-6 shadow-2xl sm:m-4 sm:rounded-[28px] ${
+                    isDark ? "border-white/10 bg-slate-900 text-slate-100" : "border-slate-200 bg-white text-slate-900"
+                }`}
+            >
+                <div className="flex items-start justify-between gap-4">
+                    <div>
+                        <span className="inline-flex rounded-full bg-blue-600 px-3 py-1.5 text-xs font-extrabold text-white">
+                            +{formatPrice(option.price)} / {optionUnitLabel}
+                        </span>
+                        <h3 className="mt-3 text-2xl font-black tracking-tight">{option.title}</h3>
+                        <p className={`mt-3 text-sm leading-7 ${isDark ? "text-slate-300" : "text-slate-600"}`}>{option.desc}</p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl leading-none transition ${
+                            isDark ? "bg-slate-800 text-slate-200 hover:bg-slate-700" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        }`}
+                    >
+                        ×
+                    </button>
+                </div>
+
+                {option.details.length > 0 && (
+                    <div className="mt-5 grid gap-3">
+                        {option.details.map((detail) => (
+                            <div
+                                key={detail}
+                                className={`rounded-[20px] border px-4 py-3 text-sm font-semibold ${
+                                    isDark ? "border-white/10 bg-slate-950 text-slate-200" : "border-slate-200 bg-slate-50 text-slate-700"
+                                }`}
+                            >
+                                {detail}
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {showImages && option.photos.length > 0 && (
+                    <div className={`mt-5 border-t pt-5 ${isDark ? "border-white/10" : "border-slate-200"}`}>
+                        <div className={`mb-3 text-xs font-bold ${isDark ? "text-slate-400" : "text-slate-500"}`}>{galleryLabel}</div>
+                        <div className={`grid gap-1.5 ${option.photos.length === 1 ? "grid-cols-1" : "grid-cols-3"}`}>
+                            {option.photos.slice(0, 3).map((src, index) => (
+                                <div key={`${option.key}-${index}`} className="relative aspect-square overflow-hidden rounded-[12px]">
+                                    <Image src={src} alt={`${option.title} ${index + 1}`} fill className="object-cover" sizes="(max-width: 640px) 30vw, 180px" />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>,
+        document.body
+    );
+}
+
+function OptionSelectionCard({
+    option,
+    active,
+    isDark,
+    optionUnitLabel,
+    infoLabel,
+    onToggle,
+    onOpenInfo,
+}: {
+    option: LocalizedTourOption;
+    active: boolean;
+    isDark: boolean;
+    optionUnitLabel: string;
+    infoLabel: string;
+    onToggle: () => void;
+    onOpenInfo: () => void;
+}) {
+    return (
+        <div
+            className={`overflow-hidden rounded-[16px] border transition-[background-color,border-color,box-shadow] duration-200 ${
+                active
+                    ? "border-blue-500 bg-blue-50 shadow-[0_8px_20px_rgba(37,99,235,0.12)]"
+                    : isDark
+                      ? "border-white/10 bg-slate-900 text-slate-100"
+                      : "border-slate-200 bg-white text-slate-900"
+            }`}
+        >
+            <button
+                type="button"
+                onClick={onToggle}
+                className={`flex w-full items-center justify-between gap-3 px-3 py-3 text-left transition-[background-color] duration-200 ${
+                    active ? "hover:bg-blue-100/70" : isDark ? "hover:bg-slate-800" : "hover:bg-slate-50"
+                }`}
+            >
+                <span className={`min-w-0 text-sm font-bold ${active ? "text-slate-900" : isDark ? "text-slate-100" : "text-slate-800"}`}>
+                    {option.title}
+                </span>
+                <span className="shrink-0 rounded-full bg-blue-600 px-2.5 py-1 text-xs font-extrabold text-white">
+                    +{formatPrice(option.price)} / {optionUnitLabel}
+                </span>
+            </button>
+            <div className="bg-transparent">
+                <div className="px-3">
+                    <div className={`h-px ${active ? "bg-blue-200/80" : isDark ? "bg-white/10" : "bg-slate-200"}`} />
+                </div>
+                <button
+                    type="button"
+                    onClick={onOpenInfo}
+                    className={`w-full px-3 py-2 text-xs font-bold transition ${
+                        active
+                            ? "text-blue-700 hover:bg-blue-100/70"
+                            : isDark
+                              ? "text-slate-300 hover:bg-slate-900"
+                              : "text-slate-600 hover:bg-slate-100"
+                    }`}
+                >
+                    {infoLabel}
+                </button>
+            </div>
+        </div>
+    );
+}
+
 function TourDetailContent() {
     const { lang, isDark, t } = usePage();
     const params = useParams();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<Tab>("intro");
     const [guests, setGuests] = useState(2);
+    const [selectedOptions, setSelectedOptions] = useState<OptionKey[]>([]);
+    const [detailOption, setDetailOption] = useState<LocalizedTourOption | null>(null);
+    const [showAllOptions, setShowAllOptions] = useState(false);
+    const [showMobileBookingSheet, setShowMobileBookingSheet] = useState(false);
 
     const tourId = Number(params.id);
-    const tour = tours.find((tr) => tr.id === tourId);
+    const { tour, loaded } = useCmsTour(tourId);
 
 
-    if (!tour) {
-        router.replace("/tours");
+    const { localizedOptions: optionChoices, loaded: optionsLoaded } = useCmsTourOptions(lang);
+    const { resolveThemeLabel } = useCmsTourThemes(lang);
+    const selectedOptionItems = selectedOptions
+        .map((key) => optionChoices.find((option) => option.key === key))
+        .filter((option): option is LocalizedTourOption => Boolean(option));
+    const optionTotalPerPerson = selectedOptionItems.reduce((sum, option) => sum + option.price, 0);
+    const optionTotal = optionTotalPerPerson * guests;
+    const totalPrice = (tour?.price ?? 0) * guests + optionTotal;
+    const perPersonTotalPrice = (tour?.price ?? 0) + optionTotalPerPerson;
+    const animatedTotalPrice = useAnimatedNumber(totalPrice);
+    const animatedPerPersonTotalPrice = useAnimatedNumber(perPersonTotalPrice);
+
+    if (!loaded) {
         return null;
     }
 
-    const totalPrice = tour.price * guests;
-    const depositPrice = tour.deposit * guests;
+    if (!tour) {
+        router.replace(withLocaleQuery("/tours", lang));
+        return null;
+    }
+
     const region = regionLabel[tour.region][lang];
-    const themeLabel = (t as unknown as Record<string, string>)[tour.theme];
+    const themeLabel = resolveThemeLabel(tour.theme);
 
     const panelBase = `rounded-[24px] border sm:rounded-[28px] ${
         isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"
@@ -90,18 +301,75 @@ function TourDetailContent() {
     const isNoRefund = (s: string) =>
         s.includes("불가") || s.includes("No refund") || s.includes("不可");
 
+    const optionSectionLabel =
+        lang === "ko" ? "추가 옵션" : lang === "ja" ? "追加オプション" : "Optional upgrades";
+    const moreOptionsLabel =
+        lang === "ko" ? "더보기" : lang === "ja" ? "もっと見る" : "Show more";
+    const lessOptionsLabel =
+        lang === "ko" ? "접기" : lang === "ja" ? "閉じる" : "Show less";
+    const estimatedTotalLabel =
+        lang === "ko" ? "예상 총액" : lang === "ja" ? "予想総額" : "Estimated total";
+    const perPersonPriceLabel =
+        lang === "ko" ? "1인 기준 가격" : lang === "ja" ? "1名あたり料金" : "Per-person price";
+    const perPersonDepositLabel =
+        lang === "ko" ? "1인당 예약금" : lang === "ja" ? "1名あたり予約金" : "Per-person deposit";
+    const grandTotalLabel =
+        lang === "ko" ? "1인당 총 합계" : lang === "ja" ? "1名あたり合計" : "Per-person total";
+    const optionUnitLabel =
+        lang === "ko" ? "1인당" : lang === "ja" ? "1名あたり" : "per person";
+    const mobileBookingOpenLabel =
+        lang === "ko" ? "자세히 보기" : lang === "ja" ? "詳しく見る" : "View details";
+    const mobileBookingCloseLabel =
+        lang === "ko" ? "접기" : lang === "ja" ? "閉じる" : "Collapse";
+    const optionInfoLabel =
+        lang === "ko" ? "옵션 정보" : lang === "ja" ? "オプション情報" : "Option info";
+    const optionGalleryLabel =
+        lang === "ko" ? "사진" : lang === "ja" ? "写真" : "Gallery";
+    const optionInfoCloseLabel =
+        lang === "ko" ? "닫기" : lang === "ja" ? "閉じる" : "Close";
+    const perPersonBasePrice = Math.max((tour?.price ?? 0) + optionTotalPerPerson - (tour?.deposit ?? 0), 0);
+
+    const toggleOption = (key: OptionKey) => {
+        setSelectedOptions((prev) => (prev.includes(key) ? prev.filter((item) => item !== key) : [...prev, key]));
+    };
+    const baseOptionChoices = optionChoices.slice(0, 2);
+    const extraOptionChoices = optionChoices.slice(2);
+
     return (
         <>
+            <button
+                type="button"
+                aria-label="Close booking sheet"
+                onClick={() => setShowMobileBookingSheet(false)}
+                className={`fixed inset-0 z-30 transition-opacity duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] sm:hidden ${
+                    showMobileBookingSheet ? "pointer-events-auto bg-slate-950/30 opacity-100" : "pointer-events-none bg-slate-950/0 opacity-0"
+                }`}
+            />
             {/* ── 히어로 ── */}
-            <div className="relative overflow-hidden rounded-[24px] sm:rounded-[28px]" style={{ height: "clamp(280px, 44vw, 480px)" }}>
-                <Image
-                    src={tour.heroImage}
-                    alt={tour.title[lang]}
-                    fill
-                    priority
-                    className="object-cover"
-                    sizes="100vw"
+            {detailOption ? (
+                <OptionInfoModal
+                    option={detailOption}
+                    isDark={isDark}
+                    closeLabel={optionInfoCloseLabel}
+                    optionUnitLabel={optionUnitLabel}
+                    galleryLabel={optionGalleryLabel}
+                    showImages={optionsLoaded}
+                    onClose={() => setDetailOption(null)}
                 />
+            ) : null}
+            <div className="relative overflow-hidden rounded-[24px] sm:rounded-[28px]" style={{ height: "clamp(280px, 44vw, 480px)" }}>
+                {loaded ? (
+                    <Image
+                        src={tour.heroImage}
+                        alt={tour.title[lang]}
+                        fill
+                        priority
+                        className="object-cover"
+                        sizes="100vw"
+                    />
+                ) : (
+                    <div className={`absolute inset-0 ${isDark ? "bg-slate-950" : "bg-slate-100"}`} />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
 
                 <div className="absolute inset-x-0 bottom-0 p-5 sm:p-7 lg:p-10">
@@ -136,7 +404,7 @@ function TourDetailContent() {
             </div>
 
             {/* ── 2컬럼 레이아웃 ── */}
-            <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:gap-6">
+            <div className="flex flex-col gap-5 pb-28 sm:pb-0 lg:flex-row lg:items-start lg:gap-6">
 
                 {/* ── 왼쪽 메인 콘텐츠 ── */}
                 <div className="min-w-0 flex-1">
@@ -208,14 +476,27 @@ function TourDetailContent() {
                                     </h3>
                                     <div className="grid grid-cols-3 gap-2 sm:gap-3">
                                         {tour.images.map((src, i) => (
-                                            <div key={i} className="relative overflow-hidden rounded-[16px]" style={{ aspectRatio: "4/3" }}>
-                                                <Image
-                                                    src={src}
-                                                    alt={`${tour.title[lang]} ${i + 1}`}
-                                                    fill
-                                                    className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.06]"
-                                                    sizes="(max-width: 768px) 33vw, (max-width: 1024px) 22vw, 15vw"
-                                                />
+                                            <div
+                                                key={i}
+                                                className={`group rounded-[18px] border p-1 transition-[background-color,border-color,box-shadow] duration-200 ${
+                                                    isDark
+                                                        ? "border-white/10 bg-slate-900 hover:bg-white/5 hover:shadow-[0_8px_20px_rgba(15,23,42,0.28)]"
+                                                        : "border-slate-200 bg-white hover:bg-slate-100 hover:shadow-[0_8px_20px_rgba(15,23,42,0.08)]"
+                                                }`}
+                                            >
+                                                <div className="relative overflow-hidden rounded-[14px]" style={{ aspectRatio: "4/3" }}>
+                                                    {loaded ? (
+                                                        <Image
+                                                            src={src}
+                                                            alt={`${tour.title[lang]} ${i + 1}`}
+                                                            fill
+                                                            className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
+                                                            sizes="(max-width: 768px) 33vw, (max-width: 1024px) 22vw, 15vw"
+                                                        />
+                                                    ) : (
+                                                        <div className={`absolute inset-0 ${isDark ? "bg-slate-950" : "bg-slate-100"}`} />
+                                                    )}
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
@@ -229,14 +510,21 @@ function TourDetailContent() {
                                         </h3>
                                         <div className="flex flex-col gap-3">
                                             {tour.detailImages.map((src, i) => (
-                                                <div key={i} className={`overflow-hidden rounded-[18px] border ${isDark ? "border-white/10" : "border-slate-200"}`}>
+                                                <div
+                                                    key={i}
+                                                    className={`overflow-hidden rounded-[20px] border p-1 ${
+                                                        isDark
+                                                            ? "border-white/10 bg-slate-900"
+                                                            : "border-slate-200 bg-white"
+                                                    }`}
+                                                >
                                                     <Image
                                                         src={src}
                                                         alt={`${tour.title[lang]} 상세 ${i + 1}`}
                                                         width={800}
                                                         height={0}
                                                         style={{ width: "100%", height: "auto" }}
-                                                        className="block"
+                                                        className="block rounded-[16px]"
                                                         sizes="(max-width: 768px) 100vw, (max-width: 1024px) 65vw, 50vw"
                                                     />
                                                 </div>
@@ -291,14 +579,20 @@ function TourDetailContent() {
                                                 </div>
 
                                                 {/* 카드 */}
-                                                <div className={`flex-1 overflow-hidden rounded-[20px] border ${isLast ? "mb-0" : "mb-1"} ${isDark ? "border-white/10 bg-slate-950" : "border-slate-200 bg-slate-50"}`}>
+                                                <div
+                                                    className={`group flex-1 overflow-hidden rounded-[20px] border transition-[background-color,border-color,box-shadow] duration-200 ${isLast ? "mb-0" : "mb-1"} ${
+                                                        isDark
+                                                            ? "border-white/10 bg-slate-950 hover:bg-white/5 hover:shadow-[0_10px_24px_rgba(15,23,42,0.24)]"
+                                                            : "border-slate-200 bg-slate-50 hover:bg-slate-100 hover:shadow-[0_10px_24px_rgba(15,23,42,0.08)]"
+                                                    }`}
+                                                >
                                                     {/* 이미지 */}
                                                     <div className="relative w-full overflow-hidden" style={{ aspectRatio: "16/7" }}>
                                                         <Image
                                                             src={dayImg}
                                                             alt={hl}
                                                             fill
-                                                            className="object-cover"
+                                                            className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
                                                             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 65vw, 50vw"
                                                         />
                                                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
@@ -334,7 +628,9 @@ function TourDetailContent() {
                                     {/* 포함 */}
                                     <div className={`rounded-[20px] border p-5 ${isDark ? "border-emerald-500/20 bg-emerald-500/5" : "border-emerald-200 bg-emerald-50"}`}>
                                         <div className="mb-4 flex items-center gap-2.5">
-                                            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-sm font-black text-white">✓</span>
+                                            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-white">
+                                                <CheckIcon className="h-4 w-4" />
+                                            </span>
                                             <h3 className={`font-black ${isDark ? "text-emerald-400" : "text-emerald-700"}`}>
                                                 {lang === "ko" ? "포함 사항" : lang === "ja" ? "含む" : "Included"}
                                             </h3>
@@ -352,7 +648,9 @@ function TourDetailContent() {
                                     {/* 불포함 */}
                                     <div className={`rounded-[20px] border p-5 ${isDark ? "border-red-500/20 bg-red-500/5" : "border-red-200 bg-red-50"}`}>
                                         <div className="mb-4 flex items-center gap-2.5">
-                                            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-red-500 text-sm font-black text-white">✕</span>
+                                            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-red-500 text-white">
+                                                <XIcon className="h-4 w-4" />
+                                            </span>
                                             <h3 className={`font-black ${isDark ? "text-red-400" : "text-red-700"}`}>
                                                 {lang === "ko" ? "불포함 사항" : lang === "ja" ? "含まない" : "Excluded"}
                                             </h3>
@@ -417,20 +715,45 @@ function TourDetailContent() {
                 </div>
 
                 {/* ── 오른쪽 사이드바 ── */}
-                <aside className="lg:w-[300px] xl:w-[340px] shrink-0">
-                    <div className="sticky top-24 flex flex-col gap-4">
+                <aside className="sticky top-4 h-fit shrink-0 self-start sm:top-5 lg:top-24 lg:w-[300px] xl:w-[340px]">
+                    <div className="flex flex-col gap-4 self-start">
 
                         {/* 가격 + 예약 카드 */}
-                        <div className={`rounded-[24px] border p-5 shadow-sm sm:p-6 ${isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"}`}>
+                        <div className={`hidden rounded-[24px] border p-6 shadow-sm sm:block ${isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"}`}>
 
                             {/* 가격 */}
-                            <div className="flex items-end justify-between gap-2">
+                            <button
+                                type="button"
+                                onClick={() => setShowMobileBookingSheet((prev) => !prev)}
+                                className="flex w-full items-end justify-between gap-3 text-left sm:hidden"
+                            >
                                 <div>
                                     <div className={`text-xs font-semibold ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-                                        {t.priceLabel}
+                                        {estimatedTotalLabel}
+                                    </div>
+                                    <div className={`mt-0.5 text-2xl font-black tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>
+                                        {formatPrice(animatedTotalPrice)}
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className={`rounded-full border px-3 py-1.5 text-xs font-bold ${
+                                        isDark ? "border-white/10 bg-slate-800 text-slate-300" : "border-slate-200 bg-slate-100 text-slate-600"
+                                    }`}>
+                                        {tour.duration[lang]}
+                                    </span>
+                                    <span className={`text-xs font-bold ${isDark ? "text-slate-300" : "text-slate-600"}`}>
+                                        {showMobileBookingSheet ? mobileBookingCloseLabel : mobileBookingOpenLabel}
+                                    </span>
+                                </div>
+                            </button>
+
+                            <div className="hidden items-end justify-between gap-2 sm:flex">
+                                <div>
+                                    <div className={`text-xs font-semibold ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                                        {estimatedTotalLabel}
                                     </div>
                                     <div className={`mt-0.5 text-3xl font-black tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>
-                                        {formatPrice(tour.price)}
+                                        {formatPrice(animatedTotalPrice)}
                                     </div>
                                 </div>
                                 <span className={`rounded-full border px-3 py-1.5 text-xs font-bold ${
@@ -441,6 +764,8 @@ function TourDetailContent() {
                             </div>
 
                             {/* 인원 선택 */}
+                            <div className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] sm:grid-rows-[1fr] sm:opacity-100 ${showMobileBookingSheet ? "mt-4 grid-rows-[1fr] opacity-100" : "mt-0 grid-rows-[0fr] opacity-0 sm:mt-4"}`}>
+                                <div className="overflow-hidden">
                             <div className={`mt-4 rounded-[18px] border p-4 ${isDark ? "border-white/10 bg-slate-950" : "border-slate-100 bg-slate-50"}`}>
                                 <div className={`mb-3 text-xs font-bold ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                                     {t.guestsLabel}
@@ -470,27 +795,88 @@ function TourDetailContent() {
 
                             {/* 금액 요약 */}
                             <div className={`mt-3 rounded-[18px] border p-4 ${isDark ? "border-white/10 bg-slate-950" : "border-slate-100 bg-slate-50"}`}>
-                                <div className="flex items-center justify-between">
-                                    <span className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>{t.totalPrice}</span>
-                                    <span className={`text-sm font-black ${isDark ? "text-white" : "text-slate-900"}`}>{formatPrice(totalPrice)}</span>
+                                <div className={`mb-3 text-xs font-bold ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                                    {optionSectionLabel}
                                 </div>
-                                <div className="mt-2 flex items-center justify-between border-t pt-2 ${isDark ? 'border-white/5' : 'border-slate-200'}">
-                                    <span className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>{t.deposit}</span>
-                                    <span className="text-sm font-black text-blue-500">{formatPrice(depositPrice)}</span>
+                                <div className="grid gap-2">
+                                    {baseOptionChoices.map((option) => {
+                                        const active = selectedOptions.includes(option.key);
+                                        return (
+                                            <OptionSelectionCard
+                                                key={option.key}
+                                                option={option}
+                                                active={active}
+                                                isDark={isDark}
+                                                optionUnitLabel={optionUnitLabel}
+                                                infoLabel={optionInfoLabel}
+                                                onToggle={() => toggleOption(option.key)}
+                                                onOpenInfo={() => setDetailOption(option)}
+                                            />
+                                        );
+                                    })}
+                                </div>
+                                {extraOptionChoices.length > 0 && (
+                                    <div className={`grid transition-[grid-template-rows,opacity,margin] duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] ${showAllOptions ? "mt-2 grid-rows-[1fr] opacity-100" : "mt-0 grid-rows-[0fr] opacity-0"}`}>
+                                        <div className="overflow-hidden">
+                                            <div className="grid gap-2">
+                                                {extraOptionChoices.map((option) => {
+                                                    const active = selectedOptions.includes(option.key);
+                                                    return (
+                                                        <OptionSelectionCard
+                                                            key={option.key}
+                                                            option={option}
+                                                            active={active}
+                                                            isDark={isDark}
+                                                            optionUnitLabel={optionUnitLabel}
+                                                            infoLabel={optionInfoLabel}
+                                                            onToggle={() => toggleOption(option.key)}
+                                                            onOpenInfo={() => setDetailOption(option)}
+                                                        />
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                                {extraOptionChoices.length > 0 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowAllOptions((prev) => !prev)}
+                                        className={`mt-2 w-full rounded-[14px] px-3 py-2 text-sm font-bold transition ${
+                                            isDark ? "bg-slate-900 text-slate-200 hover:bg-slate-800" : "bg-white text-slate-700 hover:bg-slate-100"
+                                        }`}
+                                    >
+                                        {showAllOptions ? lessOptionsLabel : moreOptionsLabel}
+                                    </button>
+                                )}
+                            </div>
+
+                            <div className={`mt-3 rounded-[18px] border p-4 ${isDark ? "border-white/10 bg-slate-950" : "border-slate-100 bg-slate-50"}`}>
+                                <div className="flex items-center justify-between">
+                                    <span className={`text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}>{perPersonPriceLabel}</span>
+                                    <span className={`text-xs font-black ${isDark ? "text-white" : "text-slate-900"}`}>{formatPrice(perPersonBasePrice)}</span>
+                                </div>
+                                <div className="mt-1 flex items-center justify-between pt-1">
+                                    <span className={`text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}>{perPersonDepositLabel}</span>
+                                    <span className="text-xs font-black text-blue-500">{formatPrice(tour.deposit)}</span>
+                                </div>
+                                <div className="mt-4 flex items-center justify-between border-t pt-4 ${isDark ? 'border-white/5' : 'border-slate-200'}">
+                                    <span className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>{grandTotalLabel}</span>
+                                    <span className={`text-sm font-black ${isDark ? "text-white" : "text-slate-900"}`}>{formatPrice(animatedPerPersonTotalPrice)}</span>
                                 </div>
                             </div>
 
                             {/* CTA 버튼 */}
                             <div className="mt-4 flex flex-col gap-2.5">
                                 <Link
-                                    href={`/booking?tour=${tour.id}&guests=${guests}`}
-                                    className="flex items-center justify-center rounded-[18px] bg-blue-600 px-5 py-4 text-base font-black text-white shadow-[0_10px_24px_rgba(37,99,235,0.28)] transition-[transform,background-color,box-shadow] duration-700 ease-in-out hover:-translate-y-[2px] hover:bg-blue-500 hover:shadow-[0_14px_30px_rgba(37,99,235,0.36)] active:scale-[0.97] active:translate-y-0"
+                                    href={withLocaleQuery(`/payment?tour=${tour.id}&guests=${guests}${selectedOptions.length > 0 ? `&options=${selectedOptions.join(",")}` : ""}`, lang)}
+                                    className="flex items-center justify-center rounded-[18px] bg-blue-600 px-5 py-4 text-base font-black text-white shadow-[0_10px_24px_rgba(37,99,235,0.28)] transition-[transform,background-color,box-shadow] duration-700 ease-in-out hover:bg-blue-500 hover:shadow-[0_14px_30px_rgba(37,99,235,0.36)] active:scale-[0.97] active:translate-y-0"
                                 >
                                     {t.reserve}
                                 </Link>
                                 <Link
-                                    href="/contact"
-                                    className={`flex items-center justify-center rounded-[18px] border px-5 py-3.5 text-sm font-bold transition-[transform,background-color] duration-700 ease-in-out hover:-translate-y-[2px] active:scale-[0.97] active:translate-y-0 ${
+                                    href={withLocaleQuery("/contact", lang)}
+                                    className={`flex items-center justify-center rounded-[18px] border px-5 py-3.5 text-sm font-bold transition-[transform,background-color] duration-700 ease-in-out active:scale-[0.97] active:translate-y-0 ${
                                         isDark
                                             ? "border-white/10 bg-slate-800 text-slate-100 hover:bg-slate-700"
                                             : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
@@ -499,10 +885,12 @@ function TourDetailContent() {
                                     {lang === "ko" ? "상담 문의" : lang === "ja" ? "お問い合わせ" : "Inquire"}
                                 </Link>
                             </div>
+                                </div>
+                            </div>
                         </div>
 
                         {/* 상품 정보 */}
-                        <div className={`rounded-[24px] border p-5 ${isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"}`}>
+                        <div className={`hidden rounded-[24px] border p-5 sm:block ${isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"}`}>
                             <h3 className={`mb-4 text-sm font-black ${isDark ? "text-white" : "text-slate-900"}`}>
                                 {lang === "ko" ? "상품 정보" : lang === "ja" ? "商品情報" : "Tour Info"}
                             </h3>
@@ -536,7 +924,7 @@ function TourDetailContent() {
                         {/* 다른 투어 보기 */}
                         <Link
                             href="/tours"
-                            className={`flex items-center justify-center gap-2 rounded-[20px] border px-5 py-4 text-sm font-bold transition-[background-color,transform] duration-700 ease-in-out hover:-translate-y-[2px] active:scale-[0.97] ${
+                            className={`hidden items-center justify-center gap-2 rounded-[20px] border px-5 py-4 text-sm font-bold transition-[background-color,transform] duration-700 ease-in-out active:scale-[0.97] sm:flex ${
                                 isDark ? "border-white/10 bg-slate-900 text-slate-300 hover:bg-slate-800" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
                             }`}
                         >
@@ -544,6 +932,174 @@ function TourDetailContent() {
                         </Link>
                     </div>
                 </aside>
+            </div>
+
+            <div className="sm:hidden">
+                <div className={`fixed inset-x-0 bottom-[30px] z-[60] mx-3 rounded-[24px] border px-4 pb-6 pt-4 shadow-[0_-14px_40px_rgba(15,23,42,0.16)] transition-[transform,box-shadow] duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] ${showMobileBookingSheet ? "translate-y-0 shadow-[0_-18px_48px_rgba(15,23,42,0.22)]" : "translate-y-0"} ${isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"}`}>
+                    <button
+                        type="button"
+                        onClick={() => setShowMobileBookingSheet((prev) => !prev)}
+                        className="relative flex w-full items-end justify-between gap-3 pt-4 text-left"
+                    >
+                        <span className={`pointer-events-none absolute left-1/2 top-0 inline-flex h-5 w-8 -translate-x-1/2 items-center justify-center opacity-50 transition-[transform,color] duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] ${
+                            isDark ? "text-slate-300" : "text-slate-500"
+                        } ${showMobileBookingSheet ? "rotate-0 scale-x-100 scale-y-100" : "rotate-180 scale-x-[1.16] scale-y-[0.88]"}`}>
+                            <svg
+                                viewBox="0 0 28 18"
+                                aria-hidden="true"
+                                className="h-4 w-7 overflow-visible"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M3 5.5L14 14.5L25 5.5"
+                                    stroke="currentColor"
+                                    strokeWidth="2.4"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className="transition-[d,stroke-width] duration-700 ease-[cubic-bezier(0.19,1,0.22,1)]"
+                                />
+                            </svg>
+                        </span>
+                        <div>
+                            <div className={`text-xs font-semibold ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                                {estimatedTotalLabel}
+                            </div>
+                            <div className={`mt-0.5 text-2xl font-black tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>
+                                {formatPrice(animatedTotalPrice)}
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className={`rounded-full border px-3 py-1.5 text-xs font-bold ${
+                                isDark ? "border-white/10 bg-slate-800 text-slate-300" : "border-slate-200 bg-slate-100 text-slate-600"
+                            }`}>
+                                {tour.duration[lang]}
+                            </span>
+                        </div>
+                    </button>
+
+                    <div className={`grid transition-[grid-template-rows,opacity,margin] duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] ${showMobileBookingSheet ? "mt-4 grid-rows-[1fr] opacity-100" : "mt-0 grid-rows-[0fr] opacity-0"}`}>
+                        <div className="overflow-hidden">
+                            <div className={`mt-4 rounded-[18px] border p-4 ${isDark ? "border-white/10 bg-slate-950" : "border-slate-100 bg-slate-50"}`}>
+                                <div className={`mb-3 text-xs font-bold ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                                    {t.guestsLabel}
+                                </div>
+                                <div className="flex items-center justify-between gap-3">
+                                    <button
+                                        onClick={() => setGuests(Math.max(1, guests - 1))}
+                                        className={`flex h-9 w-9 items-center justify-center rounded-full border text-lg font-black transition-[background-color,transform] duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.92] ${
+                                            isDark ? "border-white/10 bg-slate-800 text-white hover:bg-slate-700" : "border-slate-200 bg-white text-slate-900 hover:bg-slate-100"
+                                        }`}
+                                    >
+                                        -
+                                    </button>
+                                    <span className={`text-xl font-black ${isDark ? "text-white" : "text-slate-900"}`}>
+                                        {guests}{lang === "ko" ? "명" : lang === "ja" ? "名" : " pax"}
+                                    </span>
+                                    <button
+                                        onClick={() => setGuests(Math.min(20, guests + 1))}
+                                        className={`flex h-9 w-9 items-center justify-center rounded-full border text-lg font-black transition-[background-color,transform] duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.92] ${
+                                            isDark ? "border-white/10 bg-slate-800 text-white hover:bg-slate-700" : "border-slate-200 bg-white text-slate-900 hover:bg-slate-100"
+                                        }`}
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className={`mt-3 rounded-[18px] border p-4 ${isDark ? "border-white/10 bg-slate-950" : "border-slate-100 bg-slate-50"}`}>
+                                <div className={`mb-3 text-xs font-bold ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                                    {optionSectionLabel}
+                                </div>
+                                <div className="grid gap-2">
+                                    {baseOptionChoices.map((option) => {
+                                        const active = selectedOptions.includes(option.key);
+                                        return (
+                                            <OptionSelectionCard
+                                                key={option.key}
+                                                option={option}
+                                                active={active}
+                                                isDark={isDark}
+                                                optionUnitLabel={optionUnitLabel}
+                                                infoLabel={optionInfoLabel}
+                                                onToggle={() => toggleOption(option.key)}
+                                                onOpenInfo={() => setDetailOption(option)}
+                                            />
+                                        );
+                                    })}
+                                </div>
+                                {extraOptionChoices.length > 0 && (
+                                    <div className={`grid transition-[grid-template-rows,opacity,margin] duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] ${showAllOptions ? "mt-2 grid-rows-[1fr] opacity-100" : "mt-0 grid-rows-[0fr] opacity-0"}`}>
+                                        <div className="overflow-hidden">
+                                            <div className="grid gap-2">
+                                                {extraOptionChoices.map((option) => {
+                                                    const active = selectedOptions.includes(option.key);
+                                                    return (
+                                                        <OptionSelectionCard
+                                                            key={option.key}
+                                                            option={option}
+                                                            active={active}
+                                                            isDark={isDark}
+                                                            optionUnitLabel={optionUnitLabel}
+                                                            infoLabel={optionInfoLabel}
+                                                            onToggle={() => toggleOption(option.key)}
+                                                            onOpenInfo={() => setDetailOption(option)}
+                                                        />
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                                {extraOptionChoices.length > 0 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowAllOptions((prev) => !prev)}
+                                        className={`mt-2 w-full rounded-[14px] px-3 py-2 text-sm font-bold transition ${
+                                            isDark ? "bg-slate-900 text-slate-200 hover:bg-slate-800" : "bg-white text-slate-700 hover:bg-slate-100"
+                                        }`}
+                                    >
+                                        {showAllOptions ? lessOptionsLabel : moreOptionsLabel}
+                                    </button>
+                                )}
+                            </div>
+
+                            <div className={`mt-3 rounded-[18px] border p-4 ${isDark ? "border-white/10 bg-slate-950" : "border-slate-100 bg-slate-50"}`}>
+                                <div className="flex items-center justify-between">
+                                    <span className={`text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}>{perPersonPriceLabel}</span>
+                                    <span className={`text-xs font-black ${isDark ? "text-white" : "text-slate-900"}`}>{formatPrice(perPersonBasePrice)}</span>
+                                </div>
+                                <div className="mt-1 flex items-center justify-between pt-1">
+                                    <span className={`text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}>{perPersonDepositLabel}</span>
+                                    <span className="text-xs font-black text-blue-500">{formatPrice(tour.deposit)}</span>
+                                </div>
+                                <div className="mt-4 flex items-center justify-between border-t pt-4 ${isDark ? 'border-white/5' : 'border-slate-200'}">
+                                    <span className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>{grandTotalLabel}</span>
+                                    <span className={`text-sm font-black ${isDark ? "text-white" : "text-slate-900"}`}>{formatPrice(animatedPerPersonTotalPrice)}</span>
+                                </div>
+                            </div>
+
+                            <div className="mt-4 flex flex-col gap-2.5">
+                                <Link
+                                    href={withLocaleQuery(`/payment?tour=${tour.id}&guests=${guests}${selectedOptions.length > 0 ? `&options=${selectedOptions.join(",")}` : ""}`, lang)}
+                                    className="flex items-center justify-center rounded-[18px] bg-blue-600 px-5 py-4 text-base font-black text-white shadow-[0_10px_24px_rgba(37,99,235,0.28)] transition-[transform,background-color,box-shadow] duration-700 ease-in-out hover:bg-blue-500 hover:shadow-[0_14px_30px_rgba(37,99,235,0.36)] active:scale-[0.97] active:translate-y-0"
+                                >
+                                    {t.reserve}
+                                </Link>
+                                <Link
+                                    href={withLocaleQuery("/contact", lang)}
+                                    className={`flex items-center justify-center rounded-[18px] border px-5 py-3.5 text-sm font-bold transition-[transform,background-color] duration-700 ease-in-out active:scale-[0.97] active:translate-y-0 ${
+                                        isDark
+                                            ? "border-white/10 bg-slate-800 text-slate-100 hover:bg-slate-700"
+                                            : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                                    }`}
+                                >
+                                    {lang === "ko" ? "상담 문의" : lang === "ja" ? "お問い合わせ" : "Inquire"}
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </>
     );

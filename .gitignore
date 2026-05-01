@@ -39,3 +39,20 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local runtime data (auth users, sessions, sqlite DB, email verifications)
+/data/
+
+# user uploads served from public/
+/public/uploads/
+
+# next dev server logs
+.next-dev.log
+.next-dev.err
+
+# claude code workspace
+.claude/
+
+# secrets / api key notes (do not commit raw keys)
+open*api*key*
+*.api-key.txt

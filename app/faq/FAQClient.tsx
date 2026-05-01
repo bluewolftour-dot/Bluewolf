@@ -98,14 +98,14 @@ function FAQContent() {
                 <div className="mt-6 flex flex-wrap gap-3">
                     <Link
                         href="/booking"
-                        className="rounded-2xl bg-white px-5 py-4 font-bold text-slate-900 transition-[transform,background-color] duration-700 ease-in-out hover:-translate-y-[3px] hover:bg-slate-100 active:scale-[0.97] active:translate-y-0"
+                        className="rounded-2xl bg-white px-5 py-4 font-bold text-slate-900 transition-[transform,background-color] duration-700 ease-in-out hover:bg-slate-100 active:scale-[0.97] active:translate-y-0"
                     >
                         예약 상담 시작
                     </Link>
 
                     <Link
                         href="/contact"
-                        className="rounded-2xl bg-white/10 px-5 py-4 font-bold text-white transition-[transform,background-color] duration-700 ease-in-out hover:-translate-y-[3px] hover:bg-white/20 active:scale-[0.97] active:translate-y-0"
+                        className="rounded-2xl bg-white/10 px-5 py-4 font-bold text-white transition-[transform,background-color] duration-700 ease-in-out hover:bg-white/20 active:scale-[0.97] active:translate-y-0"
                     >
                         문의 페이지
                     </Link>

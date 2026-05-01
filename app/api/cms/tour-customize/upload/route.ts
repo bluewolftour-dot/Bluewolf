@@ -1,0 +1,72 @@
+import { mkdir, readdir, unlink, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { NextResponse } from "next/server";
+import { requireAdminResponse } from "@/lib/admin-auth";
+
+export const runtime = "nodejs";
+
+const uploadDir = path.join(process.cwd(), "public", "uploads", "cms", "tour-customize");
+const allowedSlotPattern =
+    /^tour-customize-(south|north|central|west)-[a-z0-9-]+$/;
+
+function normalizeExtension(filename: string, mimeType: string) {
+    const lowerName = filename.toLowerCase();
+    if (lowerName.endsWith(".png") || mimeType === "image/png") return ".png";
+    if (
+        lowerName.endsWith(".jpg") ||
+        lowerName.endsWith(".jpeg") ||
+        mimeType === "image/jpeg"
+    ) {
+        return ".jpg";
+    }
+    if (lowerName.endsWith(".webp") || mimeType === "image/webp") {
+        return ".webp";
+    }
+    return null;
+}
+
+export async function POST(request: Request) {
+    const forbidden = await requireAdminResponse();
+    if (forbidden) return forbidden;
+
+    const formData = await request.formData();
+    const file = formData.get("file");
+    const slot = formData.get("slot");
+
+    if (!(file instanceof File) || typeof slot !== "string") {
+        return NextResponse.json({ error: "INVALID_UPLOAD" }, { status: 400 });
+    }
+
+    if (!allowedSlotPattern.test(slot)) {
+        return NextResponse.json({ error: "INVALID_SLOT" }, { status: 400 });
+    }
+
+    const extension = normalizeExtension(file.name, file.type);
+    if (!extension) {
+        return NextResponse.json({ error: "UNSUPPORTED_FILE_TYPE" }, { status: 400 });
+    }
+
+    await mkdir(uploadDir, { recursive: true });
+
+    const currentFiles = await readdir(uploadDir);
+    await Promise.all(
+        currentFiles
+            .filter(
+                (name) =>
+                    name === `${slot}.jpg` ||
+                    name === `${slot}.png` ||
+                    name === `${slot}.webp` ||
+                    name.startsWith(`${slot}-`)
+            )
+            .map((name) => unlink(path.join(uploadDir, name)).catch(() => undefined))
+    );
+
+    const fileName = `${slot}-${Date.now()}${extension}`;
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    await writeFile(path.join(uploadDir, fileName), buffer);
+
+    return NextResponse.json({
+        path: `/uploads/cms/tour-customize/${fileName}`,
+    });
+}

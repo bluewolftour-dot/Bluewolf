@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import { copy, type Locale } from "@/lib/bluewolf-data";
+import { buildAccountMenuItems } from "@/lib/account-menu";
+import { authCopy } from "@/lib/auth-copy";
 import { buildHeaderNav } from "@/lib/header-nav";
+import { withLocaleQuery } from "@/lib/locale-routing";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
@@ -41,14 +44,16 @@ export function AboutPageTemplate({
     const { isDark } = useTheme();
 
     const headerCopy = copy[locale];
+    const authText = authCopy[locale];
     const navItems = buildHeaderNav({
         locale,
         t: headerCopy,
     });
+    const accountMenuItems = buildAccountMenuItems(locale);
 
     return (
         <div
-            className={`min-h-screen [font-family:var(--font-noto-sans-cjk),sans-serif] transition-colors duration-300 ${
+            className={`flex min-h-screen flex-col [font-family:var(--font-noto-sans-cjk),sans-serif] transition-colors duration-300 ${
                 isDark ? "bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-900"
             }`}
         >
@@ -57,11 +62,14 @@ export function AboutPageTemplate({
                 navItems={navItems}
                 activeKey="about"
                 loginLabel={t.login}
+                loginHref={withLocaleQuery("/login", locale)}
+                logoutLabel={authText.logout}
+                accountMenuItems={accountMenuItems}
                 isDark={isDark}
                 rightSlot={<LanguageSwitcher currentLocale={locale} isDark={isDark} mode="link" />}
             />
 
-            <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10">
+            <main className="animate-site-page-enter mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-10">
                 <section
                     className={`rounded-[32px] border p-8 shadow-sm transition-colors duration-300 lg:p-10 ${
                         isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"
@@ -159,13 +167,13 @@ export function AboutPageTemplate({
 
                     <div className="mt-6 flex flex-wrap gap-3">
                         <Link
-                            href="/tours"
+                            href={withLocaleQuery("/tours", locale)}
                             className="rounded-2xl bg-white px-5 py-4 font-bold text-slate-900 transition hover:bg-slate-100"
                         >
                             {t.ctaPrimary}
                         </Link>
                         <Link
-                            href="/"
+                            href={withLocaleQuery("/", locale)}
                             className="rounded-2xl bg-white/10 px-5 py-4 font-bold text-white transition hover:bg-white/20"
                         >
                             {t.ctaSecondary}
@@ -179,6 +187,7 @@ export function AboutPageTemplate({
                 description={t.footerDesc}
                 copyright={t.footerCopyright}
                 isDark={isDark}
+                locale={locale}
             />
         </div>
     );

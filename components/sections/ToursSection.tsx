@@ -3,7 +3,9 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Dropdown } from "@/components/ui/Dropdown";
+import { SearchIcon } from "@/components/ui/SafeIcons";
 import { copy, type Locale, type Tour } from "@/lib/bluewolf-data";
+import { getPrimaryTourBadgeTags, getSecondaryTourTags } from "@/lib/tour-tags";
 import { formatPrice } from "@/lib/bluewolf-utils";
 
 type CopyValue = (typeof copy)[Locale];
@@ -29,6 +31,9 @@ export function ToursSection({
     resetFilters,
     setSelectedTourId,
     isDark,
+    showImages,
+    themeOptions,
+    resolveThemeLabel,
 }: {
     t: CopyValue;
     lang: Locale;
@@ -46,6 +51,9 @@ export function ToursSection({
     resetFilters: () => void;
     setSelectedTourId: (id: number) => void;
     isDark: boolean;
+    showImages: boolean;
+    themeOptions: Array<{ value: string; label: string }>;
+    resolveThemeLabel: (themeKey: string) => string;
 }) {
     const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
@@ -115,10 +123,7 @@ export function ToursSection({
                     onChange={setTheme}
                     options={[
                         { value: "all", label: t.allTheme },
-                        { value: "desert", label: t.desert },
-                        { value: "family", label: t.family },
-                        { value: "premium", label: t.premium },
-                        { value: "adventure", label: t.adventure },
+                        ...themeOptions,
                     ]}
                     isDark={isDark}
                 />
@@ -179,7 +184,10 @@ export function ToursSection({
             <aside className={`hidden lg:block lg:w-[260px] xl:w-[280px] shrink-0`}>
                 <div className={`sticky top-24 ${panelBase} p-5`}>
                     <h3 className={`mb-5 text-base font-black ${isDark ? "text-white" : "text-slate-900"}`}>
-                        🔍 필터
+                        <span className="inline-flex items-center gap-2">
+                            <SearchIcon className="h-4 w-4" />
+                            필터
+                        </span>
                     </h3>
                     {filterPanel}
                 </div>
@@ -220,7 +228,9 @@ export function ToursSection({
                         <div className={`mt-5 rounded-[22px] border p-8 text-center ${
                             isDark ? "border-white/10 bg-slate-950" : "border-slate-200 bg-slate-50"
                         }`}>
-                            <div className="text-3xl">🔍</div>
+                            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white">
+                                <SearchIcon className="h-5 w-5" />
+                            </div>
                             <h3 className={`mt-3 text-lg font-black ${isDark ? "text-white" : "text-slate-900"}`}>
                                 {t.noResults}
                             </h3>
@@ -236,29 +246,46 @@ export function ToursSection({
                         </div>
                     ) : (
                         <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                            {filteredTours.map((tour) => (
-                                <article
-                                    key={tour.id}
-                                    className="relative h-[200px] cursor-pointer overflow-hidden rounded-[22px] shadow-sm transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:shadow-xl active:scale-[0.98] sm:h-[240px]"
-                                    onClick={() => setSelectedTourId(tour.id)}
-                                >
+                            {filteredTours.map((tour) => {
+                                const topTags = getPrimaryTourBadgeTags(tour, lang, [
+                                    resolveThemeLabel(tour.theme),
+                                    tour.duration[lang],
+                                ]);
+                                const secondaryTags = getSecondaryTourTags(tour, lang).slice(0, 2);
+
+                                return (
+                                    <article
+                                        key={tour.id}
+                                        className="group relative h-[200px] cursor-pointer overflow-hidden rounded-[22px] shadow-sm transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:shadow-xl active:scale-[0.98] sm:h-[240px]"
+                                        onClick={() => setSelectedTourId(tour.id)}
+                                    >
                                     {/* 배경 이미지 */}
-                                    <Image
-                                        src={tour.heroImage}
-                                        alt={tour.title[lang]}
-                                        fill
-                                        className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.06]"
-                                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                                    />
+                                    {showImages ? (
+                                        <Image
+                                            src={tour.heroImage}
+                                            alt={tour.title[lang]}
+                                            fill
+                                            className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                                        />
+                                    ) : (
+                                        <div className={`absolute inset-0 ${isDark ? "bg-slate-950" : "bg-slate-100"}`} />
+                                    )}
 
                                     {/* 상단 배지 */}
-                                    <div className="absolute left-3 top-3 flex items-center gap-2 sm:left-4 sm:top-4">
-                                        <span className="rounded-full bg-blue-600/85 px-2.5 py-1 text-xs font-extrabold text-white backdrop-blur-sm">
-                                            {(t as unknown as Record<string, string>)[tour.theme]}
-                                        </span>
-                                        <span className="rounded-full border border-white/25 bg-black/30 px-2.5 py-1 text-xs font-extrabold text-white backdrop-blur-sm">
-                                            {tour.duration[lang]}
-                                        </span>
+                                    <div className="absolute left-3 top-3 flex flex-wrap items-center gap-2 sm:left-4 sm:top-4">
+                                        {topTags.map((tag, index) => (
+                                            <span
+                                                key={`${tour.id}-top-tag-${tag}`}
+                                                className={`rounded-full px-2.5 py-1 text-xs font-extrabold text-white backdrop-blur-sm ${
+                                                    index === 0
+                                                        ? "bg-blue-600/85"
+                                                        : "border border-white/25 bg-black/30"
+                                                }`}
+                                            >
+                                                {tag}
+                                            </span>
+                                        ))}
                                     </div>
 
                                     {/* 하단 그라데이션 + 텍스트 */}
@@ -271,7 +298,7 @@ export function ToursSection({
                                         </p>
                                         <div className="mt-2.5 flex items-end justify-between gap-2">
                                             <div className="flex flex-wrap gap-1">
-                                                {tour.tags[lang].slice(0, 2).map((tag) => (
+                                                {secondaryTags.map((tag) => (
                                                     <span
                                                         key={tag}
                                                         className="rounded-full border border-white/20 bg-white/10 px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm sm:text-xs"
@@ -285,8 +312,9 @@ export function ToursSection({
                                             </span>
                                         </div>
                                     </div>
-                                </article>
-                            ))}
+                                    </article>
+                                );
+                            })}
                         </div>
                     )}
                 </div>

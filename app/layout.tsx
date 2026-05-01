@@ -1,6 +1,18 @@
-import "./globals.css";
+﻿import "./globals.css";
 import localFont from "next/font/local";
+import Script from "next/script";
+import { AuthProvider } from "@/components/auth/AuthProvider";
+import { CmsBootstrapProvider, type CmsBootstrapPayload } from "@/components/cms/CmsBootstrapProvider";
 import { ScrollRestorer } from "@/components/layout/ScrollRestorer";
+import {
+    getAllCmsTours,
+    getCmsCommunityContent,
+    getCmsHomeContent,
+    getCmsTourCustomizeContent,
+    getCmsTourOptionsContent,
+    getCmsTourRegionCardsContent,
+    getCmsTourThemesContent,
+} from "@/lib/cms-crm-db";
 
 const notoSansCJK = localFont({
     src: [
@@ -30,17 +42,79 @@ const themeInitScript = `
 })();
 `;
 
+function buildCmsBootstrapPayload(): CmsBootstrapPayload {
+    return {
+        homeContent: (() => {
+            try {
+                return getCmsHomeContent();
+            } catch {
+                return null;
+            }
+        })(),
+        communityContent: (() => {
+            try {
+                return getCmsCommunityContent();
+            } catch {
+                return null;
+            }
+        })(),
+        tours: (() => {
+            try {
+                return getAllCmsTours();
+            } catch {
+                return null;
+            }
+        })(),
+        tourRegionCardsContent: (() => {
+            try {
+                return getCmsTourRegionCardsContent();
+            } catch {
+                return null;
+            }
+        })(),
+        tourOptionsContent: (() => {
+            try {
+                return getCmsTourOptionsContent();
+            } catch {
+                return null;
+            }
+        })(),
+        tourCustomizeContent: (() => {
+            try {
+                return getCmsTourCustomizeContent();
+            } catch {
+                return null;
+            }
+        })(),
+        tourThemesContent: (() => {
+            try {
+                return getCmsTourThemesContent();
+            } catch {
+                return null;
+            }
+        })(),
+    };
+}
+
 export default function RootLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
+    const cmsBootstrapPayload = buildCmsBootstrapPayload();
+
     return (
         <html lang="ko" suppressHydrationWarning>
             <body className={notoSansCJK.variable}>
-                <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
-                <ScrollRestorer />
-                {children}
+                <Script id="theme-init" strategy="beforeInteractive">
+                    {themeInitScript}
+                </Script>
+                <AuthProvider>
+                    <CmsBootstrapProvider initialData={cmsBootstrapPayload}>
+                        <ScrollRestorer />
+                        {children}
+                    </CmsBootstrapProvider>
+                </AuthProvider>
             </body>
         </html>
     );

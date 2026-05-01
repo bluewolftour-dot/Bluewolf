@@ -1,4 +1,5 @@
 import { type Locale } from "@/lib/bluewolf-data";
+import { withLocaleQuery } from "@/lib/locale-routing";
 
 type HeaderCopySource = {
     navTours: string;
@@ -14,32 +15,31 @@ export type HeaderNavItem = {
 };
 
 const fixedHeaderLabel = {
-    ko: { home: "홈", about: "회사소개", contact: "문의" },
-    ja: { home: "ホーム", about: "会社紹介", contact: "お問い合わせ" },
-    en: { home: "Home", about: "About", contact: "Contact" },
+    ko: { home: "홈", contact: "문의" },
+    ja: { home: "ホーム", contact: "お問い合わせ" },
+    en: { home: "Home", contact: "Contact" },
 } as const;
-
-function getAboutHref(locale: Locale) {
-    if (locale === "ko") return "/about";
-    return `/about/${locale}`;
-}
 
 export function buildHeaderNav({
     locale,
     t,
+    isAuthenticated = false,
 }: {
     locale: Locale;
     t: HeaderCopySource;
+    isAuthenticated?: boolean;
 }): HeaderNavItem[] {
     const fixed = fixedHeaderLabel[locale];
+    const bookingHref = isAuthenticated
+        ? withLocaleQuery("/mypage/bookings", locale)
+        : withLocaleQuery("/booking", locale);
 
     return [
-        { key: "home", href: "/", label: fixed.home },
-        { key: "about", href: getAboutHref(locale), label: fixed.about },
-        { key: "tours", href: "/tours", label: t.navTours },
-        { key: "booking", href: "/booking", label: t.navBooking },
-        { key: "community", href: "/community", label: t.navCommunity },
-        { key: "faq", href: "/faq", label: t.navFaq },
-        { key: "contact", href: "/contact", label: fixed.contact },
+        { key: "home", href: withLocaleQuery("/", locale), label: fixed.home },
+        { key: "tours", href: withLocaleQuery("/tours", locale), label: t.navTours },
+        { key: "booking", href: bookingHref, label: t.navBooking },
+        { key: "community", href: withLocaleQuery("/community", locale), label: t.navCommunity },
+        { key: "faq", href: withLocaleQuery("/faq", locale), label: t.navFaq },
+        { key: "contact", href: withLocaleQuery("/contact", locale), label: fixed.contact },
     ];
 }

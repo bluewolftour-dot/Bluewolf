@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type Locale } from "@/lib/bluewolf-data";
 
 type CalendarPickerProps = {
@@ -12,6 +12,8 @@ type CalendarPickerProps = {
     todayLabel: string;
     locale: Locale;
     isDark?: boolean;
+    minDate?: string;
+    defaultViewDate?: string;
 };
 
 function useClickOutside<T extends HTMLElement>(onOutside: () => void) {
@@ -33,6 +35,13 @@ function useClickOutside<T extends HTMLElement>(onOutside: () => void) {
     return ref;
 }
 
+function parseDateValue(raw: string) {
+    const date = raw ? new Date(raw) : null;
+    return date && !Number.isNaN(date.getTime())
+        ? new Date(date.getFullYear(), date.getMonth(), date.getDate())
+        : null;
+}
+
 export function CalendarPicker({
     value,
     onChange,
@@ -42,6 +51,8 @@ export function CalendarPicker({
     todayLabel,
     locale,
     isDark = false,
+    minDate = "",
+    defaultViewDate = "",
 }: CalendarPickerProps) {
     const [open, setOpen] = useState(false);
     const close = useCallback(() => setOpen(false), []);
@@ -49,16 +60,25 @@ export function CalendarPicker({
 
     const today = new Date();
     const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const baseDate = value ? new Date(value) : todayStart;
+    const minSelectableDate = useMemo(() => parseDateValue(minDate), [minDate]);
+    const viewBaseDate = parseDateValue(value) ?? parseDateValue(defaultViewDate) ?? minSelectableDate ?? todayStart;
+    const selectableStart =
+        minSelectableDate && minSelectableDate > todayStart ? minSelectableDate : todayStart;
+    const baseDate = viewBaseDate;
     const [view, setView] = useState(new Date(baseDate.getFullYear(), baseDate.getMonth(), 1));
 
     useEffect(() => {
-        if (!value) return;
-        const next = new Date(value);
-        if (!Number.isNaN(next.getTime())) {
-            setView(new Date(next.getFullYear(), next.getMonth(), 1));
+        const next = parseDateValue(value) ?? parseDateValue(defaultViewDate) ?? minSelectableDate;
+        if (next) {
+            const frameId = window.requestAnimationFrame(() => {
+                setView(new Date(next.getFullYear(), next.getMonth(), 1));
+            });
+
+            return () => {
+                window.cancelAnimationFrame(frameId);
+            };
         }
-    }, [value]);
+    }, [defaultViewDate, minDate, minSelectableDate, value]);
 
     const year = view.getFullYear();
     const month = view.getMonth();
@@ -175,7 +195,7 @@ export function CalendarPicker({
                             const cell = toValue(date);
                             const selected = cell === value;
                             const isToday = cell === toValue(todayStart);
-                            const isPast = normalize(date) < todayStart;
+                            const isPast = normalize(date) < selectableStart;
 
                             return (
                                 <button
@@ -226,8 +246,8 @@ export function CalendarPicker({
                         <button
                             type="button"
                             onClick={() => {
-                                onChange(toValue(todayStart));
-                                setView(new Date(todayStart.getFullYear(), todayStart.getMonth(), 1));
+                                onChange(toValue(selectableStart));
+                                setView(new Date(selectableStart.getFullYear(), selectableStart.getMonth(), 1));
                                 setOpen(false);
                             }}
                             className={`rounded-full px-3 py-2 text-sm font-semibold transition ${isDark
