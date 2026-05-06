@@ -2,6 +2,13 @@ import { randomBytes, randomInt } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import nodemailer from "nodemailer";
+import {
+    isSupabaseDatabaseEnabled,
+    supabaseDelete,
+    supabasePatch,
+    supabaseSelectOne,
+    supabaseUpsertOne,
+} from "@/lib/supabase-server";
 
 type VerificationLocale = "ko" | "ja" | "en";
 
@@ -15,8 +22,38 @@ type EmailVerificationRecord = {
     createdAt: string;
 };
 
+type SupabaseEmailVerificationRow = {
+    email: string;
+    code: string;
+    token: string | null;
+    expires_at: string;
+    verified_at: string | null;
+    consumed_at: string | null;
+    created_at: string;
+};
+
 const dataDir = path.join(process.cwd(), "data", "auth");
 const verificationPath = path.join(dataDir, "email-verifications.json");
+
+function toRecord(row: SupabaseEmailVerificationRow): EmailVerificationRecord {
+    return {
+        email: row.email,
+        code: row.code,
+        token: row.token,
+        expiresAt: row.expires_at,
+        verifiedAt: row.verified_at,
+        consumedAt: row.consumed_at,
+        createdAt: row.created_at,
+    };
+}
+
+async function findSupabaseVerification(email: string) {
+    const row = await supabaseSelectOne<SupabaseEmailVerificationRow>(
+        "app_email_verifications",
+        { email: `eq.${email}` }
+    );
+    return row ? toRecord(row) : null;
+}
 
 function resolveLocale(locale: string): VerificationLocale {
     if (locale === "ja") return "ja";
@@ -163,23 +200,63 @@ export async function sendEmailVerificationCode(input: { email: string; locale: 
     const createdAt = new Date().toISOString();
     const expiresAt = new Date(Date.now() + 1000 * 60 * 10).toISOString();
 
-    const records = pruneRecords(await readVerifications()).filter((record) => record.email !== email);
-    records.push({
-        email,
-        code,
-        token: null,
-        expiresAt,
-        verifiedAt: null,
-        consumedAt: null,
-        createdAt,
-    });
-    await writeVerifications(records);
+    if (isSupabaseDatabaseEnabled()) {
+        await supabaseUpsertOne<SupabaseEmailVerificationRow>(
+            "app_email_verifications",
+            {
+                email,
+                code,
+                token: null,
+                expires_at: expiresAt,
+                verified_at: null,
+                consumed_at: null,
+                created_at: createdAt,
+            },
+            "email"
+        );
+    } else {
+        const records = pruneRecords(await readVerifications()).filter((record) => record.email !== email);
+        records.push({
+            email,
+            code,
+            token: null,
+            expiresAt,
+            verifiedAt: null,
+            consumedAt: null,
+            createdAt,
+        });
+        await writeVerifications(records);
+    }
+
     await sendVerificationMail(email, code, locale);
 }
 
 export async function verifyEmailVerificationCode(input: { email: string; code: string }) {
     const email = normalizeEmail(input.email);
     const code = input.code.trim();
+
+    if (isSupabaseDatabaseEnabled()) {
+        const record = await findSupabaseVerification(email);
+        if (
+            !record ||
+            record.code !== code ||
+            record.verifiedAt ||
+            record.consumedAt ||
+            new Date(record.expiresAt).getTime() <= Date.now()
+        ) {
+            return { ok: false as const, code: "INVALID_CODE" };
+        }
+
+        const token = createToken();
+        await supabasePatch<SupabaseEmailVerificationRow>(
+            "app_email_verifications",
+            { email: `eq.${email}` },
+            { token, verified_at: new Date().toISOString() }
+        );
+
+        return { ok: true as const, token };
+    }
+
     const records = pruneRecords(await readVerifications());
     const target = records.find(
         (record) =>
@@ -205,6 +282,23 @@ export async function verifyEmailVerificationCode(input: { email: string; code: 
 export async function consumeEmailVerification(input: { email: string; token: string }) {
     const email = normalizeEmail(input.email);
     const token = input.token.trim();
+
+    if (isSupabaseDatabaseEnabled()) {
+        const record = await findSupabaseVerification(email);
+        if (
+            !record ||
+            record.token !== token ||
+            !record.verifiedAt ||
+            record.consumedAt ||
+            new Date(record.expiresAt).getTime() <= Date.now()
+        ) {
+            return false;
+        }
+
+        await supabaseDelete("app_email_verifications", { email: `eq.${email}` });
+        return true;
+    }
+
     const records = pruneRecords(await readVerifications());
     const target = records.find(
         (record) =>
