@@ -36,7 +36,7 @@ export function buildAccountMenuItems(locale: Locale): AccountMenuItem[] {
 
     return [
         { key: "mypage", href: withLocaleQuery("/mypage", locale), label: copy.mypage },
-        { key: "applications", href: withLocaleQuery("/mypage/applications", locale), label: copy.applications },
+        { key: "applications", href: withLocaleQuery("/mypage/bookings", locale), label: copy.applications },
         { key: "community", href: withLocaleQuery("/community", locale), label: copy.community },
         { key: "mates", href: withLocaleQuery("/community/mates", locale), label: copy.mates },
         { key: "notifications", href: withLocaleQuery("/notifications", locale), label: copy.notifications },
