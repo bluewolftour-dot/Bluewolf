@@ -16,6 +16,7 @@ type AuthUser = {
     name: string;
     phone: string;
     email: string;
+    isAdmin?: boolean;
 };
 
 type AuthResult =

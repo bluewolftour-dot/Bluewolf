@@ -42,66 +42,50 @@ const themeInitScript = `
 })();
 `;
 
-function buildCmsBootstrapPayload(): CmsBootstrapPayload {
+async function safeCmsValue<T>(loader: () => Promise<T>) {
+    try {
+        return await loader();
+    } catch {
+        return null;
+    }
+}
+
+async function buildCmsBootstrapPayload(): Promise<CmsBootstrapPayload> {
+    const [
+        homeContent,
+        communityContent,
+        tours,
+        tourRegionCardsContent,
+        tourOptionsContent,
+        tourCustomizeContent,
+        tourThemesContent,
+    ] = await Promise.all([
+        safeCmsValue(getCmsHomeContent),
+        safeCmsValue(getCmsCommunityContent),
+        safeCmsValue(getAllCmsTours),
+        safeCmsValue(getCmsTourRegionCardsContent),
+        safeCmsValue(getCmsTourOptionsContent),
+        safeCmsValue(getCmsTourCustomizeContent),
+        safeCmsValue(getCmsTourThemesContent),
+    ]);
+
     return {
-        homeContent: (() => {
-            try {
-                return getCmsHomeContent();
-            } catch {
-                return null;
-            }
-        })(),
-        communityContent: (() => {
-            try {
-                return getCmsCommunityContent();
-            } catch {
-                return null;
-            }
-        })(),
-        tours: (() => {
-            try {
-                return getAllCmsTours();
-            } catch {
-                return null;
-            }
-        })(),
-        tourRegionCardsContent: (() => {
-            try {
-                return getCmsTourRegionCardsContent();
-            } catch {
-                return null;
-            }
-        })(),
-        tourOptionsContent: (() => {
-            try {
-                return getCmsTourOptionsContent();
-            } catch {
-                return null;
-            }
-        })(),
-        tourCustomizeContent: (() => {
-            try {
-                return getCmsTourCustomizeContent();
-            } catch {
-                return null;
-            }
-        })(),
-        tourThemesContent: (() => {
-            try {
-                return getCmsTourThemesContent();
-            } catch {
-                return null;
-            }
-        })(),
+        homeContent,
+        communityContent,
+        tours,
+        tourRegionCardsContent,
+        tourOptionsContent,
+        tourCustomizeContent,
+        tourThemesContent,
     };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    const cmsBootstrapPayload = buildCmsBootstrapPayload();
+    const cmsBootstrapPayload = await buildCmsBootstrapPayload();
 
     return (
         <html lang="ko" suppressHydrationWarning>

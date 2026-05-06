@@ -25,6 +25,7 @@ function ThemeLandingContent() {
     const items = tourItems.filter((tour) => tour.theme === theme.key);
     const panel = isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white";
     const card = isDark ? "border-white/10 bg-slate-950" : "border-slate-200 bg-slate-50";
+    const perPersonLabel = lang === "ko" ? "1인 기준" : lang === "ja" ? "1名基準" : "Per person";
 
     return (
         <>
@@ -48,7 +49,10 @@ function ThemeLandingContent() {
                         <p className="text-sm font-black text-blue-500">{tour.duration[lang]}</p>
                         <h2 className={`mt-2 text-xl font-black ${isDark ? "text-white" : "text-slate-950"}`}>{tour.title[lang]}</h2>
                         <p className={`mt-3 line-clamp-3 text-sm leading-7 ${isDark ? "text-slate-400" : "text-slate-600"}`}>{tour.desc[lang]}</p>
-                        <p className="mt-4 text-lg font-black text-blue-500">{formatPrice(tour.price)}</p>
+                        <div className="mt-4 text-blue-500">
+                            <span className="block text-[11px] font-extrabold leading-none">{perPersonLabel}</span>
+                            <span className="mt-1 block text-lg font-black leading-tight">{formatPrice(tour.price)}</span>
+                        </div>
                     </Link>
                 ))}
             </section>

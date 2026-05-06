@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -51,7 +51,7 @@ type PrepareCustomPlanPaymentResponse = {
     failUrl: string;
 };
 
-const CUSTOM_PLAN_DEPOSIT_PER_PERSON = 50000;
+const PLAN_PACKAGE_FEE_PER_PERSON = 50000;
 
 function addDaysValue(value: string, days: number) {
     const date = new Date(value);
@@ -270,58 +270,60 @@ export function ToursCustomizeContent() {
     const checkoutCopy = {
         ko: {
             title: "선택한 플랜 확인",
-            desc: "예약 전 선택한 여행 조건을 확인하고 문의 사항을 남겨주세요.",
-            travelerTitle: "예약자 정보",
-            nameLabel: "예약자 이름",
+            desc: "플랜 신청 전 선택한 여행 조건과 신청자 정보를 확인해 주세요.",
+            travelerTitle: "신청자 정보",
+            nameLabel: "신청자 이름",
             phoneLabel: "연락처",
             emailLabel: "이메일",
             inquiryLabel: "문의 사항",
-            inquiryPlaceholder: "추가 요청 사항이나 상담이 필요한 내용을 입력해주세요.",
-            depositLabel: "지금 결제할 예약금",
-            depositDesc: "예약금은 1인당 50,000원으로 계산됩니다.",
-            payLabel: "이 플랜으로 결제하기",
+            inquiryPlaceholder: "추가 요청 사항이나 확인이 필요한 내용을 입력해주세요.",
+            depositLabel: "지금 결제할 플랜 패키지 이용료",
+            depositDesc: "플랜 패키지 이용료는 1인 기준 50,000원으로 계산됩니다.",
+            payLabel: "플랜 패키지 결제하기",
             cancelLabel: "닫기",
             datesRequired: "출발일과 도착일을 먼저 선택해주세요.",
-            travelerRequired: "예약자 이름과 연락처를 입력해주세요.",
+            travelerRequired: "신청자 이름과 연락처를 입력해주세요.",
             sdkError: "결제창을 아직 불러오지 못했습니다. 잠시 후 다시 시도해주세요.",
             failedError: "결제 준비 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.",
             processingLabel: "결제 준비 중...",
             customTitleSuffix: "커스텀 플랜",
             noInquiry: "문의 사항 없음",
+            notice: "본 결제는 BlueWolf KR이 제공하는 몽골 여행 플랜 패키지 이용료입니다. 본 금액은 여행상품 예약금, 계약금 또는 여행대금이 아니며, 결제 완료만으로 여행 일정, 숙박, 차량, 가이드 또는 여행상품 예약이 확정되지 않습니다. 실제 여행계약, 일정 확정, 잔금 결제, 취소·환불 및 현지 운영은 BlueWolf Mongolia와 별도로 진행됩니다.",
         },
         ja: {
             title: "選択したプラン確認",
-            desc: "予約前に選択内容を確認し、追加のリクエストを入力してください。",
-            travelerTitle: "予約者情報",
-            nameLabel: "予約者名",
+            desc: "申請前に選択内容を確認し、追加のリクエストを入力してください。",
+            travelerTitle: "申請者情報",
+            nameLabel: "申請者名",
             phoneLabel: "連絡先",
             emailLabel: "メール",
             inquiryLabel: "お問い合わせ内容",
             inquiryPlaceholder: "追加リクエストや相談したい内容を入力してください。",
-            depositLabel: "今支払う予約金",
-            depositDesc: "予約金は1名あたり50,000ウォンで計算されます。",
-            payLabel: "このプランで決済する",
+            depositLabel: "今支払うプランパッケージ利用料",
+            depositDesc: "プランパッケージ利用料は1名基準50,000ウォンで計算されます。",
+            payLabel: "プランパッケージ利用料を決済する",
             cancelLabel: "閉じる",
             datesRequired: "出発日と到着日を先に選択してください。",
-            travelerRequired: "予約者名と連絡先を入力してください。",
+            travelerRequired: "申請者名と連絡先を入力してください。",
             sdkError: "決済画面をまだ読み込めていません。しばらくしてから再度お試しください。",
             failedError: "決済準備中に問題が発生しました。しばらくしてから再度お試しください。",
             processingLabel: "決済準備中...",
             customTitleSuffix: "カスタムプラン",
             noInquiry: "お問い合わせ内容なし",
+            notice: "本決済は BlueWolf KR が提供するモンゴル旅行プランパッケージ利用料です。この金額は旅行商品の予約金、契約金、旅行代金ではなく、決済完了のみで旅行日程、宿泊、車両、ガイド、旅行商品の予約は確定しません。実際の旅行契約、日程確定、残金決済、取消・返金、現地運営は BlueWolf Mongolia と別途進行されます。",
         },
         en: {
             title: "Review your selected plan",
-            desc: "Confirm your custom trip plan and leave any extra requests before payment.",
-            travelerTitle: "Traveler details",
-            nameLabel: "Lead traveler name",
+            desc: "Confirm your custom trip plan and leave any extra requests before submitting payment.",
+            travelerTitle: "Applicant details",
+            nameLabel: "Applicant name",
             phoneLabel: "Phone number",
             emailLabel: "Email",
             inquiryLabel: "Inquiry",
             inquiryPlaceholder: "Add special requests or anything you would like us to check.",
-            depositLabel: "Deposit due now",
-            depositDesc: "The deposit is calculated at ₩50,000 per person.",
-            payLabel: "Pay for this plan",
+            depositLabel: "Plan package fee due now",
+            depositDesc: "The plan package fee is calculated at KRW 50,000 per person.",
+            payLabel: "Pay plan package fee",
             cancelLabel: "Close",
             datesRequired: "Please select both start and end dates first.",
             travelerRequired: "Please enter the lead traveler name and phone number.",
@@ -330,6 +332,7 @@ export function ToursCustomizeContent() {
             processingLabel: "Preparing payment...",
             customTitleSuffix: "custom plan",
             noInquiry: "No inquiry",
+            notice: "This payment is the Mongolia travel plan package fee provided by BlueWolf KR. It is not a travel product deposit, contract payment, or travel fare, and payment alone does not confirm any itinerary, stay, vehicle, guide, or travel booking. The actual travel contract, itinerary confirmation, balance payment, cancellation or refund, and local operations are handled separately by BlueWolf Mongolia.",
         },
     }[lang];
     const regionParam = searchParams.get("region");
@@ -486,7 +489,7 @@ export function ToursCustomizeContent() {
     const travelDateLabel = startDate && endDate ? `${startDate} - ${endDate}` : periodCopy.durationPlaceholder;
     const endDateMinValue = startDate ? addDaysValue(startDate, 1) : "";
     const customPlanTitle = `${regionInfo.title} ${checkoutCopy.customTitleSuffix}`;
-    const customPlanDeposit = CUSTOM_PLAN_DEPOSIT_PER_PERSON * guests;
+    const customPlanDeposit = PLAN_PACKAGE_FEE_PER_PERSON * guests;
     const paymentButtonLabel = !tossReady
         ? lang === "ja"
             ? "決済画面を読み込み中..."
@@ -680,15 +683,15 @@ export function ToursCustomizeContent() {
 
                     <div className="grid gap-8 p-6 sm:p-8">
                         <div ref={periodSectionRef} className="scroll-mt-28">
-                            <h2 className={`text-xl font-black tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>{periodCopy.sectionLabel}</h2>
-                            <p className={`mt-2 text-sm leading-7 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{copy.nightsDesc}</p>
-                            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                            <h2 className={`text-lg font-black tracking-tight sm:text-xl ${isDark ? "text-white" : "text-slate-900"}`}>{periodCopy.sectionLabel}</h2>
+                            <p className={`mt-1.5 text-xs leading-6 sm:mt-2 sm:text-sm sm:leading-7 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{copy.nightsDesc}</p>
+                            <div className="mt-3 grid gap-3 sm:mt-5 sm:gap-4 sm:grid-cols-2">
                                 <div>
-                                    <div className={`mb-2 text-sm font-extrabold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{periodCopy.startLabel}</div>
-                                    <CalendarPicker value={startDate} onChange={handleStartDateChange} placeholder={copy.datePlaceholder} weekdays={copy.weekdays} deleteLabel={copy.deleteLabel} todayLabel={copy.todayLabel} locale={lang} isDark={isDark} />
+                                    <div className={`mb-1.5 text-xs font-extrabold sm:mb-2 sm:text-sm ${isDark ? "text-slate-100" : "text-slate-900"}`}>{periodCopy.startLabel}</div>
+                                    <CalendarPicker value={startDate} onChange={handleStartDateChange} placeholder={copy.datePlaceholder} weekdays={copy.weekdays} deleteLabel={copy.deleteLabel} todayLabel={copy.todayLabel} locale={lang} isDark={isDark} compactOnMobile />
                                 </div>
                                 <div>
-                                    <div className={`mb-2 text-sm font-extrabold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{periodCopy.endLabel}</div>
+                                    <div className={`mb-1.5 text-xs font-extrabold sm:mb-2 sm:text-sm ${isDark ? "text-slate-100" : "text-slate-900"}`}>{periodCopy.endLabel}</div>
                                     <CalendarPicker
                                         value={endDate}
                                         onChange={handleEndDateChange}
@@ -700,13 +703,14 @@ export function ToursCustomizeContent() {
                                         isDark={isDark}
                                         minDate={endDateMinValue}
                                         defaultViewDate={endDateMinValue}
+                                        compactOnMobile
                                     />
                                 </div>
                             </div>
 
-                            <div className={`mt-4 rounded-[22px] border p-4 transition-colors duration-300 ${isDark ? "border-white/10 bg-slate-950" : "border-slate-200 bg-slate-50"}`}>
-                                <div className={`text-xs font-bold ${isDark ? "text-slate-400" : "text-slate-500"}`}>{periodCopy.durationLabel}</div>
-                                <div className={`mt-1 text-base font-black ${isDark ? "text-white" : "text-slate-900"}`}>
+                            <div className={`mt-3 rounded-[18px] border p-3 transition-colors duration-300 sm:mt-4 sm:rounded-[22px] sm:p-4 ${isDark ? "border-white/10 bg-slate-950" : "border-slate-200 bg-slate-50"}`}>
+                                <div className={`text-[11px] font-bold sm:text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}>{periodCopy.durationLabel}</div>
+                                <div className={`mt-0.5 text-sm font-black sm:mt-1 sm:text-base ${isDark ? "text-white" : "text-slate-900"}`}>
                                     {tripDuration ? periodCopy.formatDuration(tripDuration.nights, tripDuration.days) : periodCopy.durationPlaceholder}
                                 </div>
                             </div>
@@ -720,27 +724,27 @@ export function ToursCustomizeContent() {
                         <div>
                             <h2 className={`text-xl font-black tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>{guestCopy.sectionLabel}</h2>
                             <p className={`mt-2 text-sm leading-7 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{guestCopy.desc}</p>
-                            <div className={`mt-4 rounded-[24px] border p-5 ${isDark ? "border-white/10 bg-slate-950" : "border-slate-200 bg-slate-50"}`}>
-                                <div className={`mb-3 text-xs font-bold ${isDark ? "text-slate-400" : "text-slate-500"}`}>{t.guestsLabel}</div>
+                            <div className={`mt-3 rounded-[18px] border p-3.5 sm:mt-4 sm:rounded-[24px] sm:p-5 ${isDark ? "border-white/10 bg-slate-950" : "border-slate-200 bg-slate-50"}`}>
+                                <div className={`mb-2 text-[11px] font-bold sm:mb-3 sm:text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}>{t.guestsLabel}</div>
                                 <div className="flex items-center justify-between gap-3">
                                     <button
                                         type="button"
                                         onClick={() => setGuests((prev) => Math.max(1, prev - 1))}
-                                        className={`flex h-11 w-11 items-center justify-center rounded-full border text-lg font-black transition-[background-color,transform] duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.94] ${
+                                        className={`flex h-9 w-9 items-center justify-center rounded-full border text-base font-black transition-[background-color,transform] duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.94] sm:h-11 sm:w-11 sm:text-lg ${
                                             isDark ? "border-white/10 bg-slate-900 text-white hover:bg-slate-800" : "border-slate-200 bg-white text-slate-900 hover:bg-slate-100"
                                         }`}
                                         aria-label="Decrease guests"
                                     >
                                         -
                                     </button>
-                                    <div className={`text-center text-2xl font-black ${isDark ? "text-white" : "text-slate-900"}`}>
+                                    <div className={`text-center text-xl font-black sm:text-2xl ${isDark ? "text-white" : "text-slate-900"}`}>
                                         {guests}
-                                        <span className={`ml-1 text-base ${isDark ? "text-slate-300" : "text-slate-600"}`}>{guestCopy.unit}</span>
+                                        <span className={`ml-1 text-sm sm:text-base ${isDark ? "text-slate-300" : "text-slate-600"}`}>{guestCopy.unit}</span>
                                     </div>
                                     <button
                                         type="button"
                                         onClick={() => setGuests((prev) => Math.min(20, prev + 1))}
-                                        className={`flex h-11 w-11 items-center justify-center rounded-full border text-lg font-black transition-[background-color,transform] duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.94] ${
+                                        className={`flex h-9 w-9 items-center justify-center rounded-full border text-base font-black transition-[background-color,transform] duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.94] sm:h-11 sm:w-11 sm:text-lg ${
                                             isDark ? "border-white/10 bg-slate-900 text-white hover:bg-slate-800" : "border-slate-200 bg-white text-slate-900 hover:bg-slate-100"
                                         }`}
                                         aria-label="Increase guests"
@@ -754,7 +758,7 @@ export function ToursCustomizeContent() {
                         <div>
                             <h2 className={`text-xl font-black tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>{destinationCopy.sectionLabel}</h2>
                             <p className={`mt-2 text-sm leading-7 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{destinationCopy.desc}</p>
-                            <div className="mt-4 grid gap-3">
+                            <div className="mt-3 grid grid-cols-2 gap-2.5 sm:mt-4 sm:grid-cols-1 sm:gap-3">
                                 {destinationOptions.map((destination: (typeof destinationOptions)[number]) => {
                                     const active = activeSelectedDestinations.includes(destination.id);
                                     return (
@@ -769,7 +773,7 @@ export function ToursCustomizeContent() {
                                                         : [...prev, destination.id]
                                                 );
                                             }}
-                                            className={`overflow-hidden rounded-[24px] border text-left transition-[background-color,border-color,box-shadow] duration-300 ${
+                                            className={`overflow-hidden rounded-[18px] border text-left transition-[background-color,border-color,box-shadow] duration-300 sm:rounded-[24px] ${
                                                 active
                                                     ? isDark
                                                         ? "border-blue-400 bg-blue-500/15 text-slate-100 shadow-[0_10px_24px_rgba(37,99,235,0.18)]"
@@ -779,25 +783,25 @@ export function ToursCustomizeContent() {
                                                       : "border-slate-200 bg-slate-50 text-slate-800 hover:border-blue-300 hover:bg-blue-50/70"
                                             }`}
                                         >
-                                            <div className="flex flex-col sm:flex-row">
-                                                <div className="relative aspect-[16/9] w-full overflow-hidden sm:w-52 sm:shrink-0">
+                                            <div className="flex min-h-full flex-col sm:flex-row">
+                                                <div className="relative aspect-[4/3] w-full overflow-hidden sm:aspect-[16/9] sm:w-52 sm:shrink-0">
                                                     {customizeLoaded ? (
                                                         <Image
                                                             src={destination.image}
                                                             alt={destination.title}
                                                             fill
                                                             className="object-cover"
-                                                            sizes="(max-width: 640px) 100vw, 208px"
+                                                            sizes="(max-width: 640px) 50vw, 208px"
                                                         />
                                                     ) : (
                                                         <div className={`absolute inset-0 ${isDark ? "bg-slate-900" : "bg-slate-100"}`} />
                                                     )}
                                                 </div>
-                                                <div className="flex flex-1 flex-col justify-center px-4 py-4">
-                                                    <div className={`text-base font-black ${isDark ? "text-white" : "text-slate-900"}`}>
+                                                <div className="flex flex-1 flex-col justify-center px-3 py-3 sm:px-4 sm:py-4">
+                                                    <div className={`line-clamp-2 text-[13px] font-black leading-5 sm:text-base sm:leading-normal ${isDark ? "text-white" : "text-slate-900"}`}>
                                                         {destination.title}
                                                     </div>
-                                                    <p className={`mt-2 text-sm leading-6 ${active ? (isDark ? "text-blue-100" : "text-slate-700") : isDark ? "text-slate-400" : "text-slate-500"}`}>
+                                                    <p className={`mt-2 hidden text-sm leading-6 sm:block ${active ? (isDark ? "text-blue-100" : "text-slate-700") : isDark ? "text-slate-400" : "text-slate-500"}`}>
                                                         {destination.desc}
                                                     </p>
                                                 </div>
@@ -811,7 +815,7 @@ export function ToursCustomizeContent() {
                         <div>
                             <h2 className={`text-xl font-black tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>{activityCopy.sectionLabel}</h2>
                             <p className={`mt-2 text-sm leading-7 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{activityCopy.desc}</p>
-                            <div className="mt-4 grid gap-3 md:grid-cols-2">
+                            <div className="mt-3 grid grid-cols-2 gap-2.5 sm:mt-4 sm:gap-3 md:grid-cols-2">
                                 {activityOptions.map((activity) => {
                                     const active = selectedActivities.includes(activity.id);
                                     return (
@@ -819,7 +823,7 @@ export function ToursCustomizeContent() {
                                             key={activity.id}
                                             type="button"
                                             onClick={() => toggleActivity(activity.id)}
-                                            className={`overflow-hidden rounded-[24px] border text-left transition-[background-color,border-color,box-shadow] duration-300 ${
+                                            className={`overflow-hidden rounded-[18px] border text-left transition-[background-color,border-color,box-shadow] duration-300 sm:rounded-[24px] ${
                                                 active
                                                     ? "border-blue-500 bg-blue-50 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.12)]"
                                                     : isDark
@@ -827,29 +831,29 @@ export function ToursCustomizeContent() {
                                                       : "border-slate-200 bg-slate-50 text-slate-800 hover:bg-white"
                                             }`}
                                         >
-                                            <div className="relative aspect-[16/9] overflow-hidden">
+                                            <div className="relative aspect-[4/3] overflow-hidden sm:aspect-[16/9]">
                                                 {customizeLoaded ? (
                                                     <Image
                                                         src={activity.image}
                                                         alt={activity.title}
                                                         fill
                                                         className="object-cover"
-                                                        sizes="(max-width: 768px) 100vw, 50vw"
+                                                        sizes="(max-width: 640px) 50vw, 50vw"
                                                     />
                                                 ) : (
                                                     <div className={`absolute inset-0 ${isDark ? "bg-slate-900" : "bg-slate-100"}`} />
                                                 )}
                                             </div>
-                                            <div className="p-4">
-                                                <div className="flex flex-wrap items-start justify-between gap-2">
-                                                    <div className={`text-base font-black ${active ? "text-slate-900" : isDark ? "text-white" : "text-slate-900"}`}>
+                                            <div className="p-3 sm:p-4">
+                                                <div className="flex flex-col items-start gap-1.5 sm:flex-row sm:flex-wrap sm:justify-between sm:gap-2">
+                                                    <div className={`line-clamp-2 text-[13px] font-black leading-5 sm:text-base sm:leading-normal ${active ? "text-slate-900" : isDark ? "text-white" : "text-slate-900"}`}>
                                                         {activity.title}
                                                     </div>
-                                                    <span className="rounded-full bg-blue-600 px-2.5 py-1 text-xs font-extrabold text-white">
+                                                    <span className="max-w-full truncate rounded-full bg-blue-600 px-2 py-0.5 text-[10px] font-extrabold text-white sm:px-2.5 sm:py-1 sm:text-xs">
                                                         +{formatPrice(activity.price)} / {optionUnitLabel}
                                                     </span>
                                                 </div>
-                                                <p className={`mt-2 text-sm leading-6 ${active ? "text-slate-700" : isDark ? "text-slate-400" : "text-slate-500"}`}>
+                                                <p className={`mt-2 hidden text-sm leading-6 sm:block ${active ? "text-slate-700" : isDark ? "text-slate-400" : "text-slate-500"}`}>
                                                     {activity.desc}
                                                 </p>
                                             </div>
@@ -862,7 +866,7 @@ export function ToursCustomizeContent() {
                         <div>
                             <h2 className={`text-xl font-black tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>{copy.optionsTitle}</h2>
                             <p className={`mt-2 text-sm leading-7 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{copy.optionsDesc}</p>
-                            <div className="mt-4 grid gap-3">
+                            <div className="mt-3 grid gap-2 sm:mt-4 sm:gap-3">
                                 {optionChoices.map((option) => {
                                     const active = selectedOptions.includes(option.key);
                                     return (
@@ -877,28 +881,38 @@ export function ToursCustomizeContent() {
                                                     toggleOption(option.key);
                                                 }
                                             }}
-                                            className={`rounded-[24px] border p-5 text-left transition-[background-color,border-color,box-shadow] duration-300 ${active ? "border-blue-500 bg-blue-50 shadow-[0_12px_28px_rgba(37,99,235,0.10)]" : isDark ? "border-white/10 bg-slate-950 hover:bg-slate-800" : "border-slate-200 bg-slate-50 hover:bg-white"}`}
+                                            className={`rounded-[18px] border p-3 text-left transition-[background-color,border-color,box-shadow] duration-300 sm:rounded-[24px] sm:p-5 ${active ? "border-blue-500 bg-blue-50 shadow-[0_12px_28px_rgba(37,99,235,0.10)]" : isDark ? "border-white/10 bg-slate-950 hover:bg-slate-800" : "border-slate-200 bg-slate-50 hover:bg-white"}`}
                                         >
-                                            <div className="flex items-start justify-between gap-4">
+                                            <div className="flex items-start justify-between gap-2 sm:gap-4">
                                                 <div className="min-w-0">
-                                                    <div className="flex flex-wrap items-center gap-2">
-                                                    <div className={`text-base font-black ${active ? "text-slate-900" : isDark ? "text-white" : "text-slate-900"}`}>{option.title}</div>
-                                                        <span className="rounded-full bg-blue-600 px-2.5 py-1 text-xs font-extrabold text-white">+{formatPrice(option.price)} / {optionUnitLabel}</span>
+                                                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                                                        <div className={`text-sm font-black sm:text-base ${active ? "text-slate-900" : isDark ? "text-white" : "text-slate-900"}`}>{option.title}</div>
+                                                        <span className="rounded-full bg-blue-600 px-2 py-0.5 text-[10px] font-extrabold text-white sm:px-2.5 sm:py-1 sm:text-xs">+{formatPrice(option.price)} / {optionUnitLabel}</span>
                                                     </div>
-                                                    <p className={`mt-2 text-sm leading-6 ${active ? "text-slate-700" : isDark ? "text-slate-400" : "text-slate-500"}`}>{option.desc}</p>
+                                                    <p className={`mt-1 line-clamp-1 !text-[11px] !leading-4 sm:mt-2 sm:line-clamp-none sm:!text-xs sm:!leading-5 ${active ? "text-slate-700" : isDark ? "text-slate-400" : "text-slate-500"}`}>{option.desc}</p>
                                                 </div>
-                                                <span className={`inline-flex h-10 min-w-10 items-center justify-center rounded-full px-4 text-sm font-black transition ${active ? "bg-blue-600 text-white" : isDark ? "bg-slate-800 text-slate-200" : "bg-slate-200 text-slate-700"}`}>
-                                                    {active ? copy.selectedLabel : "+"}
-                                                </span>
-                                            </div>
-                                            <div className="mt-4 flex flex-wrap gap-2">
                                                 <button
                                                     type="button"
                                                     onClick={(event) => {
                                                         event.stopPropagation();
                                                         setDetailOption(option);
                                                     }}
-                                                    className={`rounded-full px-4 py-2 text-sm font-bold transition ${isDark ? "bg-slate-800 text-slate-200 hover:bg-slate-700" : "bg-white text-slate-700 hover:bg-slate-100"}`}
+                                                    className={`inline-flex h-7 shrink-0 items-center justify-center rounded-full px-2.5 text-[11px] font-bold transition sm:hidden ${isDark ? "bg-slate-800 text-slate-200 hover:bg-slate-700" : "bg-white text-slate-700 hover:bg-slate-100"}`}
+                                                >
+                                                    {copy.detailsLabel}
+                                                </button>
+                                                <span className={`hidden h-10 min-w-10 items-center justify-center rounded-full px-4 text-sm font-black transition sm:inline-flex ${active ? "bg-blue-600 text-white" : isDark ? "bg-slate-800 text-slate-200" : "bg-slate-200 text-slate-700"}`}>
+                                                    {active ? copy.selectedLabel : "+"}
+                                                </span>
+                                            </div>
+                                            <div className="mt-4 hidden flex-wrap gap-2 sm:flex">
+                                                <button
+                                                    type="button"
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
+                                                        setDetailOption(option);
+                                                    }}
+                                                    className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${isDark ? "bg-slate-800 text-slate-200 hover:bg-slate-700" : "bg-white text-slate-700 hover:bg-slate-100"}`}
                                                 >
                                                     {copy.detailsLabel}
                                                 </button>
@@ -988,18 +1002,18 @@ export function ToursCustomizeContent() {
                     className="pointer-events-none fixed inset-x-0 z-40 px-3 pb-3 transition-[bottom] duration-200 sm:px-5 sm:pb-5"
                     style={{ bottom: footerOverlap }}
                 >
-                <div className={`pointer-events-auto mx-auto w-full max-w-6xl overflow-hidden rounded-[28px] border shadow-[0_-12px_40px_rgba(15,23,42,0.18)] backdrop-blur-xl transition-colors duration-300 ${isDark ? "border-white/10 bg-slate-900/95" : "border-slate-200 bg-white/95"}`}>
-                    <div className="grid gap-4 p-4 sm:p-5 lg:grid-cols-[1.35fr_0.55fr] lg:items-stretch">
-                        <div className="flex h-full items-center rounded-[24px] bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500 p-5 text-white lg:h-[104px]">
-                            <div className="flex w-full flex-col gap-3 lg:flex-row lg:items-center lg:gap-4">
+                <div className={`pointer-events-auto mx-auto w-full max-w-6xl overflow-hidden rounded-[22px] border shadow-[0_-12px_40px_rgba(15,23,42,0.18)] backdrop-blur-xl transition-colors duration-300 sm:rounded-[28px] ${isDark ? "border-white/10 bg-slate-900/95" : "border-slate-200 bg-white/95"}`}>
+                    <div className="grid gap-2 p-2.5 sm:gap-4 sm:p-5 lg:grid-cols-[1.35fr_0.55fr] lg:items-stretch">
+                        <div className="flex h-full items-center rounded-[20px] bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500 p-3 text-white sm:rounded-[24px] sm:p-5 lg:h-[104px]">
+                            <div className="flex w-full flex-col gap-2 sm:gap-3 lg:flex-row lg:items-center lg:gap-4">
                                 <div className="flex w-full items-start justify-between gap-4 lg:w-auto lg:flex-none lg:justify-start">
                                     <div className="self-start text-left">
-                                        <div className="text-sm font-bold text-blue-100">{copy.estimateLabel}</div>
-                                        <div className="mt-2 text-3xl font-black tracking-tight">{formatPrice(animatedPrice)}</div>
+                                        <div className="text-[11px] font-bold text-blue-100 sm:text-sm">{copy.estimateLabel}</div>
+                                        <div className="mt-1 text-2xl font-black tracking-tight sm:mt-2 sm:text-3xl">{formatPrice(animatedPrice)}</div>
                                     </div>
-                                    <div className="ml-auto min-w-[140px] shrink-0 text-right text-sm leading-6 text-blue-100 lg:hidden">
+                                    <div className="ml-auto min-w-[96px] shrink-0 text-right text-xs leading-5 text-blue-100 sm:min-w-[140px] sm:text-sm sm:leading-6 lg:hidden">
                                         <div>{regionInfo.title}</div>
-                                        <div className="text-base font-black text-white">{tripDuration ? periodCopy.formatDuration(tripDuration.nights, tripDuration.days) : periodCopy.durationPlaceholder}</div>
+                                        <div className="text-sm font-black text-white sm:text-base">{tripDuration ? periodCopy.formatDuration(tripDuration.nights, tripDuration.days) : periodCopy.durationPlaceholder}</div>
                                     </div>
                                 </div>
                                 <div className="ml-auto hidden items-center gap-3 lg:flex">
@@ -1027,11 +1041,11 @@ export function ToursCustomizeContent() {
                             </div>
                         </div>
 
-                        <div className="grid h-full gap-3 lg:h-[104px]">
-                            <button type="button" onClick={handleOpenPlanCheckout} className="flex min-h-0 items-center justify-center rounded-2xl bg-blue-600 px-4 py-3 text-center text-sm font-bold text-white transition hover:bg-blue-500 sm:text-base">
+                        <div className="grid h-full gap-2 sm:gap-3 lg:h-[104px]">
+                            <button type="button" onClick={handleOpenPlanCheckout} className="flex min-h-0 items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-center text-xs font-bold text-white transition hover:bg-blue-500 sm:rounded-2xl sm:py-3 sm:text-base">
                                 {copy.continueLabel}
                             </button>
-                            <Link href={withLocaleQuery("/tours", lang)} className={`flex min-h-0 items-center justify-center rounded-2xl px-4 py-3 text-center text-sm font-bold transition sm:text-base ${isDark ? "bg-slate-800 text-slate-100 hover:bg-slate-700" : "bg-slate-100 text-slate-900 hover:bg-slate-200"}`}>
+                            <Link href={withLocaleQuery("/tours", lang)} className={`flex min-h-0 items-center justify-center rounded-xl px-4 py-2 text-center text-xs font-bold transition sm:rounded-2xl sm:py-3 sm:text-base ${isDark ? "bg-slate-800 text-slate-100 hover:bg-slate-700" : "bg-slate-100 text-slate-900 hover:bg-slate-200"}`}>
                                 {copy.backLabel}
                             </Link>
                         </div>
@@ -1125,6 +1139,7 @@ export function ToursCustomizeContent() {
                                 </div>
                                 <div className={`text-2xl font-black ${isDark ? "text-white" : "text-slate-900"}`}>{formatPrice(customPlanDeposit)}</div>
                             </div>
+                            <p className={`mt-4 text-xs leading-6 ${isDark ? "text-slate-300" : "text-slate-600"}`}>{checkoutCopy.notice}</p>
                         </div>
 
                         {checkoutError || tossLoadFailed ? (

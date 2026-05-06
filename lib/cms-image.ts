@@ -1,14 +1,39 @@
-import { type Tour } from "@/lib/bluewolf-data";
+import { type Tour } from "@/lib/bluewolf-types";
 
 export const CMS_NULL_IMAGE = "/images/null.png";
 export const CMS_UPLOAD_PREFIX = "/uploads/cms/";
 export const COMMUNITY_UPLOAD_PREFIX = "/uploads/community/";
 
+function isSupabasePublicUploadImagePath(value: string) {
+    return getSupabasePublicUploadObjectPath(value) !== null;
+}
+
+function getSupabasePublicUploadObjectPath(value: string) {
+    try {
+        const url = new URL(value);
+        if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+
+        const marker = "/storage/v1/object/public/";
+        const markerIndex = url.pathname.indexOf(marker);
+        if (markerIndex < 0) return null;
+
+        const objectPath = decodeURIComponent(url.pathname.slice(markerIndex + marker.length))
+            .split("/")
+            .slice(1)
+            .join("/");
+
+        return objectPath.startsWith("cms/") || objectPath.startsWith("community/") ? objectPath : null;
+    } catch {
+        return null;
+    }
+}
+
 export function isCmsUploadImagePath(value?: string | null) {
     const trimmed = value?.trim() ?? "";
     return (
         trimmed.startsWith(CMS_UPLOAD_PREFIX) ||
-        trimmed.startsWith(COMMUNITY_UPLOAD_PREFIX)
+        trimmed.startsWith(COMMUNITY_UPLOAD_PREFIX) ||
+        isSupabasePublicUploadImagePath(trimmed)
     );
 }
 
@@ -16,6 +41,8 @@ export function normalizeCmsImagePath(value?: string | null) {
     const trimmed = value?.trim() ?? "";
     if (!trimmed) return CMS_NULL_IMAGE;
     if (trimmed === CMS_NULL_IMAGE) return CMS_NULL_IMAGE;
+    const supabaseObjectPath = getSupabasePublicUploadObjectPath(trimmed);
+    if (supabaseObjectPath) return `/uploads/${supabaseObjectPath}`;
     if (isCmsUploadImagePath(trimmed)) return trimmed;
     return CMS_NULL_IMAGE;
 }

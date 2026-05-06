@@ -10,6 +10,71 @@ export function SearchIcon({ className = "h-4 w-4" }: IconProps) {
     );
 }
 
+export function PlaneIcon({ className = "h-4 w-4" }: IconProps) {
+    return (
+        <svg
+            className={className}
+            viewBox="0 0 64 64"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+        >
+            <defs>
+                <linearGradient id="bw-pl-body" x1="100%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="#FFFFFF" />
+                    <stop offset="50%" stopColor="#EBF2FE" />
+                    <stop offset="100%" stopColor="#9DBCEC" />
+                </linearGradient>
+                <linearGradient id="bw-pl-wing-top" x1="100%" y1="0%" x2="20%" y2="100%">
+                    <stop offset="0%" stopColor="#F8FBFF" />
+                    <stop offset="100%" stopColor="#7FA3D6" />
+                </linearGradient>
+                <linearGradient id="bw-pl-wing-bottom" x1="100%" y1="0%" x2="20%" y2="100%">
+                    <stop offset="0%" stopColor="#FFFFFF" />
+                    <stop offset="50%" stopColor="#DCE9FD" />
+                    <stop offset="100%" stopColor="#7DA1D6" />
+                </linearGradient>
+                <linearGradient id="bw-pl-tail" x1="100%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="#F4F8FF" />
+                    <stop offset="100%" stopColor="#86A8D8" />
+                </linearGradient>
+            </defs>
+
+            <path
+                d="M28 24 Q24 22 20 18 L12 10 Q8 8 8 12 L10 22 Q12 28 18 30 L30 30 Z"
+                fill="url(#bw-pl-wing-top)"
+            />
+
+            <path
+                d="M18 38 L8 44 Q4 46 8 48 L12 50 Q16 50 20 46 L22 40 Z"
+                fill="url(#bw-pl-tail)"
+                opacity="0.95"
+            />
+
+            <path
+                d="M52 12 Q58 14 56 20 L26 50 Q20 56 14 54 Q10 50 14 46 L46 14 Q48 11 52 12 Z"
+                fill="url(#bw-pl-body)"
+            />
+
+            <path
+                d="M30 32 L50 38 Q56 42 54 48 L46 56 Q42 58 38 54 L28 38 Z"
+                fill="url(#bw-pl-wing-bottom)"
+            />
+
+            <path
+                d="M48 14 Q52 14 54 18 L26 46 Q23 48 22 46 L50 18 Q50 14 48 14 Z"
+                fill="#FFFFFF"
+                opacity="0.55"
+            />
+
+            <path
+                d="M40 38 L48 42 Q50 44 48 46 L42 50 Q40 50 39 48 L38 42 Z"
+                fill="#FFFFFF"
+                opacity="0.45"
+            />
+        </svg>
+    );
+}
+
 export function PinIcon({ className = "h-4 w-4" }: IconProps) {
     return (
         <svg className={className} fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">

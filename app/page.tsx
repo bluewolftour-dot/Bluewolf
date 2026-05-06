@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Suspense, useEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from "react";
 import Image from "next/image";
@@ -17,6 +17,7 @@ import { formatPrice } from "@/lib/bluewolf-utils";
 import { buildHeaderNav } from "@/lib/header-nav";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { PromoBannerSection } from "@/components/sections/PromoBannerSection";
+import { MongoliaWeatherSection } from "@/components/sections/MongoliaWeatherSection";
 import { CloudField } from "@/components/effects/CloudField";
 import { StarField } from "@/components/effects/StarField";
 import { SiteHeader } from "@/components/layout/SiteHeader";
@@ -29,11 +30,11 @@ const homeExtra = {
         featuredTitle: "인기 여행 코스",
         featuredDesc: "블루울프 대표 투어 상품을 만나보세요.",
         viewAll: "투어 전체 보기",
-        reserveNow: "예약하기",
+        reserveNow: "플랜 신청하기",
         reviewTitle: "여행자들의 이야기",
         ctaTitle: "지금 바로 몽골 여행을 시작해보세요",
-        ctaDesc: "입문형부터 프리미엄까지, 당신에게 맞는 일정으로 바로 예약 상담이 가능합니다.",
-        ctaButton: "예약 상담 시작",
+        ctaDesc: "입문형부터 프리미엄까지, 당신에게 맞는 일정으로 바로 플랜 상담을 시작할 수 있습니다.",
+        ctaButton: "플랜 상담 시작",
         ctaSecondary: "투어 살펴보기",
         priceFrom: "부터",
     },
@@ -256,7 +257,7 @@ function HomeContent() {
 
                 {/* 추천 투어 미리보기 */}
                 <section
-                    className={`relative left-1/2 w-screen -translate-x-1/2 py-12 sm:py-16 ${
+                    className={`relative left-1/2 w-screen -translate-x-1/2 pb-6 pt-12 sm:pb-8 sm:pt-16 ${
                         isDark ? "bg-slate-950" : "bg-[#f5f5f7]"
                     }`}
                     style={{
@@ -283,7 +284,7 @@ function HomeContent() {
 
                     <div
                         ref={lineupRef}
-                        className="relative mt-9 snap-x snap-mandatory overflow-x-auto pb-7 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mt-11"
+                        className="relative mt-9 snap-x snap-mandatory overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mt-11 sm:pb-3"
                         style={{
                             scrollPaddingLeft: "var(--featured-gutter)",
                             scrollPaddingRight: "var(--featured-gutter)",
@@ -305,13 +306,13 @@ function HomeContent() {
                                 ).slice(0, 4);
 
                                 return (
-                                    <article
+                                    <Link
                                         key={`${tour.id}-apple-lineup`}
-                                        className="flex w-[78vw] shrink-0 snap-start flex-col sm:w-[360px] lg:w-[390px]"
+                                        href={withLocaleQuery(`/tours/${tour.id}`, lang)}
+                                        className="group flex w-[280px] shrink-0 snap-start flex-col sm:w-[360px] lg:w-[390px]"
                                     >
-                                        <Link
-                                            href={withLocaleQuery(`/tours/${tour.id}`, lang)}
-                                            className={`group relative block h-[280px] overflow-hidden rounded-[30px] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.015] sm:h-[320px] ${
+                                        <span
+                                            className={`relative block aspect-square overflow-hidden rounded-[30px] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.015] sm:aspect-auto sm:h-[320px] ${
                                                 isDark ? "bg-slate-900" : "bg-white"
                                             }`}
                                         >
@@ -321,14 +322,14 @@ function HomeContent() {
                                                     alt={tour.title[lang]}
                                                     fill
                                                     className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"
-                                                    sizes="(max-width: 640px) 78vw, 390px"
+                                                    sizes="(max-width: 640px) 280px, 390px"
                                                 />
                                             ) : (
-                                                <div className={`absolute inset-0 ${isDark ? "bg-slate-900" : "bg-slate-200"}`} />
+                                                <span className={`absolute inset-0 ${isDark ? "bg-slate-900" : "bg-slate-200"}`} />
                                             )}
-                                        </Link>
+                                        </span>
 
-                                        <div className="mt-4 flex h-5 items-center gap-1.5">
+                                        <span className="mt-4 flex h-5 items-center gap-1.5">
                                             {lineupTags.map((tag) => (
                                                 <span
                                                     key={`${tour.id}-lineup-tag-${tag}`}
@@ -337,26 +338,18 @@ function HomeContent() {
                                                     {tag}
                                                 </span>
                                             ))}
-                                        </div>
+                                        </span>
 
-                                        <h3 className={`mt-12 text-[21px] font-black leading-tight tracking-[-0.02em] ${isDark ? "text-white" : "text-black"}`}>
+                                        <span className={`mt-4 block text-[21px] font-black leading-tight tracking-[-0.02em] sm:mt-5 ${isDark ? "text-white" : "text-black"}`}>
                                             {tour.title[lang]}
-                                        </h3>
-                                        <p className={`mt-4 line-clamp-2 text-[14px] font-medium leading-[1.55] ${isDark ? "text-slate-300" : "text-slate-800"}`}>
+                                        </span>
+                                        <span className={`mt-4 line-clamp-2 text-[14px] font-medium leading-[1.55] ${isDark ? "text-slate-300" : "text-slate-800"}`}>
                                             {tour.desc[lang]}
-                                        </p>
-                                        <p className={`mt-4 text-[14px] font-black ${isDark ? "text-white" : "text-black"}`}>
+                                        </span>
+                                        <span className={`mt-4 text-[14px] font-black ${isDark ? "text-white" : "text-black"}`}>
                                             {formatPrice(tour.price)}{h.priceFrom}
-                                        </p>
-                                        <div className="mt-10 flex justify-end">
-                                            <Link
-                                                href={withLocaleQuery(`/tours/${tour.id}`, lang)}
-                                                className="rounded-full bg-blue-600 px-5 py-2.5 text-[14px] font-black text-white transition-colors duration-300 hover:bg-blue-500"
-                                            >
-                                                {lang === "ko" ? "이 플랜 보기" : lang === "ja" ? "このプランを見る" : "View plan"}
-                                            </Link>
-                                        </div>
-                                    </article>
+                                        </span>
+                                    </Link>
                                 );
                             })}
                         </div>
@@ -480,6 +473,8 @@ function HomeContent() {
                         </div>
                     </section>
                 )}
+
+                <MongoliaWeatherSection isDark={isDark} lang={lang} />
 
                 {/* CTA 배너 */}
                 <div className="px-5 sm:px-8 lg:px-12">

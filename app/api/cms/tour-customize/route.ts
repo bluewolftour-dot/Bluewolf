@@ -8,7 +8,7 @@ import { requireAdminResponse } from "@/lib/admin-auth";
 
 export async function GET() {
     return NextResponse.json({
-        tourCustomize: getCmsTourCustomizeContent(),
+        tourCustomize: await getCmsTourCustomizeContent(),
     });
 }
 
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     if (forbidden) return forbidden;
 
     const body = (await request.json()) as CmsTourCustomizeRecord;
-    const saved = saveCmsTourCustomizeContent(body);
+    const saved = await saveCmsTourCustomizeContent(body);
 
     return NextResponse.json({
         tourCustomize: saved,

@@ -28,13 +28,13 @@ type PreparePaymentBody = {
     memo?: string;
 };
 
-const CUSTOM_PLAN_DEPOSIT_PER_PERSON = 50000;
+const PLAN_PACKAGE_FEE_PER_PERSON = 50000;
 const SESSION_COOKIE = "bluewolf_session";
 
 function buildOrderName(locale: string, title: string) {
-    if (locale === "ja") return `${title} 予約金`;
-    if (locale === "en") return `${title} deposit`;
-    return `${title} 예약금`;
+    if (locale === "ja") return `${title} プランパッケージ利用料`;
+    if (locale === "en") return `${title} plan package fee`;
+    return `${title} 플랜 패키지 이용료`;
 }
 
 function resolveLocale(locale: string) {
@@ -69,14 +69,14 @@ export async function POST(request: NextRequest) {
         : [];
     const memo = body.memo?.trim() ?? "";
 
-    const tour = Number.isInteger(tourId) ? getCmsTourById(tourId) : null;
+    const tour = Number.isInteger(tourId) ? await getCmsTourById(tourId) : null;
     const cookieStore = await cookies();
     const token = cookieStore.get(SESSION_COOKIE)?.value;
     const user = await getSessionUser(token);
     const email = user?.email?.trim().toLowerCase() || requestedEmail;
 
     if (!tour && !isCustomPlan) {
-        return NextResponse.json({ error: "A valid tour is required." }, { status: 400 });
+        return NextResponse.json({ error: "A valid plan is required." }, { status: 400 });
     }
 
     if (!customerName || !email || !phone || !departDate || !Number.isFinite(guests) || guests < 1) {
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
               tourId,
               departDate,
               guests,
-              bookings: getCrmBookings(),
+              bookings: await getCrmBookings(),
           });
 
     if (!availability.ok) {
@@ -114,11 +114,11 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    const amount = isCustomPlan ? CUSTOM_PLAN_DEPOSIT_PER_PERSON * guests : (tour?.deposit ?? 0) * guests;
+    const amount = isCustomPlan ? PLAN_PACKAGE_FEE_PER_PERSON * guests : (tour?.deposit ?? 0) * guests;
 
     if (!Number.isFinite(amount) || amount < 1) {
         return NextResponse.json(
-            { error: "A valid payment amount is required." },
+            { error: "A valid plan package fee amount is required." },
             { status: 400 }
         );
     }
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
         isCustomPlan ? "custom=1" : `tour=${tour?.id ?? ""}`
     }`;
 
-    const order = createCrmPaymentOrder({
+    const order = await createCrmPaymentOrder({
         orderId,
         tourId: tour?.id ?? 0,
         customTitle: isCustomPlan ? customPlanTitle : "",

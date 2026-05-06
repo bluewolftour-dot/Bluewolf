@@ -19,9 +19,9 @@ type ChatMessage = {
 
 const contactData = {
     ko: {
-        formTitle: "사람 상담 요청",
+        formTitle: "상담 요청",
         formDesc:
-            "예약 변경, 결제 확인, 단체 일정처럼 직접 확인이 필요한 문의는 아래 양식으로 남겨주세요.",
+            "플랜 신청 변경, 결제 확인, 단체 일정처럼 직접 확인이 필요한 문의는 아래 양식으로 남겨주세요.",
         nameLabel: "이름",
         namePlaceholder: "홍길동",
         emailLabel: "이메일",
@@ -29,7 +29,7 @@ const contactData = {
         phoneLabel: "연락처",
         phonePlaceholder: "010-0000-0000",
         subjectLabel: "문의 유형",
-        subjects: ["투어 문의", "예약 상담", "결제 문의", "기타"],
+        subjects: ["투어 문의", "플랜 상담", "결제 문의", "기타"],
         messageLabel: "문의 내용",
         messagePlaceholder: "궁금한 내용을 자세히 적어주세요.",
         submitBtn: "문의 보내기",
@@ -45,8 +45,8 @@ const contactData = {
         phoneValue: "+82-2-0000-0000",
         hoursValue: "평일 09:00 - 18:00 (KST)",
         addressValue: "서울시 강남구 테헤란로 123",
-        quickTitle: "사람 상담이 필요하신가요?",
-        quickDesc: "예약 확인이나 일정 조정이 필요하면 이메일로 바로 문의하실 수 있어요.",
+        quickTitle: "상담이 필요하신가요?",
+        quickDesc: "진행 상태 확인이나 일정 조정이 필요하면 이메일로 바로 문의하실 수 있어요.",
         quickButton: "이메일 문의 열기",
     },
     ja: {
@@ -76,14 +76,14 @@ const contactData = {
         phoneValue: "+82-2-0000-0000",
         hoursValue: "平日 09:00 - 18:00 (KST)",
         addressValue: "ソウル市 江南区 テヘラン路 123",
-        quickTitle: "スタッフ相談が必要ですか？",
-        quickDesc: "予約確認や日程調整が必要な場合は、メールですぐにお問い合わせいただけます。",
+        quickTitle: "相談が必要ですか？",
+        quickDesc: "進行状況の確認や日程調整が必要な場合は、メールですぐにお問い合わせいただけます。",
         quickButton: "メールで問い合わせる",
     },
     en: {
         formTitle: "Human support request",
         formDesc:
-            "For booking changes, payment checks, or group itinerary coordination that needs direct confirmation, send us a message below.",
+            "For plan changes, payment checks, or group itinerary coordination that needs direct confirmation, send us a message below.",
         nameLabel: "Full name",
         namePlaceholder: "John Doe",
         emailLabel: "Email address",
@@ -107,7 +107,7 @@ const contactData = {
         phoneValue: "+82-2-0000-0000",
         hoursValue: "Mon - Fri 09:00 - 18:00 (KST)",
         addressValue: "123 Teheran-ro, Gangnam-gu, Seoul",
-        quickTitle: "Need a human reply?",
+        quickTitle: "Need support?",
         quickDesc: "If you need booking confirmation or itinerary support, you can contact us by email right away.",
         quickButton: "Open email inquiry",
     },
@@ -131,7 +131,7 @@ const assistantData = {
         ],
         note: "AI 답변은 홈페이지의 내용 기반으로 생성됩니다.",
         fallback:
-            "AI 상담 연결에 문제가 발생했습니다. 잠시 후 다시 시도하거나 아래 사람 상담 요청을 이용해주세요.",
+            "AI 상담 연결에 문제가 발생했습니다. 잠시 후 다시 시도하거나 아래 상담 요청을 이용해주세요.",
     },
     ja: {
         badge: "AI相談",
@@ -169,7 +169,7 @@ const assistantData = {
         ],
         note: "AI answers are generated from website content.",
         fallback:
-            "The AI concierge is temporarily unavailable. Please try again shortly or use the human support form below.",
+            "The AI concierge is temporarily unavailable. Please try again shortly or use the support form below.",
     },
 } as const;
 

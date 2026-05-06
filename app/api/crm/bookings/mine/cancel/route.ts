@@ -13,6 +13,7 @@ import {
     hasTossPaymentsConfig,
     TOSS_PAYMENT_URL,
 } from "@/lib/toss-payments";
+import { createNotification } from "@/lib/notifications";
 
 const SESSION_COOKIE = "bluewolf_session";
 
@@ -23,6 +24,7 @@ type SelfCancelBody = {
 };
 
 type RefundLocale = "ko" | "ja" | "en";
+type RefundStatus = "refunded" | "manual_required" | "not_paid";
 
 function resolveLocale(locale: string): RefundLocale {
     if (locale === "ja") return "ja";
@@ -55,60 +57,20 @@ function formatAmount(amount: number, locale: RefundLocale) {
     }).format(amount);
 }
 
-function buildRefundMessage(
-    status: "refunded" | "manual_required" | "not_paid",
-    amount: number,
-    locale: RefundLocale
-) {
+function buildRefundMessage(status: RefundStatus, amount: number, locale: RefundLocale) {
     if (status === "refunded") {
         if (locale === "ja") {
-            return `お支払い済みの予約金 ${formatAmount(amount, locale)} は決済手段へ返金処理されます。カード会社や決済会社の都合により、実際の反映までお時間をいただく場合があります。`;
+            return `お支払い済みの予約金 ${formatAmount(amount, locale)} は元のお支払い方法へ返金されます。反映まで時間がかかる場合があります。`;
         }
         if (locale === "en") {
             return `Your paid deposit of ${formatAmount(amount, locale)} will be refunded to the original payment method. Posting times depend on your card issuer and payment provider.`;
         }
-        return `결제된 예약금 ${formatAmount(amount, locale)}은 결제 수단으로 환불 처리됩니다. 카드사나 결제사 사정에 따라 실제 반영까지 시간이 걸릴 수 있습니다.`;
+        return `결제된 플랜 패키지 이용료 ${formatAmount(amount, locale)}는 결제 수단으로 환불 처리됩니다. 카드사나 결제사 사정에 따라 실제 반영까지 시간이 걸릴 수 있습니다.`;
     }
 
     if (status === "manual_required") {
         if (locale === "ja") {
-            return "決済の確認は完了していますが、自動返金情報がないため担当者が手動で返金を進めます。";
-        }
-        if (locale === "en") {
-            return "We've confirmed your payment, but automatic refund details are missing — our team will process the refund manually.";
-        }
-        return "결제 확인은 완료되었지만 자동 환불 정보가 없어 담당자가 수동 환불 절차를 진행합니다.";
-    }
-
-    if (locale === "ja") {
-        return "決済履歴を確認のうえ、返金可能額をご案内し返金処理を行います。";
-    }
-    if (locale === "en") {
-        return "We will check your payment history and notify you of the refundable amount before processing.";
-    }
-    return "결제 내역을 확인한 뒤 환불 가능 금액을 안내하고 환불을 진행합니다.";
-}
-
-void buildRefundMessage;
-
-function buildSafeRefundMessage(
-    status: "refunded" | "manual_required" | "not_paid",
-    amount: number,
-    locale: RefundLocale
-) {
-    if (status === "refunded") {
-        if (locale === "ja") {
-            return `決済済みの予約金 ${formatAmount(amount, locale)} は元の決済手段へ返金処理されます。カード会社や決済会社の処理状況により反映まで時間がかかる場合があります。`;
-        }
-        if (locale === "en") {
-            return `Your paid deposit of ${formatAmount(amount, locale)} will be refunded to the original payment method. Posting times depend on your card issuer and payment provider.`;
-        }
-        return `결제된 예약금 ${formatAmount(amount, locale)}은 결제 수단으로 환불 처리됩니다. 카드사나 결제사 사정에 따라 실제 반영까지 시간이 걸릴 수 있습니다.`;
-    }
-
-    if (status === "manual_required") {
-        if (locale === "ja") {
-            return "決済は確認済みですが自動返金情報が不足しているため、担当者が手動で返金手続きを進めます。";
+            return "お支払いは確認済みですが自動返金情報が不足しているため、担当者が手動で返金手続きを進めます。";
         }
         if (locale === "en") {
             return "We've confirmed your payment, but automatic refund details are missing. Our team will process the refund manually.";
@@ -117,12 +79,12 @@ function buildSafeRefundMessage(
     }
 
     if (locale === "ja") {
-        return "決済履歴を確認したうえで、返金可能金額をご案内してから返金を進めます。";
+        return "お支払い履歴を確認した後、返金可能額をご案内して返金を進めます。";
     }
     if (locale === "en") {
         return "We will check your payment history and notify you of the refundable amount before processing.";
     }
-    return "결제 내역을 확인한 후 환불 가능 금액을 안내하고 환불을 진행합니다.";
+    return "결제 내역을 확인한 뒤 환불 가능 금액을 안내하고 환불을 진행합니다.";
 }
 
 export async function POST(request: NextRequest) {
@@ -143,7 +105,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
     }
 
-    const target = findCrmBookingByNoForEmail(bookingNo, user.email);
+    const target = await findCrmBookingByNoForEmail(bookingNo, user.email);
     if (!target) {
         return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
     }
@@ -157,8 +119,8 @@ export async function POST(request: NextRequest) {
     }
 
     const locale = resolveLocale(target.locale);
-    const paymentOrder = getCrmPaymentOrderByBookingNo(target.bookingNo);
-    let refundStatus: "refunded" | "manual_required" | "not_paid" = "not_paid";
+    const paymentOrder = await getCrmPaymentOrderByBookingNo(target.bookingNo);
+    let refundStatus: RefundStatus = "not_paid";
     let refundedAmount = 0;
 
     if (paymentOrder?.status === "paid" && paymentOrder.paymentKey) {
@@ -200,7 +162,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        markCrmPaymentOrderCancelledByBookingNo(target.bookingNo);
+        await markCrmPaymentOrderCancelledByBookingNo(target.bookingNo);
         refundStatus = "refunded";
         refundedAmount = paymentOrder.amount;
     } else if (paymentOrder?.status === "paid") {
@@ -208,9 +170,9 @@ export async function POST(request: NextRequest) {
         refundedAmount = paymentOrder.amount;
     }
 
-    const refundMessage = buildSafeRefundMessage(refundStatus, refundedAmount, locale);
+    const refundMessage = buildRefundMessage(refundStatus, refundedAmount, locale);
 
-    const booking = cancelCrmBookingById({
+    const booking = await cancelCrmBookingById({
         id: target.id,
         cancelReason,
         cancelMemo,
@@ -218,6 +180,26 @@ export async function POST(request: NextRequest) {
 
     if (!booking) {
         return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
+    }
+
+    try {
+        await createNotification({
+            userId: user.id,
+            type: "booking_cancelled",
+            title: {
+                ko: "예약 취소 완료",
+                ja: "予約キャンセル完了",
+                en: "Booking Cancelled",
+            },
+            content: {
+                ko: `[${booking.bookingNo}] 예약 취소가 완료되었습니다. 환불 관련 내용은 마이페이지에서 확인하실 수 있습니다.`,
+                ja: `[${booking.bookingNo}] 予約キャンセルが完了しました。返金の詳細はマイページで確認できます。`,
+                en: `[${booking.bookingNo}] Your booking cancellation is complete. You can check refund details in My Page.`,
+            },
+            link: "/mypage/bookings",
+        });
+    } catch (error) {
+        console.error("Failed to create cancellation notification:", error);
     }
 
     let emailSent = false;

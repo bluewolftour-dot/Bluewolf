@@ -8,7 +8,7 @@ import { requireAdminResponse } from "@/lib/admin-auth";
 
 export async function GET() {
     return NextResponse.json({
-        community: getCmsCommunityContent(),
+        community: await getCmsCommunityContent(),
     });
 }
 
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     if (forbidden) return forbidden;
 
     const body = (await request.json()) as CmsCommunityRecord;
-    const saved = saveCmsCommunityContent(body);
+    const saved = await saveCmsCommunityContent(body);
 
     return NextResponse.json({
         community: saved,

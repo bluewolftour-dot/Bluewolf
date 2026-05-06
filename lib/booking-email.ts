@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+﻿import nodemailer from "nodemailer";
 
 type BookingEmailLocale = "ko" | "ja" | "en";
 type BookingEmailStatus = "pending" | "confirmed";
@@ -96,77 +96,77 @@ function pickStatusCopy(locale: BookingEmailLocale, status: BookingEmailStatus):
     if (locale === "ja") {
         if (status === "pending") {
             return {
-                subject: "BlueWolf 予約受付のご案内",
-                heading: "予約リクエストを受け付けました",
-                intro: "担当者が内容を確認し、順次ご案内いたします。予約番号は以下でご確認ください。",
-                bookingNoLabel: "予約番号",
-                tourLabel: "ツアー",
+                subject: "BlueWolf プラン申請受付のご案内",
+                heading: "プラン申請を受け付けました",
+                intro: "担当者が内容を確認し、順次ご案内いたします。申請番号は以下でご確認ください。",
+                bookingNoLabel: "申請番号",
+                tourLabel: "プラン",
                 departDateLabel: "出発日",
                 guestsLabel: "人数",
-                footer: "ご不明点があれば BlueWolf サポートまでお問い合わせください。",
+                footer: "BlueWolf KR は旅行商品の直接販売者・旅行業者ではなく、実際の旅行契約・日程確定・現地運営は BlueWolf Mongolia が担当します。",
             };
         }
 
         return {
-            subject: "BlueWolf 予約確定のご案内",
-            heading: "ご予約が確定しました",
-            intro: "お支払いが正常に完了し、予約番号が発行されました。下記の内容をご確認ください。",
-            bookingNoLabel: "予約番号",
-            tourLabel: "ツアー",
+            subject: "BlueWolf Mongolia 確認完了のご案内",
+            heading: "BlueWolf Mongolia の確認が完了しました",
+            intro: "BlueWolf Mongolia 側の確認が完了しました。下記の内容をご確認ください。",
+            bookingNoLabel: "申請番号",
+            tourLabel: "プラン",
             departDateLabel: "出発日",
             guestsLabel: "人数",
-            footer: "ご不明点があれば BlueWolf サポートまでお問い合わせください。",
+            footer: "BlueWolf KR は旅行商品の直接販売者・旅行業者ではなく、実際の旅行契約・日程確定・現地運営は BlueWolf Mongolia が担当します。",
         };
     }
 
     if (locale === "en") {
         if (status === "pending") {
             return {
-                subject: "BlueWolf booking request received",
-                heading: "Your booking request has been received",
-                intro: "Our team will review your request and follow up shortly. Please keep your booking number below.",
-                bookingNoLabel: "Booking number",
-                tourLabel: "Tour",
+                subject: "BlueWolf plan application received",
+                heading: "Your plan application has been received",
+                intro: "Our team will review your application and follow up shortly. Please keep your application number below.",
+                bookingNoLabel: "Application number",
+                tourLabel: "Plan",
                 departDateLabel: "Departure date",
                 guestsLabel: "Guests",
-                footer: "If you have any questions, please contact BlueWolf support.",
+                footer: "BlueWolf KR is not the direct seller or travel operator. The actual travel contract, itinerary confirmation, and local operations are handled by BlueWolf Mongolia.",
             };
         }
 
         return {
-            subject: "BlueWolf booking confirmed",
-            heading: "Your booking is confirmed",
-            intro: "Your payment has been completed successfully and your booking number has been issued.",
-            bookingNoLabel: "Booking number",
-            tourLabel: "Tour",
+            subject: "BlueWolf Mongolia review completed",
+            heading: "BlueWolf Mongolia review has been completed",
+            intro: "BlueWolf Mongolia has completed the review for your application.",
+            bookingNoLabel: "Application number",
+            tourLabel: "Plan",
             departDateLabel: "Departure date",
             guestsLabel: "Guests",
-            footer: "If you have any questions, please contact BlueWolf support.",
+            footer: "BlueWolf KR is not the direct seller or travel operator. The actual travel contract, itinerary confirmation, and local operations are handled by BlueWolf Mongolia.",
         };
     }
 
     if (status === "pending") {
         return {
-            subject: "BlueWolf 예약 요청 접수 안내",
-            heading: "예약 요청이 접수되었습니다",
-            intro: "담당자가 내용을 확인한 뒤 순차적으로 안내드립니다. 아래 예약 번호를 보관해주세요.",
-            bookingNoLabel: "예약 번호",
-            tourLabel: "투어",
+            subject: "BlueWolf 플랜 신청 접수 안내",
+            heading: "플랜 신청이 접수되었습니다",
+            intro: "담당자가 내용을 확인한 뒤 순차적으로 안내드립니다. 아래 신청 번호를 보관해주세요.",
+            bookingNoLabel: "신청 번호",
+            tourLabel: "플랜",
             departDateLabel: "출발일",
             guestsLabel: "인원",
-            footer: "문의가 있으면 BlueWolf 상담 채널로 문의해주세요.",
+            footer: "BlueWolf KR은 여행상품의 직접 판매자나 여행업자가 아니며, 실제 여행계약·일정 확정·현지 운영은 BlueWolf Mongolia가 담당합니다.",
         };
     }
 
     return {
-        subject: "BlueWolf 예약 확정 안내",
-        heading: "예약이 확정되었습니다",
-        intro: "결제가 정상적으로 완료되어 예약 번호가 발급되었습니다. 아래 내용을 확인해주세요.",
-        bookingNoLabel: "예약 번호",
-        tourLabel: "투어",
+        subject: "BlueWolf Mongolia 확인 완료 안내",
+        heading: "BlueWolf Mongolia 확인이 완료되었습니다",
+        intro: "BlueWolf Mongolia 측 확인이 완료되었습니다. 아래 내용을 확인해주세요.",
+        bookingNoLabel: "신청 번호",
+        tourLabel: "플랜",
         departDateLabel: "출발일",
         guestsLabel: "인원",
-        footer: "문의가 있으면 BlueWolf 상담 채널로 문의해주세요.",
+        footer: "BlueWolf KR은 여행상품의 직접 판매자나 여행업자가 아니며, 실제 여행계약·일정 확정·현지 운영은 BlueWolf Mongolia가 담당합니다.",
     };
 }
 
@@ -189,32 +189,32 @@ function pickCancellationCopy(locale: BookingEmailLocale): BookingCancellationEm
 
     if (locale === "en") {
         return {
-            subject: "BlueWolf cancellation request received",
-            heading: "Your cancellation request has been received",
-            intro: "Our team will review your cancellation request and follow up with refund or confirmation details shortly.",
-            bookingNoLabel: "Booking number",
-            tourLabel: "Tour",
+            subject: "BlueWolf plan package fee refund inquiry received",
+            heading: "Your plan package fee refund inquiry has been received",
+            intro: "Our team will review your refund inquiry and follow up shortly.",
+            bookingNoLabel: "Application number",
+            tourLabel: "Plan",
             departDateLabel: "Departure date",
             guestsLabel: "Guests",
             cancelReasonLabel: "Cancellation reason",
             cancelMemoLabel: "Additional notes",
             refundMessageLabel: "Refund information",
-            footer: "If you have any questions, please contact BlueWolf support.",
+            footer: "BlueWolf KR is not the direct seller or travel operator. The actual travel contract, itinerary confirmation, and local operations are handled by BlueWolf Mongolia.",
         };
     }
 
     return {
-        subject: "BlueWolf 취소 요청 접수 안내",
-        heading: "취소 요청이 접수되었습니다",
-        intro: "담당자가 신청 내역을 확인한 뒤 환불 및 취소 확정 내용을 순차적으로 안내드립니다.",
-        bookingNoLabel: "예약 번호",
-        tourLabel: "투어",
+        subject: "BlueWolf 플랜 이용료 환불 문의 접수 안내",
+        heading: "플랜 이용료 환불 문의가 접수되었습니다",
+        intro: "담당자가 신청 내역을 확인한 뒤 환불 관련 내용을 순차적으로 안내드립니다.",
+        bookingNoLabel: "신청 번호",
+        tourLabel: "플랜",
         departDateLabel: "출발일",
         guestsLabel: "인원",
         cancelReasonLabel: "취소 사유",
         cancelMemoLabel: "추가 메모",
         refundMessageLabel: "환불 안내",
-        footer: "문의가 있으면 BlueWolf 상담 채널로 문의해주세요.",
+        footer: "BlueWolf KR은 여행상품의 직접 판매자나 여행업자가 아니며, 실제 여행계약·일정 확정·현지 운영은 BlueWolf Mongolia가 담당합니다.",
     };
 }
 

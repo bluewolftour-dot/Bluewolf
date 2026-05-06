@@ -7,6 +7,6 @@ export async function GET() {
     if (forbidden) return forbidden;
 
     return NextResponse.json({
-        overview: getCrmOverview(),
+        overview: await getCrmOverview(),
     });
 }

@@ -189,6 +189,7 @@ export function HeroSection({
         selectedDestination?.image && selectedDestination.image !== CMS_NULL_IMAGE
             ? selectedDestination.image
             : null;
+    const currentSlideTitle = currentSlide.title.replace(/\s*\n\s*/g, " ");
 
     useEffect(() => {
         onDestinationImageChange?.(selectedDestinationImage);
@@ -215,14 +216,14 @@ export function HeroSection({
 
     return (
         <>
-                <div className="relative z-30 flex min-h-0 flex-col justify-start overflow-visible rounded-[24px] border border-white/10 bg-slate-950/28 p-5 backdrop-blur-[2px] sm:rounded-[28px] sm:px-8 md:min-h-[430px] md:justify-center md:py-8 lg:min-h-[560px] lg:px-10">
+                <div className="relative z-30 flex min-h-0 flex-col justify-start overflow-visible rounded-[24px] border border-white/10 bg-slate-950/28 p-5 backdrop-blur-[2px] sm:rounded-[28px] sm:px-7 md:min-h-[360px] md:justify-center md:py-6 lg:min-h-[460px] lg:px-8">
                     <h1
-                        className="relative whitespace-pre-line text-[26px] font-black leading-tight tracking-tight text-white"
+                        className="relative whitespace-pre-line !text-[1.8rem] font-black leading-tight tracking-tight text-white"
                     >
                         {searchCopy.title}
                     </h1>
 
-                    <form onSubmit={handleSearch} className="relative mt-8 grid max-w-md gap-3">
+                    <form onSubmit={handleSearch} className="relative mt-6 grid max-w-md gap-3">
                         <HeroDestinationDropdown
                             value={destination}
                             placeholder={searchCopy.destinationPlaceholder}
@@ -244,7 +245,7 @@ export function HeroSection({
 
                         <button
                             type="submit"
-                            className="mt-3 h-[52px] rounded-2xl bg-blue-600 px-6 text-[15px] font-black text-white transition duration-300 hover:bg-blue-500 active:scale-[0.99]"
+                            className="mt-2 h-[52px] rounded-2xl bg-blue-600 px-6 text-[15px] font-black text-white transition duration-300 hover:bg-blue-500 active:scale-[0.99]"
                         >
                             {searchCopy.search}
                         </button>
@@ -252,7 +253,7 @@ export function HeroSection({
                 </div>
 
                 <div
-                    className="relative z-10 min-h-[170px] overflow-hidden rounded-[20px] bg-slate-950/28 backdrop-blur-[2px] sm:rounded-[28px] md:min-h-[430px] lg:min-h-[560px]"
+                    className="relative z-10 min-h-[170px] overflow-hidden rounded-[20px] bg-slate-950/28 backdrop-blur-[2px] sm:rounded-[28px] md:min-h-[360px] lg:min-h-[460px]"
                     onMouseEnter={() => setPaused(true)}
                     onMouseLeave={() => setPaused(false)}
                 >
@@ -274,27 +275,27 @@ export function HeroSection({
                                     className="object-cover"
                                     sizes="(min-width: 1024px) 65vw, 100vw"
                                 />
-                                <span className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,6,23,0.72)_0%,rgba(2,6,23,0.50)_34%,rgba(2,6,23,0.18)_70%,rgba(2,6,23,0.04)_100%)]" />
+                                <span className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/38 to-transparent" />
                             </a>
                         ))
                     ) : (
                         <div className={`absolute inset-0 ${isDark ? "bg-slate-900" : "bg-slate-100"}`} />
                     )}
 
-                    <div className="pointer-events-none relative z-10 flex h-[170px] flex-col justify-end p-5 md:h-auto md:min-h-[430px] md:justify-between md:p-10 lg:min-h-[560px]">
-                        <div className="absolute left-5 top-1/2 max-w-[62%] -translate-y-1/2 md:static md:max-w-xl md:translate-y-0">
-                            <span className="hidden rounded-full bg-white/90 px-4 py-2 text-xs font-black text-blue-700 shadow-[0_6px_18px_rgba(15,23,42,0.08)] backdrop-blur md:inline-flex">
+                    <div className="pointer-events-none relative z-10 flex h-[170px] flex-col justify-end p-5 md:h-auto md:min-h-[360px] md:p-8 lg:min-h-[460px]">
+                        <div className="absolute bottom-5 left-5 max-w-[62%] md:bottom-8 md:left-8 md:max-w-xl">
+                            <span className="hidden rounded-full bg-white/90 px-4 py-2 text-[11px] font-black text-blue-700 shadow-[0_6px_18px_rgba(15,23,42,0.08)] backdrop-blur md:inline-flex">
                                 {currentSlide.eyebrow}
                             </span>
-                            <h2 className="whitespace-pre-line text-[18px] font-black leading-tight tracking-tight text-white md:mt-6 md:text-[46px] lg:text-[58px]">
-                                {currentSlide.title}
+                            <h2 className="text-[13px] font-black leading-tight tracking-tight text-white md:mt-5 md:text-[36px] lg:text-[46px]">
+                                {currentSlideTitle}
                             </h2>
-                            <p className="mt-3 line-clamp-2 max-w-md text-[12px] font-bold leading-5 text-slate-200 md:mt-5 md:text-lg md:leading-7">
+                            <p className="mt-3 hidden max-w-md font-bold text-slate-200 md:mt-4 md:line-clamp-2 md:block md:text-[15px] md:leading-6">
                                 {currentSlide.desc}
                             </p>
                         </div>
 
-                        <div className="pointer-events-auto flex items-end justify-end gap-2 md:items-center md:justify-center">
+                        <div className="pointer-events-auto absolute bottom-5 right-5 flex items-end justify-end gap-2 md:bottom-8 md:right-8 md:items-center">
                             <div className="flex items-center gap-2 rounded-full bg-slate-950/72 px-3 py-2 text-xs font-black text-white backdrop-blur-md md:gap-3 md:px-4 md:py-3 md:text-sm">
                                 <span>
                                     {activeSlideNumber}/{hero.length}

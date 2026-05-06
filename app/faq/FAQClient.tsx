@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { faq } from "@/lib/bluewolf-data";
 import { PageShell, usePage } from "@/components/layout/PageShell";
+import { withLocaleQuery } from "@/lib/locale-routing";
 
 function FAQContent() {
-    const { isDark, t } = usePage();
+    const { isDark, lang, t } = usePage();
     const items = faq.ko;
 
     return (
@@ -32,7 +33,7 @@ function FAQContent() {
                         isDark ? "text-slate-300" : "text-slate-500"
                     }`}
                 >
-                    예약, 결제, 출발 준비, 항공권, 1인 출발 관련해서 자주 묻는 질문을 정리했습니다.
+                    플랜 신청, 결제, 출발 준비 등 여행 전 과정에서 자주 묻는 질문을 정리했습니다.
                 </p>
             </section>
 
@@ -70,7 +71,7 @@ function FAQContent() {
                                         isDark ? "text-slate-500" : "text-slate-400"
                                     }`}
                                 >
-                                    ⌄
+                                    ▾
                                 </span>
                             </summary>
 
@@ -88,23 +89,23 @@ function FAQContent() {
 
             <section className="rounded-[28px] border border-blue-500/20 bg-blue-600 p-8 text-white shadow-sm">
                 <h2 className="text-2xl font-black tracking-tight">
-                    원하는 답변이 없으면 바로 문의하세요
+                    더 필요한 내용이 있으면 바로 문의해주세요.
                 </h2>
 
                 <p className="mt-3 max-w-2xl leading-8 text-blue-100">
-                    일정, 인원, 출발 희망일에 맞춰 예약 상담과 견적 안내를 도와드립니다.
+                    일정, 인원, 출발 희망일에 맞춰 플랜 상담과 견적 안내를 도와드립니다.
                 </p>
 
                 <div className="mt-6 flex flex-wrap gap-3">
                     <Link
-                        href="/booking"
+                        href={withLocaleQuery("/booking", lang)}
                         className="rounded-2xl bg-white px-5 py-4 font-bold text-slate-900 transition-[transform,background-color] duration-700 ease-in-out hover:bg-slate-100 active:scale-[0.97] active:translate-y-0"
                     >
-                        예약 상담 시작
+                        플랜 상담 시작
                     </Link>
 
                     <Link
-                        href="/contact"
+                        href={withLocaleQuery("/contact", lang)}
                         className="rounded-2xl bg-white/10 px-5 py-4 font-bold text-white transition-[transform,background-color] duration-700 ease-in-out hover:bg-white/20 active:scale-[0.97] active:translate-y-0"
                     >
                         문의 페이지

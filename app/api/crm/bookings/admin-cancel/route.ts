@@ -12,6 +12,8 @@ import {
     hasTossPaymentsConfig,
     TOSS_PAYMENT_URL,
 } from "@/lib/toss-payments";
+import { createNotification } from "@/lib/notifications";
+import { findUserByEmail } from "@/lib/auth-server";
 
 type AdminCancelBody = {
     id?: number;
@@ -56,12 +58,12 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
     }
 
-    const target = getCrmBookingById(id);
+    const target = await getCrmBookingById(id);
     if (!target) {
         return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
     }
 
-    const paymentOrder = getCrmPaymentOrderByBookingNo(target.bookingNo);
+    const paymentOrder = await getCrmPaymentOrderByBookingNo(target.bookingNo);
     let refundMessage = "결제 내역을 확인한 뒤 환불 가능 금액을 안내하고 환불을 진행합니다.";
     let refundStatus: "refunded" | "manual_required" | "not_paid" = "not_paid";
 
@@ -101,15 +103,15 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        markCrmPaymentOrderCancelledByBookingNo(target.bookingNo);
+        await markCrmPaymentOrderCancelledByBookingNo(target.bookingNo);
         refundStatus = "refunded";
-        refundMessage = `결제된 예약금 ${formatWon(paymentOrder.amount)}은 결제 수단으로 환불 처리됩니다. 카드사나 결제사 사정에 따라 실제 반영까지 시간이 걸릴 수 있습니다.`;
+        refundMessage = `결제된 플랜 패키지 이용료 ${formatWon(paymentOrder.amount)}는 결제 수단으로 환불 처리됩니다. 카드사나 결제사 사정에 따라 실제 반영까지 시간이 걸릴 수 있습니다.`;
     } else if (paymentOrder?.status === "paid") {
         refundStatus = "manual_required";
         refundMessage = "결제 확인은 완료되었지만 자동 환불 정보가 없어 담당자가 수동 환불 절차를 진행합니다.";
     }
 
-    const booking = cancelCrmBookingById({
+    const booking = await cancelCrmBookingById({
         id,
         cancelReason,
         cancelMemo,
@@ -117,6 +119,30 @@ export async function POST(request: NextRequest) {
 
     if (!booking) {
         return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
+    }
+
+    // 알림 생성
+    try {
+        const user = await findUserByEmail(booking.email);
+        if (user) {
+            await createNotification({
+                userId: user.id,
+                type: "booking_cancelled",
+                title: {
+                    ko: "예약 취소 안내",
+                    ja: "予約キャンセルのご案内",
+                    en: "Booking Cancelled"
+                },
+                content: {
+                    ko: `[${booking.bookingNo}] 관리자에 의해 예약이 취소되었습니다. 상세 내용은 마이페이지에서 확인하실 수 있습니다.`,
+                    ja: `[${booking.bookingNo}] 管理者により予約がキャンセルされました。詳細はマイページで確認できます。`,
+                    en: `[${booking.bookingNo}] Your booking has been cancelled by the administrator. Check details in My Page.`
+                },
+                link: "/mypage/bookings"
+            });
+        }
+    } catch (err) {
+        console.error("Failed to create admin-cancellation notification:", err);
     }
 
     let emailSent = false;

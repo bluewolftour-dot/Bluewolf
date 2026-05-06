@@ -110,7 +110,7 @@ function MenuIcon({
     className?: string;
 }) {
     return (
-        <span className={`relative block h-5 w-5 ${className}`}>
+        <span className={className ? `relative block h-5 w-5 ${className}` : "relative block h-5 w-5"}>
             <svg
                 viewBox="0 0 24 24"
                 className={`absolute inset-0 h-5 w-5 transition-[transform,opacity] duration-[250ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${

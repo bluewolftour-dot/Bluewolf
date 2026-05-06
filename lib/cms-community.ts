@@ -49,6 +49,7 @@ function normalizeItem(input: Partial<CommunityItem> | undefined, fallbackId: nu
         id: Number.isFinite(Number(input?.id)) ? Number(input?.id) : fallbackId,
         type,
         author: input?.author?.trim() || "",
+        authorId: input?.authorId?.trim().toLowerCase() || undefined,
         date: input?.date?.trim() || today(),
         text: input?.text?.trim() || "",
         likes: Number.isFinite(Number(input?.likes)) ? Number(input?.likes) : 0,

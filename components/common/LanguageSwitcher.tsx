@@ -11,6 +11,10 @@ const items: { key: Locale; label: string; href: string }[] = [
     { key: "en", label: "EN", href: "/about/en" },
 ];
 
+function cx(...classes: Array<string | false | null | undefined>) {
+    return classes.filter(Boolean).join(" ");
+}
+
 function FlagIcon({ locale }: { locale: Locale }) {
     if (locale === "ja") {
         return (
@@ -116,7 +120,10 @@ export function LanguageSwitcher({
                 <svg
                     viewBox="0 0 20 20"
                     fill="none"
-                    className={`h-4 w-4 stroke-[2.4] transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+                    className={cx(
+                        "h-4 w-4 stroke-[2.4] transition-transform duration-300",
+                        open && "rotate-180"
+                    )}
                 >
                     <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>

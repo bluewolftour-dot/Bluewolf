@@ -1,14 +1,20 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth-server";
+import { isProductionRuntime, readCommaSeparatedEnv } from "@/lib/env";
 
 const SESSION_COOKIE = "bluewolf_session";
 
 function getAdminIds() {
-    return (process.env.BLUEWOLF_ADMIN_IDS || "admin,bluewolf")
-        .split(",")
+    const ids = readCommaSeparatedEnv("BLUEWOLF_ADMIN_IDS")
         .map((item) => item.trim().toLowerCase())
         .filter(Boolean);
+
+    if (isProductionRuntime() && ids.length === 0) {
+        throw new Error("BLUEWOLF_ADMIN_IDS must be configured in production.");
+    }
+
+    return ids;
 }
 
 export async function getAdminUser() {

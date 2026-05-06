@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -143,17 +143,17 @@ function PaymentSuccessContent() {
     return (
         <section className={shellClass}>
             <div className="inline-flex rounded-full bg-emerald-50 px-4 py-1.5 text-sm font-bold text-emerald-600">
-                {pick(lang, "결제 완료", "決済完了", "Payment completed")}
+                {pick(lang, "플랜 패키지 결제 완료", "プランパッケージ決済完了", "Plan package payment completed")}
             </div>
             <h1 className={`mt-4 text-3xl font-black ${isDark ? "text-white" : "text-slate-900"}`}>
-                {pick(lang, "예약 확인 중입니다", "予約確認中です", "Your booking is under review")}
+                {pick(lang, "BlueWolf Mongolia 검토 중입니다", "BlueWolf Mongolia 確認中です", "BlueWolf Mongolia is reviewing your request")}
             </h1>
             <p className={`mx-auto mt-3 max-w-xl text-sm sm:text-base ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                 {pick(
                     lang,
-                    "예약금 결제가 완료되었습니다. 여행 담당자에게 예약 정보가 전달되며 확인 후 연락드리겠습니다.",
-                    "予約金の決済が完了しました。旅行担当者へ予約情報が共有され、確認後にご連絡します。",
-                    "Your deposit payment is complete. Your travel manager will be notified and contact you after review."
+                    "플랜 패키지 이용료 결제가 완료되었습니다. BlueWolf Mongolia 검토 후 진행 상태가 갱신됩니다.",
+                    "プランパッケージ利用料の決済が完了しました。BlueWolf Mongolia の確認後に進行状況が更新されます。",
+                    "Your plan package fee payment is complete. BlueWolf Mongolia will review this request and update the progress."
                 )}
             </p>
             <div
@@ -163,7 +163,7 @@ function PaymentSuccessContent() {
             >
                 <div className="flex items-center justify-between">
                     <span className={`text-sm font-bold ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-                        {pick(lang, "예약 번호", "予約番号", "Booking number")}
+                        {pick(lang, "신청 번호", "申請番号", "Application number")}
                     </span>
                     <span className={`text-2xl font-black tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>
                         {result.bookingNo}
@@ -172,7 +172,7 @@ function PaymentSuccessContent() {
                 <div className={`mt-4 border-t pt-4 ${isDark ? "border-white/10" : "border-slate-200"}`}>
                     <div className="flex items-center justify-between">
                         <span className={`text-sm font-bold ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-                            {pick(lang, "결제된 예약금", "支払い済み予約金", "Deposit paid")}
+                            {pick(lang, "플랜 패키지 이용료", "プランパッケージ利用料", "Plan package fee paid")}
                         </span>
                         <span className={`text-lg font-black ${isDark ? "text-white" : "text-slate-900"}`}>
                             {formatPrice(Number(result.payment?.amount ?? 0))}
@@ -182,10 +182,10 @@ function PaymentSuccessContent() {
             </div>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
                 <Link
-                    href={withLocaleQuery("/booking", lang)}
+                    href={withLocaleQuery("/mypage/bookings", lang)}
                     className="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-blue-500"
                 >
-                    {pick(lang, "예약 조회로 이동", "予約照会へ", "Go to booking lookup")}
+                    {pick(lang, "진행 상태 조회로 이동", "進行状況照会へ", "Go to progress lookup")}
                 </Link>
                 <Link
                     href={withLocaleQuery("/tours", lang)}
@@ -195,7 +195,7 @@ function PaymentSuccessContent() {
                             : "border-slate-200 bg-white text-slate-800 hover:bg-slate-50"
                     }`}
                 >
-                    {pick(lang, "투어 목록 보기", "ツアー一覧を見る", "View tours")}
+                    {pick(lang, "플랜 목록 보기", "プラン一覧を見る", "View plans")}
                 </Link>
             </div>
         </section>
@@ -211,3 +211,4 @@ export default function PaymentSuccessPage() {
         </Suspense>
     );
 }
+

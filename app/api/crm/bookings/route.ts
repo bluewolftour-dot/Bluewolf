@@ -29,7 +29,7 @@ export async function GET() {
     if (forbidden) return forbidden;
 
     return NextResponse.json({
-        bookings: getCrmBookings(),
+        bookings: await getCrmBookings(),
     });
 }
 
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     const guests = Number(body.guests);
     const locale = body.locale?.trim() ?? "ko";
     const status = body.status?.trim() === "pending" ? "pending" : "confirmed";
-    const tour = Number.isInteger(tourId) ? getCmsTourById(tourId) : null;
+    const tour = Number.isInteger(tourId) ? await getCmsTourById(tourId) : null;
     const cookieStore = await cookies();
     const token = cookieStore.get(SESSION_COOKIE)?.value;
     const user = await getSessionUser(token);
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
         tourId,
         departDate,
         guests,
-        bookings: getCrmBookings(),
+        bookings: await getCrmBookings(),
     });
 
     if (!availability.ok) {
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    const booking = createCrmBooking({
+    const booking = await createCrmBooking({
         tourId,
         totalAmount: tour.price * guests,
         depositAmount: tour.deposit * guests,
@@ -149,7 +149,7 @@ export async function PATCH(request: NextRequest) {
         );
     }
 
-    const booking = updateCrmBookingStatus(id, status);
+    const booking = await updateCrmBookingStatus(id, status);
     if (!booking) {
         return NextResponse.json(
             { error: "Booking not found." },

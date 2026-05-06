@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -33,21 +33,21 @@ const excludesData = {
 const cancelPolicy = {
     ko: [
         ["출발 30일 전 이상", "전액 환불"],
-        ["출발 20~29일 전", "예약금 제외 환불"],
+        ["출발 20~29일 전", "BlueWolf Mongolia 별도 기준 안내"],
         ["출발 10~19일 전", "여행 요금의 50% 환불"],
         ["출발 7~9일 전", "여행 요금의 30% 환불"],
         ["출발 7일 미만", "환불 불가"],
     ],
     ja: [
         ["出発30日以上前", "全額返金"],
-        ["出発20〜29日前", "予約金を除き返金"],
+        ["出発20〜29日前", "BlueWolf Mongolia 別途基準案内"],
         ["出発10〜19日前", "旅行料金の50%返金"],
         ["出発7〜9日前", "旅行料金の30%返金"],
         ["出発7日未満", "返金不可"],
     ],
     en: [
         ["30+ days before departure", "Full refund"],
-        ["20–29 days before", "Refund minus deposit"],
+        ["20–29 days before", "See BlueWolf Mongolia policy"],
         ["10–19 days before", "50% refund"],
         ["7–9 days before", "30% refund"],
         ["Under 7 days", "No refund"],
@@ -62,8 +62,8 @@ const regionLabel: Record<string, Record<string, string>> = {
 };
 
 const tabLabels: Record<Tab, Record<string, string>> = {
-    intro: { ko: "상품 소개", ja: "商品紹介", en: "Overview" },
-    itinerary: { ko: "여행 일정", ja: "旅行日程", en: "Itinerary" },
+    intro: { ko: "플랜 소개", ja: "プラン紹介", en: "Plan overview" },
+    itinerary: { ko: "플랜 일정", ja: "プラン日程", en: "Plan itinerary" },
     includes: { ko: "포함/불포함", ja: "含む/含まない", en: "Includes" },
     terms: { ko: "이용약관", ja: "利用規約", en: "Terms" },
 };
@@ -263,6 +263,38 @@ function TourDetailContent() {
     const [detailOption, setDetailOption] = useState<LocalizedTourOption | null>(null);
     const [showAllOptions, setShowAllOptions] = useState(false);
     const [showMobileBookingSheet, setShowMobileBookingSheet] = useState(false);
+    const [mounted, setMounted] = useState(false);
+    const [footerOverlap, setFooterOverlap] = useState(0);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    useEffect(() => {
+        if (!mounted) return;
+
+        const footer = document.querySelector<HTMLElement>("[data-site-footer]");
+        if (!footer) return;
+
+        let frame = 0;
+        const updateFooterOverlap = () => {
+            window.cancelAnimationFrame(frame);
+            frame = window.requestAnimationFrame(() => {
+                const rect = footer.getBoundingClientRect();
+                setFooterOverlap(Math.max(0, window.innerHeight - rect.top));
+            });
+        };
+
+        updateFooterOverlap();
+        window.addEventListener("scroll", updateFooterOverlap, { passive: true });
+        window.addEventListener("resize", updateFooterOverlap);
+
+        return () => {
+            window.cancelAnimationFrame(frame);
+            window.removeEventListener("scroll", updateFooterOverlap);
+            window.removeEventListener("resize", updateFooterOverlap);
+        };
+    }, [mounted]);
 
     const tourId = Number(params.id);
     const { tour, loaded } = useCmsTour(tourId);
@@ -312,7 +344,7 @@ function TourDetailContent() {
     const perPersonPriceLabel =
         lang === "ko" ? "1인 기준 가격" : lang === "ja" ? "1名あたり料金" : "Per-person price";
     const perPersonDepositLabel =
-        lang === "ko" ? "1인당 예약금" : lang === "ja" ? "1名あたり予約金" : "Per-person deposit";
+        lang === "ko" ? "1인 기준 플랜 패키지 이용료" : lang === "ja" ? "1名基準プランパッケージ利用料" : "Per-person plan package fee";
     const grandTotalLabel =
         lang === "ko" ? "1인당 총 합계" : lang === "ja" ? "1名あたり合計" : "Per-person total";
     const optionUnitLabel =
@@ -447,21 +479,21 @@ function TourDetailContent() {
 
                                 {/* 핵심 포인트 */}
                                 <div>
-                                    <h3 className={`mb-4 text-base font-black sm:text-lg ${isDark ? "text-white" : "text-slate-900"}`}>
+                                    <h3 className={`mb-3 text-base font-black sm:mb-4 sm:text-lg ${isDark ? "text-white" : "text-slate-900"}`}>
                                         {lang === "ko" ? "핵심 포인트" : lang === "ja" ? "ハイライト" : "Highlights"}
                                     </h3>
-                                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
                                         {tour.highlights[lang].map((hl, i) => (
                                             <div
                                                 key={i}
-                                                className={`flex items-center gap-3 rounded-[18px] border p-4 ${
+                                                className={`flex min-h-12 items-center gap-2 rounded-[14px] border px-3 py-2.5 sm:min-h-0 sm:gap-3 sm:rounded-[18px] sm:p-4 ${
                                                     isDark ? "border-white/10 bg-slate-950" : "border-slate-200 bg-slate-50"
                                                 }`}
                                             >
-                                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-xs font-black text-white">
+                                                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-600 text-[11px] font-black text-white sm:h-8 sm:w-8 sm:text-xs">
                                                     {i + 1}
                                                 </span>
-                                                <span className={`text-sm font-bold ${isDark ? "text-slate-100" : "text-slate-800"}`}>
+                                                <span className={`text-xs font-bold leading-5 sm:text-sm ${isDark ? "text-slate-100" : "text-slate-800"}`}>
                                                     {hl}
                                                 </span>
                                             </div>
@@ -704,7 +736,7 @@ function TourDetailContent() {
 
                                 <p className={`mt-4 text-xs leading-6 ${isDark ? "text-slate-500" : "text-slate-400"}`}>
                                     {lang === "ko"
-                                        ? "※ 위 취소 규정은 표준 약관 기준이며, 시즌 및 상품별로 달라질 수 있습니다. 정확한 내용은 예약 확정 시 별도 안내드립니다."
+                                        ? "※ 위 기준은 표준 약관 기준이며, 시즌 및 플랜별로 달라질 수 있습니다. 정확한 내용은 BlueWolf Mongolia 확인 완료 단계에서 별도 안내드립니다."
                                         : lang === "ja"
                                           ? "※ 上記の取消規定は標準約款に基づきます。シーズン・商品によって異なる場合があります。"
                                           : "※ Cancellation policy is based on standard terms and may vary by season or product. Full details provided upon booking confirmation."}
@@ -872,7 +904,7 @@ function TourDetailContent() {
                                     href={withLocaleQuery(`/payment?tour=${tour.id}&guests=${guests}${selectedOptions.length > 0 ? `&options=${selectedOptions.join(",")}` : ""}`, lang)}
                                     className="flex items-center justify-center rounded-[18px] bg-blue-600 px-5 py-4 text-base font-black text-white shadow-[0_10px_24px_rgba(37,99,235,0.28)] transition-[transform,background-color,box-shadow] duration-700 ease-in-out hover:bg-blue-500 hover:shadow-[0_14px_30px_rgba(37,99,235,0.36)] active:scale-[0.97] active:translate-y-0"
                                 >
-                                    {t.reserve}
+                                    {lang === "ko" ? "플랜 신청하기" : lang === "ja" ? "プラン申請する" : "Apply for this plan"}
                                 </Link>
                                 <Link
                                     href={withLocaleQuery("/contact", lang)}
@@ -909,7 +941,7 @@ function TourDetailContent() {
                                         value: tour.duration[lang],
                                     },
                                     {
-                                        label: lang === "ko" ? "예약금" : lang === "ja" ? "予約金" : "Deposit",
+                                        label: lang === "ko" ? "플랜 패키지 이용료" : lang === "ja" ? "プランパッケージ利用料" : "Plan package fee",
                                         value: formatPrice(tour.deposit),
                                     },
                                 ].map(({ label, value }) => (
@@ -934,8 +966,12 @@ function TourDetailContent() {
                 </aside>
             </div>
 
+            {mounted ? createPortal(
             <div className="sm:hidden">
-                <div className={`fixed inset-x-0 bottom-[30px] z-[60] mx-3 rounded-[24px] border px-4 pb-6 pt-4 shadow-[0_-14px_40px_rgba(15,23,42,0.16)] transition-[transform,box-shadow] duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] ${showMobileBookingSheet ? "translate-y-0 shadow-[0_-18px_48px_rgba(15,23,42,0.22)]" : "translate-y-0"} ${isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"}`}>
+                <div
+                    className={`fixed inset-x-0 z-[60] mx-3 rounded-[24px] border px-4 pb-6 pt-4 shadow-[0_-14px_40px_rgba(15,23,42,0.16)] transition-[bottom,transform,box-shadow] duration-300 ease-[cubic-bezier(0.19,1,0.22,1)] ${showMobileBookingSheet ? "translate-y-0 shadow-[0_-18px_48px_rgba(15,23,42,0.22)]" : "translate-y-0"} ${isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"}`}
+                    style={{ bottom: `${footerOverlap + 30}px` }}
+                >
                     <button
                         type="button"
                         onClick={() => setShowMobileBookingSheet((prev) => !prev)}
@@ -1100,7 +1136,9 @@ function TourDetailContent() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>,
+            document.body
+            ) : null}
         </>
     );
 }

@@ -80,7 +80,7 @@ export function Dropdown({
 
             {open && (
                 <div className={`${menuClass} apple-pop-in`}>
-                    <BluewolfScrollArea className="max-h-[296px] p-2 pr-7">
+                    <BluewolfScrollArea className="max-h-[360px] p-2">
                         {options.map((option) => {
                             const active = String(option.value) === String(value);
 

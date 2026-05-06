@@ -35,7 +35,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "INVALID_MESSAGES" }, { status: 400 });
     }
 
-    const answer = answerContactAssistantQuestion(body.locale, messages);
+    const answer = await answerContactAssistantQuestion(body.locale, messages);
 
     return NextResponse.json({ answer });
 }

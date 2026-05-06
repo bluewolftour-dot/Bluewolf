@@ -7,6 +7,7 @@ import { PageShell, usePage } from "@/components/layout/PageShell";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { useBodyScrollLock } from "@/components/ui/useBodyScrollLock";
 import type { CrmBookingRecord, CrmInquiryRecord, CrmPaymentOrderRecord } from "@/lib/cms-crm-db";
+import { maskEmail, maskPhone } from "@/lib/bluewolf-utils";
 
 type Overview = {
     inquiryCount: number;
@@ -965,7 +966,7 @@ function CrmContent() {
                                                 </div>
                                             </div>
                                             <p className={`mt-3 text-sm ${strongMutedTone}`}>
-                                                {inquiry.name} · {inquiry.email} · {inquiry.phone || "연락처 없음"}
+                                                {inquiry.name} · {maskEmail(inquiry.email)} · {inquiry.phone ? maskPhone(inquiry.phone) : "연락처 없음"}
                                             </p>
                                             <p className="mt-4 text-sm leading-7">{inquiry.message}</p>
                                             {savingKey === `inquiry-${inquiry.id}` && (

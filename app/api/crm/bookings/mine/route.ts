@@ -14,6 +14,6 @@ export async function GET() {
         return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
     }
 
-    const bookings = user.email ? getCrmBookingsByEmail(user.email) : [];
+    const bookings = user.email ? await getCrmBookingsByEmail(user.email) : [];
     return NextResponse.json({ bookings });
 }

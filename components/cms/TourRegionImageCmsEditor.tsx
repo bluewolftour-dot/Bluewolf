@@ -5,6 +5,7 @@ import { useState } from "react";
 import { type Locale, type Region } from "@/lib/bluewolf-data";
 import { type CmsTourRegionCardsContent } from "@/lib/cms-tour-region-cards";
 import { CmsLocaleTabs, localeLabels } from "@/components/cms/CmsLocaleTabs";
+import { CmsImageLibraryModal } from "@/components/cms/CmsImageLibraryModal";
 import { getCmsTourRegionMeta } from "@/lib/cms-tour-admin";
 import { tourRegionCardMeta, tourRegionOrder } from "@/lib/tour-region-cards";
 
@@ -40,6 +41,7 @@ function RegionImageCard({
     uploading,
     onChange,
     onUpload,
+    onOpenLibrary,
 }: {
     region: Region;
     locale: Locale;
@@ -49,6 +51,7 @@ function RegionImageCard({
     uploading: boolean;
     onChange: (value: string) => void;
     onUpload: (file: File) => void;
+    onOpenLibrary: () => void;
 }) {
     const meta = tourRegionCardMeta[region];
     const regionInfo = getCmsTourRegionMeta(region);
@@ -68,6 +71,16 @@ function RegionImageCard({
                         투어상품 페이지 상단 지역 선택 카드의 이미지를 수정합니다.
                     </p>
                 </div>
+                <div className="flex flex-wrap justify-end gap-2">
+                <button
+                    type="button"
+                    onClick={onOpenLibrary}
+                    className={`inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm font-bold transition-colors ${
+                        isDark ? "bg-slate-800 text-slate-100 hover:bg-slate-700" : "bg-slate-200 text-slate-900 hover:bg-slate-300"
+                    }`}
+                >
+                    라이브러리 선택
+                </button>
                 <label
                     className={`inline-flex cursor-pointer items-center justify-center rounded-2xl px-4 py-2 text-sm font-bold transition-colors ${
                         isDark ? "bg-slate-800 text-slate-100 hover:bg-slate-700" : "bg-slate-200 text-slate-900 hover:bg-slate-300"
@@ -86,6 +99,7 @@ function RegionImageCard({
                         }}
                     />
                 </label>
+                </div>
             </div>
 
             <div className="mt-5 overflow-hidden rounded-[24px]">
@@ -156,6 +170,7 @@ export function TourRegionImageCmsEditor({
     const [activeLocale, setActiveLocale] = useState<Locale>("ko");
     const [uploadingSlot, setUploadingSlot] = useState<string | null>(null);
     const [uploadError, setUploadError] = useState<string | null>(null);
+    const [libraryRegion, setLibraryRegion] = useState<Region | null>(null);
 
     const uploadImage = async (region: Region, file: File) => {
         const slot = `tour-region-${region}`;
@@ -246,9 +261,17 @@ export function TourRegionImageCmsEditor({
                         uploading={uploadingSlot === `tour-region-${region}`}
                         onChange={(value) => onUpdate(region, value)}
                         onUpload={(file) => void uploadImage(region, file)}
+                        onOpenLibrary={() => setLibraryRegion(region)}
                     />
                 ))}
             </div>
+            {libraryRegion ? (
+                <CmsImageLibraryModal
+                    isDark={isDark}
+                    onClose={() => setLibraryRegion(null)}
+                    onSelect={(path) => onUpdate(libraryRegion, path)}
+                />
+            ) : null}
         </div>
     );
 }

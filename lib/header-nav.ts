@@ -2,8 +2,10 @@ import { type Locale } from "@/lib/bluewolf-data";
 import { withLocaleQuery } from "@/lib/locale-routing";
 
 type HeaderCopySource = {
-    navTours: string;
-    navBooking: string;
+    navTours?: string;
+    navPlans?: string;
+    navBooking?: string;
+    navApplication?: string;
     navCommunity: string;
     navFaq: string;
 };
@@ -36,8 +38,8 @@ export function buildHeaderNav({
 
     return [
         { key: "home", href: withLocaleQuery("/", locale), label: fixed.home },
-        { key: "tours", href: withLocaleQuery("/tours", locale), label: t.navTours },
-        { key: "booking", href: bookingHref, label: t.navBooking },
+        { key: "tours", href: withLocaleQuery("/tours", locale), label: t.navTours ?? t.navPlans ?? "Tours" },
+        { key: "booking", href: bookingHref, label: t.navBooking ?? t.navApplication ?? "Booking" },
         { key: "community", href: withLocaleQuery("/community", locale), label: t.navCommunity },
         { key: "faq", href: withLocaleQuery("/faq", locale), label: t.navFaq },
         { key: "contact", href: withLocaleQuery("/contact", locale), label: fixed.contact },

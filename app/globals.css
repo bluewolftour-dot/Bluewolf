@@ -7,7 +7,7 @@ html {
 body {
     margin: 0;
     background: #f8fafc;
-    color: #0f172a;
+    color: #222222;
     font-family: var(--font-noto-sans-cjk), sans-serif;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -19,6 +19,10 @@ html.dark body {
 
 * {
     box-sizing: border-box;
+}
+
+html:not(.dark) :is(.text-black, .text-slate-900, .text-slate-950) {
+    color: #222222;
 }
 
 @keyframes apple-pop-in {
@@ -65,8 +69,8 @@ html.dark body {
 }
 
 .animate-site-page-enter {
-    animation: site-page-enter 520ms cubic-bezier(0.19, 1, 0.22, 1) both;
-    will-change: opacity, transform, filter;
+    animation: site-page-enter 520ms cubic-bezier(0.19, 1, 0.22, 1);
+    will-change: opacity, filter;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -167,6 +171,30 @@ html.dark body {
     }
 }
 
+@keyframes float-plane {
+    0% {
+        transform: translate3d(0, -5px, 0) rotate(-2deg);
+    }
+    50% {
+        transform: translate3d(0, 5px, 0) rotate(2deg);
+    }
+    100% {
+        transform: translate3d(0, -5px, 0) rotate(-2deg);
+    }
+}
+
+.animate-float-plane {
+    animation: float-plane 2.8s ease-in-out infinite;
+    transform-origin: center;
+    will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-float-plane {
+        animation: none;
+    }
+}
+
 .lineup-carousel {
     margin-left: -1.25rem;
     margin-right: -1.25rem;
@@ -189,5 +217,81 @@ html.dark body {
         margin-right: -3rem;
         padding-left: 3rem;
         padding-right: 3rem;
+    }
+}
+
+main {
+    font-size: 0.95rem;
+}
+
+main h1[class] {
+    font-size: clamp(1.65rem, 3.2vw, 2.25rem);
+    letter-spacing: 0;
+}
+
+main h2[class] {
+    font-size: clamp(1.35rem, 2.4vw, 1.9rem);
+    letter-spacing: 0;
+}
+
+main h3[class] {
+    font-size: clamp(1.08rem, 1.8vw, 1.35rem);
+    letter-spacing: 0;
+}
+
+main :is(p, li, label, input, textarea, select, button, a)[class] {
+    font-size: clamp(0.78rem, 1em, 0.95rem);
+}
+
+main :is(section, article, div)[class*="rounded-[32px]"],
+main :is(section, article, div)[class*="rounded-[30px]"] {
+    border-radius: 1.5rem;
+}
+
+main :is(section, article, div)[class*="rounded-[28px]"] {
+    border-radius: 1.375rem;
+}
+
+main :is(section, article, div)[class*="rounded-[24px]"] {
+    border-radius: 1.125rem;
+}
+
+main :is(section, article, div)[class~="p-12"] {
+    padding: 2rem;
+}
+
+main :is(section, article, div)[class~="p-10"] {
+    padding: 1.75rem;
+}
+
+main :is(section, article, div)[class~="p-8"] {
+    padding: 1.5rem;
+}
+
+main :is(section, article, div)[class~="p-7"] {
+    padding: 1.375rem;
+}
+
+main :is(section, article, div)[class~="p-6"] {
+    padding: 1.25rem;
+}
+
+@media (max-width: 639px) {
+    main {
+        font-size: 0.93rem;
+    }
+
+    main h1[class] {
+        font-size: clamp(1.45rem, 7vw, 1.9rem);
+    }
+
+    main h2[class] {
+        font-size: clamp(1.25rem, 6vw, 1.6rem);
+    }
+
+    main :is(section, article, div)[class~="p-8"],
+    main :is(section, article, div)[class~="p-7"],
+    main :is(section, article, div)[class~="p-6"] {
+        padding: 1.125rem;
     }
 }

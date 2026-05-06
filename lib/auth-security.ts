@@ -1,5 +1,10 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import path from "node:path";
+import { readJsonStore, writeJsonStore } from "@/lib/json-store";
+import {
+    isSupabaseDatabaseEnabled,
+    supabaseDelete,
+    supabaseSelectOne,
+    supabaseUpsertOne,
+} from "@/lib/supabase-server";
 
 type RateLimitRecord = {
     key: string;
@@ -20,8 +25,16 @@ type SecurityStore = {
     loginFailures: LoginFailureRecord[];
 };
 
-const dataDir = path.join(process.cwd(), "data", "auth");
-const securityPath = path.join(dataDir, "auth-security.json");
+type SupabaseSecurityEventRow = {
+    key: string;
+    scope: string;
+    count: number;
+    reset_at: string;
+    blocked_until: string | null;
+    locked_until: string | null;
+};
+
+const securityPath = "auth/auth-security.json";
 
 const defaultStore: SecurityStore = {
     rateLimits: [],
@@ -44,34 +57,26 @@ function toRetryAfterSeconds(until: string) {
     return Math.max(1, Math.ceil((new Date(until).getTime() - Date.now()) / 1000));
 }
 
-async function ensureStoreFile() {
-    await mkdir(dataDir, { recursive: true });
+async function getSupabaseSecurityEvent(key: string) {
+    return supabaseSelectOne<SupabaseSecurityEventRow>("app_security_events", {
+        key: `eq.${key}`,
+    });
+}
 
-    try {
-        await readFile(securityPath, "utf8");
-    } catch {
-        await writeSecurityStore(defaultStore);
-    }
+async function upsertSupabaseSecurityEvent(row: SupabaseSecurityEventRow) {
+    await supabaseUpsertOne<SupabaseSecurityEventRow>("app_security_events", row, "key");
 }
 
 async function readSecurityStore(): Promise<SecurityStore> {
-    await ensureStoreFile();
-    const raw = await readFile(securityPath, "utf8");
-
-    try {
-        const parsed = JSON.parse(raw) as Partial<SecurityStore>;
-        return {
-            rateLimits: Array.isArray(parsed.rateLimits) ? parsed.rateLimits : [],
-            loginFailures: Array.isArray(parsed.loginFailures) ? parsed.loginFailures : [],
-        };
-    } catch {
-        return defaultStore;
-    }
+    const parsed = await readJsonStore<Partial<SecurityStore>>(securityPath, defaultStore);
+    return {
+        rateLimits: Array.isArray(parsed.rateLimits) ? parsed.rateLimits : [],
+        loginFailures: Array.isArray(parsed.loginFailures) ? parsed.loginFailures : [],
+    };
 }
 
 async function writeSecurityStore(store: SecurityStore) {
-    await mkdir(dataDir, { recursive: true });
-    await writeFile(securityPath, JSON.stringify(store, null, 2), "utf8");
+    await writeJsonStore(securityPath, store);
 }
 
 function pruneStore(store: SecurityStore) {
@@ -107,6 +112,51 @@ export async function checkRateLimit(input: {
     windowMs: number;
     blockMs: number;
 }): Promise<LimitResult> {
+    if (isSupabaseDatabaseEnabled()) {
+        const key = `${input.scope}:${normalizeKey(input.key)}`;
+        const now = Date.now();
+        const existing = await getSupabaseSecurityEvent(key);
+
+        if (existing?.blocked_until && new Date(existing.blocked_until).getTime() > now) {
+            return {
+                allowed: false,
+                code: "RATE_LIMITED",
+                retryAfterSeconds: toRetryAfterSeconds(existing.blocked_until),
+            };
+        }
+
+        if (!existing || new Date(existing.reset_at).getTime() <= now) {
+            await upsertSupabaseSecurityEvent({
+                key,
+                scope: input.scope,
+                count: 1,
+                reset_at: new Date(now + input.windowMs).toISOString(),
+                blocked_until: null,
+                locked_until: null,
+            });
+            return { allowed: true };
+        }
+
+        const nextCount = existing.count + 1;
+        const blockedUntil = nextCount > input.limit ? new Date(now + input.blockMs).toISOString() : null;
+
+        await upsertSupabaseSecurityEvent({
+            ...existing,
+            count: nextCount,
+            blocked_until: blockedUntil,
+        });
+
+        if (blockedUntil) {
+            return {
+                allowed: false,
+                code: "RATE_LIMITED",
+                retryAfterSeconds: toRetryAfterSeconds(blockedUntil),
+            };
+        }
+
+        return { allowed: true };
+    }
+
     const store = pruneStore(await readSecurityStore());
     const key = `${input.scope}:${normalizeKey(input.key)}`;
     const now = Date.now();
@@ -153,6 +203,21 @@ export async function checkRateLimit(input: {
 }
 
 export async function checkAccountLock(input: { id: string }): Promise<LimitResult> {
+    if (isSupabaseDatabaseEnabled()) {
+        const key = `login-failure:${normalizeKey(input.id)}`;
+        const record = await getSupabaseSecurityEvent(key);
+
+        if (record?.locked_until && new Date(record.locked_until).getTime() > Date.now()) {
+            return {
+                allowed: false,
+                code: "ACCOUNT_LOCKED",
+                retryAfterSeconds: toRetryAfterSeconds(record.locked_until),
+            };
+        }
+
+        return { allowed: true };
+    }
+
     const store = pruneStore(await readSecurityStore());
     const key = normalizeKey(input.id);
     const record = store.loginFailures.find((item) => item.key === key);
@@ -176,6 +241,42 @@ export async function recordLoginFailure(input: {
     windowMs: number;
     lockMs: number;
 }) {
+    if (isSupabaseDatabaseEnabled()) {
+        const key = `login-failure:${normalizeKey(input.id)}`;
+        const now = Date.now();
+        const existing = await getSupabaseSecurityEvent(key);
+
+        if (!existing || new Date(existing.reset_at).getTime() <= now) {
+            await upsertSupabaseSecurityEvent({
+                key,
+                scope: "login-failure",
+                count: 1,
+                reset_at: new Date(now + input.windowMs).toISOString(),
+                blocked_until: null,
+                locked_until: null,
+            });
+            return { locked: false, retryAfterSeconds: 0 };
+        }
+
+        const nextCount = existing.count + 1;
+        const lockedUntil = nextCount >= input.maxFailures ? new Date(now + input.lockMs).toISOString() : null;
+
+        await upsertSupabaseSecurityEvent({
+            ...existing,
+            count: nextCount,
+            locked_until: lockedUntil,
+        });
+
+        if (lockedUntil) {
+            return {
+                locked: true,
+                retryAfterSeconds: toRetryAfterSeconds(lockedUntil),
+            };
+        }
+
+        return { locked: false, retryAfterSeconds: 0 };
+    }
+
     const store = pruneStore(await readSecurityStore());
     const key = normalizeKey(input.id);
     const now = Date.now();
@@ -210,6 +311,13 @@ export async function recordLoginFailure(input: {
 }
 
 export async function clearLoginFailures(id: string) {
+    if (isSupabaseDatabaseEnabled()) {
+        await supabaseDelete("app_security_events", {
+            key: `eq.login-failure:${normalizeKey(id)}`,
+        });
+        return;
+    }
+
     const store = pruneStore(await readSecurityStore());
     const key = normalizeKey(id);
     await writeSecurityStore({

@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 
-export type CmsCategory = "home" | "tours" | "community";
+export type CmsCategory = "home" | "tours" | "community" | "library";
 
 export function getCmsCategoryFromParam(value: string | null): CmsCategory {
-    if (value === "tours" || value === "community") {
+    if (value === "tours" || value === "community" || value === "library") {
         return value;
     }
 
@@ -89,6 +89,13 @@ export function CmsSidebar({
                     title="커뮤니티"
                     desc={`후기 ${counts.review}개 동행 ${counts.mate}개 질문 ${counts.qna}개`}
                     href={hrefBuilder("community")}
+                    isDark={isDark}
+                />
+                <CategoryLink
+                    active={activeCategory === "library"}
+                    title="라이브러리"
+                    desc="업로드 이미지 선택 및 삭제"
+                    href={hrefBuilder("library")}
                     isDark={isDark}
                 />
             </div>

@@ -11,6 +11,7 @@ import {
 } from "@/lib/cms-tour-customize";
 import { type Locale, type Region } from "@/lib/bluewolf-data";
 import { CMS_NULL_IMAGE } from "@/lib/cms-image";
+import { CmsImageLibraryModal } from "@/components/cms/CmsImageLibraryModal";
 
 function TextField({
     label,
@@ -105,6 +106,7 @@ function DestinationCard({
     onUpdate,
     onDelete,
     onUpload,
+    onOpenLibrary,
 }: {
     destination: CmsTourCustomizeDestination;
     locale: Locale;
@@ -114,6 +116,7 @@ function DestinationCard({
     onUpdate: (updater: (current: CmsTourCustomizeDestination) => CmsTourCustomizeDestination) => void;
     onDelete: () => void;
     onUpload: (file: File) => void;
+    onOpenLibrary: () => void;
 }) {
     return (
         <div
@@ -133,6 +136,17 @@ function DestinationCard({
                     </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
+                    <button
+                        type="button"
+                        onClick={onOpenLibrary}
+                        className={`inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm font-bold transition-colors ${
+                            isDark
+                                ? "bg-slate-800 text-slate-100 hover:bg-slate-700"
+                                : "bg-slate-200 text-slate-900 hover:bg-slate-300"
+                        }`}
+                    >
+                        라이브러리 선택
+                    </button>
                     <label
                         className={`inline-flex cursor-pointer items-center justify-center rounded-2xl px-4 py-2 text-sm font-bold transition-colors ${
                             isDark
@@ -236,6 +250,7 @@ function ActivityCard({
     onUpdate,
     onDelete,
     onUpload,
+    onOpenLibrary,
 }: {
     activity: CmsTourCustomizeActivity;
     locale: Locale;
@@ -245,6 +260,7 @@ function ActivityCard({
     onUpdate: (updater: (current: CmsTourCustomizeActivity) => CmsTourCustomizeActivity) => void;
     onDelete: () => void;
     onUpload: (file: File) => void;
+    onOpenLibrary: () => void;
 }) {
     return (
         <div
@@ -264,6 +280,17 @@ function ActivityCard({
                     </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
+                    <button
+                        type="button"
+                        onClick={onOpenLibrary}
+                        className={`inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm font-bold transition-colors ${
+                            isDark
+                                ? "bg-slate-800 text-slate-100 hover:bg-slate-700"
+                                : "bg-slate-200 text-slate-900 hover:bg-slate-300"
+                        }`}
+                    >
+                        라이브러리 선택
+                    </button>
                     <label
                         className={`inline-flex cursor-pointer items-center justify-center rounded-2xl px-4 py-2 text-sm font-bold transition-colors ${
                             isDark
@@ -411,6 +438,11 @@ export function TourCustomizeCmsEditor({
     const [activeRegion, setActiveRegion] = useState<Region | null>(cmsTourRegions[0]?.key ?? "south");
     const [uploadingSlot, setUploadingSlot] = useState<string | null>(null);
     const [uploadError, setUploadError] = useState<string | null>(null);
+    const [libraryTarget, setLibraryTarget] = useState<
+        | { type: "destination"; region: Region; id: string }
+        | { type: "activity"; region: Region; id: string }
+        | null
+    >(null);
 
     const uploadImage = async (region: Region, destinationId: string, file: File) => {
         const slot = `tour-customize-${region}-${destinationId}`;
@@ -664,6 +696,13 @@ export function TourCustomizeCmsEditor({
                                                                 file
                                                             )
                                                         }
+                                                        onOpenLibrary={() =>
+                                                            setLibraryTarget({
+                                                                type: "destination",
+                                                                region: regionMeta.key,
+                                                                id: destination.id,
+                                                            })
+                                                        }
                                                     />
                                                 ))}
                                             </div>
@@ -735,6 +774,13 @@ export function TourCustomizeCmsEditor({
                                                                 file
                                                             )
                                                         }
+                                                        onOpenLibrary={() =>
+                                                            setLibraryTarget({
+                                                                type: "activity",
+                                                                region: regionMeta.key,
+                                                                id: activity.id,
+                                                            })
+                                                        }
                                                     />
                                                 ))}
                                             </div>
@@ -746,6 +792,25 @@ export function TourCustomizeCmsEditor({
                     );
                 })}
             </div>
+            {libraryTarget ? (
+                <CmsImageLibraryModal
+                    isDark={isDark}
+                    onClose={() => setLibraryTarget(null)}
+                    onSelect={(path) => {
+                        if (libraryTarget.type === "destination") {
+                            onUpdateDestination(libraryTarget.region, libraryTarget.id, (current) => ({
+                                ...current,
+                                image: path,
+                            }));
+                        } else {
+                            onUpdateActivity(libraryTarget.region, libraryTarget.id, (current) => ({
+                                ...current,
+                                image: path,
+                            }));
+                        }
+                    }}
+                />
+            ) : null}
         </div>
     );
 }

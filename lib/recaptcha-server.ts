@@ -1,3 +1,5 @@
+import { isProductionRuntime } from "@/lib/env";
+
 type RecaptchaVerifyResponse = {
     success?: boolean;
     score?: number;
@@ -17,6 +19,10 @@ export async function verifyRecaptchaToken(input: {
 }) {
     const secret = process.env.RECAPTCHA_SECRET_KEY?.trim();
     if (!secret) {
+        if (isProductionRuntime()) {
+            return { ok: false as const, code: "RECAPTCHA_NOT_CONFIGURED" };
+        }
+
         return { ok: true as const, skipped: true as const };
     }
 

@@ -40,6 +40,12 @@ function RegionSelector({
         en: "from",
     }[lang];
 
+    const perPersonLabel = {
+        ko: "1인 기준",
+        ja: "1名基準",
+        en: "Per person",
+    }[lang];
+
     const selectedLabel = {
         ko: "선택",
         ja: "選択",
@@ -48,19 +54,39 @@ function RegionSelector({
 
     return (
         <section
-            className={`rounded-[24px] border p-6 shadow-sm sm:rounded-[28px] sm:p-8 ${
+            className={`rounded-[24px] border p-6 shadow-sm sm:rounded-[28px] sm:p-8 lg:!p-[40px] ${
                 isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"
             }`}
         >
             <h1
-                className={`text-2xl font-black tracking-tight sm:text-3xl lg:text-4xl ${
+                className={`flex items-center gap-2 !text-[23px] font-black tracking-tight sm:!text-xl lg:!text-2xl ${
                     isDark ? "text-white" : "text-slate-900"
                 }`}
             >
+                <span className="relative block h-[45px] w-16 shrink-0 overflow-visible sm:h-14 sm:w-20" aria-hidden="true">
+                    <Image
+                        src="/images/plane-icon.png"
+                        alt=""
+                        fill
+                        className={`animate-float-plane object-contain transition-opacity duration-500 ${
+                            isDark ? "opacity-0" : "opacity-100"
+                        }`}
+                        sizes="(max-width: 640px) 64px, 80px"
+                    />
+                    <Image
+                        src="/images/plane-icon-dark.png"
+                        alt=""
+                        fill
+                        className={`animate-float-plane object-contain transition-opacity duration-500 ${
+                            isDark ? "opacity-100" : "opacity-0"
+                        }`}
+                        sizes="(max-width: 640px) 64px, 80px"
+                    />
+                </span>
                 {regionTitle}
             </h1>
 
-            <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4">
+            <div className="mx-auto mt-6 grid w-full grid-cols-2 gap-3 sm:gap-4">
                 {tourRegionOrder.map((region) => {
                     const meta = tourRegionCardMeta[region];
                     const label = meta.label[lang];
@@ -84,7 +110,7 @@ function RegionSelector({
                                     : "rounded-[22px]"
                             }`}
                         >
-                            <div className="relative h-52 overflow-hidden rounded-[inherit] sm:h-60">
+                            <div className="relative h-44 overflow-hidden rounded-[inherit] sm:h-60 lg:h-[200px]">
                                 {showImages ? (
                                     <Image
                                         src={image}
@@ -97,24 +123,27 @@ function RegionSelector({
                                     <div className={`absolute inset-0 ${isDark ? "bg-slate-950" : "bg-slate-100"}`} />
                                 )}
                                 <div className="absolute inset-0 rounded-[inherit] bg-gradient-to-b from-black/35 via-black/25 to-black/60" />
-                                <div className="absolute inset-0 flex flex-col justify-between rounded-[inherit] p-5 text-white">
+                                <div className="absolute inset-0 flex flex-col justify-between rounded-[inherit] p-4 text-white sm:p-5 lg:!p-[30px]">
                                     <div className="flex items-start justify-between">
-                                        <span className="rounded-full bg-white/15 px-3 py-1.5 text-xs font-extrabold backdrop-blur-sm">
+                                        <span className="rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-extrabold backdrop-blur-sm sm:px-3 sm:py-1.5 sm:text-xs">
                                             {label}
                                         </span>
                                         {isSelected ? (
-                                            <span className="rounded-full bg-blue-500 px-3 py-1.5 text-xs font-extrabold">
+                                            <span className="rounded-full bg-blue-500 px-2.5 py-1 text-[10px] font-extrabold sm:px-3 sm:py-1.5 sm:text-xs">
                                                 {selectedLabel}
                                             </span>
                                         ) : null}
                                     </div>
 
                                     <div>
-                                        <div className="text-2xl font-black tracking-tight sm:text-3xl">
+                                        <div className="text-lg font-black tracking-tight sm:text-3xl">
                                             {subtitle}
                                         </div>
-                                        <div className="mt-3">
-                                            <span className="text-base font-black">
+                                        <div className="mt-2 sm:mt-3">
+                                            <span className="block text-[10px] font-extrabold leading-none text-white/80 sm:text-xs">
+                                                {perPersonLabel}
+                                            </span>
+                                            <span className="mt-1 block text-sm font-black leading-tight sm:text-base">
                                                 {lang === "en"
                                                     ? `${fromLabel} ${formatPrice(minPrice)}`
                                                     : `${formatPrice(minPrice)} ${fromLabel}`}

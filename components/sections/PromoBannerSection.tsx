@@ -44,7 +44,7 @@ export function PromoBannerSection({
                 isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"
             }`}
         >
-            <div className="relative min-h-[180px] sm:min-h-[240px] lg:min-h-[280px]">
+            <div className="relative min-h-[90px] sm:min-h-[120px] lg:min-h-[140px]">
                 {showImages ? (
                     banners.map((banner, index) => (
                         <div
@@ -81,9 +81,9 @@ export function PromoBannerSection({
                     }`}
                 />
 
-                <div className="pointer-events-none relative z-20 flex min-h-[180px] flex-col justify-between p-4 sm:min-h-[240px] sm:p-6 lg:min-h-[280px] lg:p-8">
+                <div className="pointer-events-none relative z-20 flex min-h-[90px] flex-col justify-between p-3 sm:min-h-[120px] sm:p-4 lg:min-h-[140px] lg:p-5">
                     <div className="flex justify-start">
-                        <span className="inline-flex rounded-full bg-blue-600 px-4 py-2 text-xs font-extrabold text-white shadow-[0_10px_24px_rgba(37,99,235,0.22)] sm:text-sm">
+                        <span className="inline-flex rounded-full bg-blue-600 px-3 py-1.5 text-[11px] font-extrabold text-white shadow-[0_10px_24px_rgba(37,99,235,0.22)] sm:text-xs">
                             {badgeByLocale[lang]}
                         </span>
                     </div>
@@ -95,12 +95,12 @@ export function PromoBannerSection({
                                 type="button"
                                 onClick={() => setCurrentIndex(index)}
                                 aria-label={`banner-${index + 1}`}
-                                className={`h-2.5 rounded-full transition-all ${
+                                className={`h-2 rounded-full transition-all ${
                                     index === currentIndex
-                                        ? "w-8 bg-blue-600"
+                                        ? "w-7 bg-blue-600"
                                         : isDark
-                                          ? "w-2.5 bg-white/35 hover:bg-white/60"
-                                          : "w-2.5 bg-white/70 hover:bg-white"
+                                          ? "w-2 bg-white/35 hover:bg-white/60"
+                                          : "w-2 bg-white/70 hover:bg-white"
                                 }`}
                             />
                         ))}

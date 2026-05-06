@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Image from "next/image";
 import { type KeyboardEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
@@ -7,6 +7,7 @@ import { cmsDurationTypeOptions } from "@/lib/cms-tour-admin";
 import { CmsLocaleTabs, localeLabels } from "@/components/cms/CmsLocaleTabs";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { CMS_NULL_IMAGE } from "@/lib/cms-image";
+import { CmsImageLibraryModal } from "@/components/cms/CmsImageLibraryModal";
 import {
     getTourTagColorClassName,
     getTourTagColorKey,
@@ -72,6 +73,7 @@ function ImageCard({
     previewSrc,
     onChange,
     onUpload,
+    onOpenLibrary,
     onRemove,
     removable,
     uploading,
@@ -83,6 +85,7 @@ function ImageCard({
     previewSrc: string;
     onChange: (value: string) => void;
     onUpload: (file: File) => void;
+    onOpenLibrary: () => void;
     onRemove?: () => void;
     removable?: boolean;
     uploading: boolean;
@@ -93,9 +96,16 @@ function ImageCard({
         <div className={`rounded-[24px] border p-4 ${isDark ? "border-white/10 bg-slate-950/70" : "border-slate-200 bg-white"}`}>
             <div className="flex items-center justify-between gap-3">
                 <p className="text-sm font-black">{title}</p>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center justify-end gap-2">
+                    <button
+                        type="button"
+                        onClick={onOpenLibrary}
+                        className={`inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm font-bold transition-colors ${isDark ? "bg-slate-800 text-slate-100 hover:bg-slate-700" : "bg-slate-200 text-slate-900 hover:bg-slate-300"}`}
+                    >
+                        라이브러리 선택
+                    </button>
                     <label className={`inline-flex cursor-pointer items-center justify-center rounded-2xl px-4 py-2 text-sm font-bold transition-colors ${isDark ? "bg-slate-800 text-slate-100 hover:bg-slate-700" : "bg-slate-200 text-slate-900 hover:bg-slate-300"}`}>
-                        {uploading ? "업로드 중..." : "이미지 업로드"}
+                        {uploading ? "업로드 중..." : "새 이미지 업로드"}
                         <input
                             type="file"
                             accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
@@ -197,6 +207,7 @@ export function TourCmsEditor({
     const mutedTone = isDark ? "text-slate-400" : "text-slate-500";
     const [activeLocale, setActiveLocale] = useState<Locale>("ko");
     const [uploadingSlot, setUploadingSlot] = useState<string | null>(null);
+    const [libraryOpenSlot, setLibraryOpenSlot] = useState<string | null>(null);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const [tagDrafts, setTagDrafts] = useState<Record<Locale, string>>({
         ko: "",
@@ -439,6 +450,7 @@ export function TourCmsEditor({
                                 previewSrc={selectedTour.heroImage || CMS_NULL_IMAGE}
                                 onChange={(value) => onUpdate((tour) => ({ ...tour, heroImage: value }))}
                                 onUpload={(file) => void uploadImage(`tour-${selectedTour.id}-hero`, file, (path) => onUpdate((tour) => ({ ...tour, heroImage: path })))}
+                                onOpenLibrary={() => setLibraryOpenSlot(`tour-${selectedTour.id}-hero`)}
                                 uploading={uploadingSlot === `tour-${selectedTour.id}-hero`}
                                 tone={tone}
                                 isDark={isDark}
@@ -649,6 +661,7 @@ export function TourCmsEditor({
                                         previewSrc={src || CMS_NULL_IMAGE}
                                         onChange={(value) => updateImageList("images", (current) => current.map((image, imageIndex) => (imageIndex === index ? value : image)))}
                                         onUpload={(file) => void uploadImage(`tour-${selectedTour.id}-gallery-${index + 1}`, file, (path) => updateImageList("images", (current) => current.map((image, imageIndex) => (imageIndex === index ? path : image))))}
+                                        onOpenLibrary={() => setLibraryOpenSlot(`tour-${selectedTour.id}-gallery-${index + 1}`)}
                                         onRemove={() => updateImageList("images", (current) => (current.length <= 1 ? current : current.filter((_, imageIndex) => imageIndex !== index)))}
                                         removable={selectedTour.images.length > 1}
                                         uploading={uploadingSlot === `tour-${selectedTour.id}-gallery-${index + 1}`}
@@ -683,6 +696,7 @@ export function TourCmsEditor({
                                         previewSrc={src || CMS_NULL_IMAGE}
                                         onChange={(value) => updateImageList("detailImages", (current) => current.map((image, imageIndex) => (imageIndex === index ? value : image)))}
                                         onUpload={(file) => void uploadImage(`tour-${selectedTour.id}-detail-${index + 1}`, file, (path) => updateImageList("detailImages", (current) => current.map((image, imageIndex) => (imageIndex === index ? path : image))))}
+                                        onOpenLibrary={() => setLibraryOpenSlot(`tour-${selectedTour.id}-detail-${index + 1}`)}
                                         onRemove={() => updateImageList("detailImages", (current) => current.filter((_, imageIndex) => imageIndex !== index))}
                                         removable
                                         uploading={uploadingSlot === `tour-${selectedTour.id}-detail-${index + 1}`}
@@ -692,6 +706,26 @@ export function TourCmsEditor({
                                 ))}
                             </div>
                         </SectionCard>
+
+                        {libraryOpenSlot ? (
+                            <CmsImageLibraryModal
+                                isDark={isDark}
+                                onClose={() => setLibraryOpenSlot(null)}
+                                onSelect={(path) => {
+                                    if (libraryOpenSlot === `tour-${selectedTour.id}-hero`) {
+                                        onUpdate((tour) => ({ ...tour, heroImage: path }));
+                                    } else if (libraryOpenSlot.includes("gallery")) {
+                                        const indexStr = libraryOpenSlot.split("-").pop() || "1";
+                                        const index = parseInt(indexStr, 10) - 1;
+                                        updateImageList("images", (current) => current.map((image, i) => (i === index ? path : image)));
+                                    } else if (libraryOpenSlot.includes("detail")) {
+                                        const indexStr = libraryOpenSlot.split("-").pop() || "1";
+                                        const index = parseInt(indexStr, 10) - 1;
+                                        updateImageList("detailImages", (current) => current.map((image, i) => (i === index ? path : image)));
+                                    }
+                                }}
+                            />
+                        ) : null}
                     </div>
                 ) : (
                     <p className={mutedTone}>{loading ? "상품 데이터를 불러오는 중..." : "수정할 상품을 먼저 선택해 주세요."}</p>
@@ -700,4 +734,3 @@ export function TourCmsEditor({
         </div>
     );
 }
-

@@ -165,11 +165,20 @@ function PaymentContent() {
     const [error, setError] = useState("");
     const [submitting, setSubmitting] = useState(false);
     const [sdkReady, setSdkReady] = useState(false);
+    const [sdkLoadFailed, setSdkLoadFailed] = useState(false);
     const [draftReady, setDraftReady] = useState(false);
     const [createdBooking, setCreatedBooking] = useState<{
         bookingNo: string;
         status: "pending" | "confirmed";
     } | null>(null);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        if (window.TossPayments) {
+            setSdkReady(true);
+            setSdkLoadFailed(false);
+        }
+    }, []);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -258,21 +267,23 @@ function PaymentContent() {
         invalidTitle: pick(lang, "선택한 상품을 찾을 수 없어요", "選択した商品が見つかりません", "We couldn't find that tour"),
         invalidDesc: pick(lang, "투어 페이지에서 다시 예약을 시작해주세요.", "ツアーページから予約を始めてください。", "Please restart the booking flow from the tours page."),
         backToTours: pick(lang, "투어로 돌아가기", "ツアーへ戻る", "Back to tours"),
-        title: pick(lang, "예약 결제", "予約決済", "Reservation payment"),
-        desc: pick(lang, "상품 정보와 여행자 정보를 확인하고 예약금을 결제하거나 예약 요청을 접수하세요.", "商品情報と旅行者情報を確認し、予約金を決済するか予約依頼を送信してください。", "Review the trip details, then pay the deposit or send the booking request."),
-        travelerDesc: pick(lang, "예약자 정보를 입력해주세요", "予約者情報を入力してください", "Enter the lead traveler details"),
+        title: pick(lang, "플랜 패키지 결제", "プランパッケージ決済", "Plan package payment"),
+        desc: pick(lang, "상품 정보와 신청자 정보를 확인하고 플랜 패키지 이용료를 결제하거나 플랜 신청을 접수하세요.", "商品情報と申請者情報を確認し、プランパッケージ利用料を決済するかプラン申請を送信してください。", "Review the trip details, then pay the plan package fee or submit your application."),
+        travelerDesc: pick(lang, "신청자 정보를 입력해주세요", "申請者情報を入力してください", "Enter the applicant details"),
         extraDesc: pick(lang, "선택한 옵션과 요청 사항을 마지막으로 확인합니다.", "選択したオプションとご要望を最後に確認します。", "Review selected options and special requests."),
         methodDesc: pick(lang, "카드와 간편결제는 토스 결제창으로, 계좌 이체는 수동 확인 예약으로 진행됩니다.", "カードと簡単決済はトス決済画面で、銀行振込は手動確認予約として進行します。", "Card and simple pay open Toss Payments. Bank transfer stays as a manual confirmation flow."),
         requiredError: pick(lang, "이름, 연락처, 출발일을 모두 입력해주세요.", "名前、連絡先、出発日をすべて入力してください。", "Please enter your name, phone number, and departure date."),
         sdkError: pick(lang, "결제창을 아직 불러오지 못했습니다. 잠시 후 다시 시도해주세요.", "決済画面をまだ読み込めていません。しばらくしてからもう一度お試しください。", "The payment window is still loading. Please try again in a moment."),
+        sdkLoading: pick(lang, "결제창을 불러오는 중입니다.", "決済画面を読み込み中です。", "Loading the payment window."),
+        sdkLoadFail: pick(lang, "결제창 스크립트를 불러오지 못했습니다. 새로고침 후 다시 시도해주세요.", "決済画面のスクリプトを読み込めませんでした。再読み込み後にお試しください。", "Could not load the payment script. Please refresh and try again."),
         failedError: pick(lang, "결제 준비 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.", "決済準備中に問題が発生しました。しばらくしてからもう一度お試しください。", "Something went wrong while preparing the payment."),
-        pendingTitle: pick(lang, "예약 요청이 접수되었습니다", "予約依頼を受け付けました", "Your booking request is received"),
-        pendingDesc: pick(lang, "담당자 확인 후 예약이 확정됩니다. 아래 예약 번호로 진행 상황을 확인할 수 있어요.", "担当者が確認したあと予約が確定します。以下の予約番号で進行状況を確認できます。", "Our team will confirm the booking after checking the transfer. You can track it with the booking number below."),
-        confirmedTitle: pick(lang, "예약이 확정되었습니다", "予約が確定しました", "Your booking is confirmed"),
-        confirmedDesc: pick(lang, "아래 예약 번호로 예약 조회 페이지에서 상태를 확인할 수 있습니다.", "以下の予約番号で予約照会ページから状態を確認できます。", "You can check the booking status with the booking number below."),
-        bookingNoLabel: pick(lang, "예약 번호", "予約番号", "Booking number"),
-        goLookup: pick(lang, "예약 조회로 이동", "予約照会へ", "Go to booking lookup"),
-        goTour: pick(lang, "상품 상세로 돌아가기", "商品詳細へ戻る", "Back to tour details"),
+        pendingTitle: pick(lang, "플랜 신청이 접수되었습니다", "プラン申請を受け付けました", "Your plan application has been received"),
+        pendingDesc: pick(lang, "BlueWolf Mongolia 검토 후 진행 상태가 갱신됩니다. 아래 신청 번호로 진행 상황을 확인할 수 있어요.", "BlueWolf Mongolia の確認後に進行状況が更新されます。以下の申請番号で確認できます。", "BlueWolf Mongolia will review this request and update the progress. You can track it with the application number below."),
+        confirmedTitle: pick(lang, "BlueWolf Mongolia 확인 완료", "BlueWolf Mongolia 確認完了", "BlueWolf Mongolia review completed"),
+        confirmedDesc: pick(lang, "아래 신청 번호로 진행 상태 조회 페이지에서 상태를 확인할 수 있습니다.", "以下の申請番号で進行状況照会ページから状態を確認できます。", "You can check the progress with the application number below."),
+        bookingNoLabel: pick(lang, "신청 번호", "申請番号", "Application number"),
+        goLookup: pick(lang, "진행 상태 조회로 이동", "進行状況照会へ", "Go to progress lookup"),
+        goTour: pick(lang, "플랜 상세로 돌아가기", "プラン詳細へ戻る", "Back to plan details"),
     };
 
     const weekdays = pick(
@@ -341,7 +352,7 @@ function PaymentContent() {
             }
 
             if (!sdkReady || !window.TossPayments) {
-                throw new Error(text.sdkError);
+                throw new Error(sdkLoadFailed ? text.sdkLoadFail : text.sdkError);
             }
 
             const response = await fetch("/api/payments/toss/prepare", {
@@ -438,7 +449,7 @@ function PaymentContent() {
                     <div className={`mt-2 text-3xl font-black tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>{createdBooking.bookingNo}</div>
                 </div>
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-                    <Link href={withLocaleQuery("/booking", lang)} className="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-blue-500">{text.goLookup}</Link>
+                    <Link href={withLocaleQuery("/mypage/bookings", lang)} className="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-blue-500">{text.goLookup}</Link>
                     <Link href={detailHref} className={`inline-flex items-center justify-center rounded-2xl border px-6 py-3.5 text-sm font-bold transition ${isDark ? "border-white/10 bg-slate-800 text-slate-100 hover:bg-slate-700" : "border-slate-200 bg-white text-slate-800 hover:bg-slate-50"}`}>{text.goTour}</Link>
                 </div>
             </section>
@@ -447,7 +458,24 @@ function PaymentContent() {
 
     return (
         <>
-            <Script src="https://js.tosspayments.com/v2/standard" strategy="afterInteractive" onLoad={() => setSdkReady(true)} />
+            <Script
+                src="https://js.tosspayments.com/v2/standard"
+                strategy="afterInteractive"
+                onReady={() => {
+                    if (window.TossPayments) {
+                        setSdkReady(true);
+                        setSdkLoadFailed(false);
+                    }
+                }}
+                onLoad={() => {
+                    setSdkReady(true);
+                    setSdkLoadFailed(false);
+                }}
+                onError={() => {
+                    setSdkReady(false);
+                    setSdkLoadFailed(true);
+                }}
+            />
 
             <section className={shellClass}>
                 <div className={`border-b px-6 py-4 ${isDark ? "border-white/10 bg-slate-950" : "border-slate-100 bg-slate-50"}`}>
@@ -481,7 +509,7 @@ function PaymentContent() {
                             <StepTitle step={2} title={pick(lang, "여행자 정보", "旅行者情報", "Traveler info")} desc={text.travelerDesc} isDark={isDark} />
                             <div className="mt-5 grid gap-4">
                                 <div>
-                                    <label className={labelClass}>{pick(lang, "예약자 이름", "予約者名", "Lead traveler name")}</label>
+                                    <label className={labelClass}>{pick(lang, "신청자 이름", "申請者名", "Applicant name")}</label>
                                     <input value={customerName} onChange={(event) => setCustomerName(event.target.value)} className={inputClass} placeholder={pick(lang, "예: 김지수", "例: 山田花子", "e.g. John Doe")} />
                                 </div>
                                 <div className="grid gap-4 sm:grid-cols-2">
@@ -564,7 +592,7 @@ function PaymentContent() {
                                             <div className={`mt-1 text-sm font-black tracking-wide ${isDark ? "text-slate-100" : "text-slate-900"}`}>신한은행 110-482-913204</div>
                                         </div>
                                     </div>
-                                    <div className={`mt-4 rounded-2xl border px-4 py-3 text-sm font-bold ${isDark ? "border-amber-500/30 bg-amber-500/10 text-amber-200" : "border-amber-200 bg-amber-50 text-amber-700"}`}>{pick(lang, "담당자 확인 후 예약이 확정됩니다.", "担当者が確認したあと予約が確定します。", "Your booking will be confirmed after our staff checks the transfer.")}</div>
+                                    <div className={`mt-4 rounded-2xl border px-4 py-3 text-sm font-bold ${isDark ? "border-amber-500/30 bg-amber-500/10 text-amber-200" : "border-amber-200 bg-amber-50 text-amber-700"}`}>{pick(lang, "BlueWolf Mongolia 확인 후 진행 상태가 갱신됩니다.", "BlueWolf Mongolia の確認後に進行状況が更新されます。", "BlueWolf Mongolia will review this transfer and update the progress.")}</div>
                                 </div>
                             ) : null}
                         </section>
@@ -579,15 +607,34 @@ function PaymentContent() {
                                 <div className={`border-t pt-4 ${isDark ? "border-white/10" : "border-slate-200"}`}>
                                     <div className="flex items-center justify-between"><span className={`text-sm font-bold ${isDark ? "text-slate-300" : "text-slate-700"}`}>{pick(lang, "예상 총액", "想定総額", "Estimated total")}</span><span className={`text-lg font-black ${isDark ? "text-white" : "text-slate-900"}`}>{formatPrice(estimatedTotal)}</span></div>
                                 </div>
-                                <div className="flex items-center justify-between"><span className="text-sm font-bold text-blue-500">{pick(lang, "지금 결제할 예약금", "今支払う予約金", "Deposit due now")}</span><span className="text-lg font-black text-blue-500">{formatPrice(depositDue)}</span></div>
+                                <div className="flex items-center justify-between"><span className="text-sm font-bold text-blue-500">{pick(lang, "지금 결제할 플랜 패키지 이용료", "今支払うプランパッケージ利用料", "Plan package fee due now")}</span><span className="text-lg font-black text-blue-500">{formatPrice(depositDue)}</span></div>
                             </div>
                         </section>
 
                         <section className={sectionClass}>
-                            <StepTitle step={6} title={pick(lang, "예약 확정", "予約確定", "Confirm booking")} isDark={isDark} />
+                            <StepTitle step={6} title={pick(lang, "BlueWolf Mongolia 확인 단계", "BlueWolf Mongolia 確認段階", "BlueWolf Mongolia review step")} isDark={isDark} />
                             {error ? <p className="mt-4 text-sm font-semibold text-red-500">{error}</p> : null}
+                            {(paymentMethod === "card" || paymentMethod === "simple") && !sdkReady ? (
+                                <p className={`mt-4 rounded-2xl border px-4 py-3 text-xs font-bold ${
+                                    sdkLoadFailed
+                                        ? isDark
+                                            ? "border-red-500/30 bg-red-500/10 text-red-200"
+                                            : "border-red-200 bg-red-50 text-red-600"
+                                        : isDark
+                                          ? "border-white/10 bg-slate-900 text-slate-300"
+                                          : "border-slate-200 bg-slate-50 text-slate-500"
+                                }`}>
+                                    {sdkLoadFailed ? text.sdkLoadFail : text.sdkLoading}
+                                </p>
+                            ) : null}
                             <button type="button" onClick={handleSubmit} disabled={submitting || ((paymentMethod === "card" || paymentMethod === "simple") && !sdkReady)} className="mt-5 inline-flex w-full items-center justify-center rounded-2xl bg-blue-600 px-6 py-4 text-base font-black text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-blue-400">
-                                {submitting ? pick(lang, "처리 중...", "処理中...", "Processing...") : paymentMethod === "bank" ? pick(lang, "예약 요청하기", "予約を送信する", "Send booking request") : pick(lang, "결제하기", "決済する", "Open payment window")}
+                                {submitting
+                                    ? pick(lang, "처리 중...", "処理中...", "Processing...")
+                                    : (paymentMethod === "card" || paymentMethod === "simple") && !sdkReady
+                                      ? pick(lang, "결제창 로딩 중", "決済画面読み込み中", "Loading payment")
+                                      : paymentMethod === "bank"
+                                        ? pick(lang, "플랜 신청하기", "プラン申請を送信する", "Submit plan application")
+                                        : pick(lang, "플랜 패키지 결제하기", "プランパッケージ決済へ", "Pay plan package fee")}
                             </button>
                             <Link href={detailHref} className={`mt-3 inline-flex w-full items-center justify-center rounded-2xl border px-6 py-3.5 text-sm font-bold transition ${isDark ? "border-white/10 bg-slate-900 text-slate-200 hover:bg-slate-800" : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"}`}>{text.goTour}</Link>
                         </section>
@@ -607,3 +654,4 @@ export default function PaymentPage() {
         </Suspense>
     );
 }
+

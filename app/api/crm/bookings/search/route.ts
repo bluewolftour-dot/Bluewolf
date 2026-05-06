@@ -10,7 +10,7 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
     }
 
-    const booking = findCrmBooking(bookingNo, name);
+    const booking = await findCrmBooking(bookingNo, name);
     if (!booking) {
         return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
     }

@@ -20,17 +20,17 @@ const overlaySpan =
 const shineSpan =
     "pointer-events-none absolute inset-y-0 left-[-30%] w-[40%] -skew-x-12 bg-gradient-to-r from-transparent via-white/35 to-transparent opacity-0 transition-all duration-700 group-hover:left-[120%] group-hover:opacity-100";
 
-export function BookingSection({
+export function ApplicationSection({
     t,
     lang,
-    selectedTourId,
-    setSelectedTourId,
+    selectedPlanId,
+    setSelectedPlanId,
     departDate,
     setDepartDate,
     guestCount,
     setGuestCount,
-    selectedTour,
-    depositPrice,
+    selectedPlan,
+    planPackageFeePrice,
     totalPrice,
     paymentDone,
     setPaymentDone,
@@ -38,20 +38,20 @@ export function BookingSection({
 }: {
     t: CopyValue;
     lang: Locale;
-    selectedTourId: number;
-    setSelectedTourId: (id: number) => void;
+    selectedPlanId: number;
+    setSelectedPlanId: (id: number) => void;
     departDate: string;
     setDepartDate: (value: string) => void;
     guestCount: number;
     setGuestCount: (count: number) => void;
-    selectedTour: Tour;
-    depositPrice: number;
+    selectedPlan: Tour;
+    planPackageFeePrice: number;
     totalPrice: number;
     paymentDone: boolean;
     setPaymentDone: (value: boolean) => void;
     isDark: boolean;
 }) {
-    const { tourItems: tours } = useCmsTours();
+    const { tourItems: plans } = useCmsTours();
     const scheduleLabel = {
         ko: "일정",
         ja: "日程",
@@ -73,29 +73,29 @@ export function BookingSection({
     return (
         <section className="grid gap-4 lg:grid-cols-[1.08fr_0.92fr] lg:gap-5">
             <div
-                id="booking"
+                id="application"
                 className={`rounded-[24px] border p-4 shadow-sm transition-colors duration-300 sm:rounded-[28px] sm:p-7 ${
                     isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"
                 }`}
             >
                 <h2 className={`text-2xl font-black tracking-tight sm:text-3xl ${isDark ? "text-white" : "text-slate-900"}`}>
-                    {t.bookingTitle}
+                    {t.applicationTitle}
                 </h2>
                 <p className={`mt-3 text-sm leading-7 sm:text-base ${isDark ? "text-slate-300" : "text-slate-500"}`}>
-                    {t.bookingDesc}
+                    {t.applicationDesc}
                 </p>
 
                 <div className="mt-6 grid gap-3 md:grid-cols-2">
                     <label className="grid gap-2 md:col-span-2">
                         <span className={`text-sm font-extrabold ${isDark ? "text-slate-100" : "text-slate-900"}`}>
-                            {t.selectTour}
+                            {t.selectPlan}
                         </span>
                         <Dropdown
-                            value={selectedTourId}
-                            onChange={(value) => setSelectedTourId(Number(value))}
-                            options={tours.map((tour) => ({
-                                value: tour.id,
-                                label: tour.title[lang],
+                            value={selectedPlanId}
+                            onChange={(value) => setSelectedPlanId(Number(value))}
+                            options={plans.map((plan) => ({
+                                value: plan.id,
+                                label: plan.title[lang],
                             }))}
                             isDark={isDark}
                         />
@@ -175,16 +175,16 @@ export function BookingSection({
                     }`}
                 >
                     <div className={`flex items-center justify-between gap-3 text-sm font-bold sm:text-base ${isDark ? "text-slate-100" : "text-slate-900"}`}>
-                        <span>{t.selectedTour}</span>
-                        <span className="text-right">{selectedTour.title[lang]}</span>
+                        <span>{t.selectedPlan}</span>
+                        <span className="text-right">{selectedPlan.title[lang]}</span>
                     </div>
                     <div className={`flex items-center justify-between gap-3 text-sm font-bold sm:text-base ${isDark ? "text-slate-100" : "text-slate-900"}`}>
                         <span>{t.guestsLabel}</span>
                         <span>{guestCount}</span>
                     </div>
                     <div className={`flex items-center justify-between gap-3 text-sm font-bold sm:text-base ${isDark ? "text-slate-100" : "text-slate-900"}`}>
-                        <span>{t.deposit}</span>
-                        <span>{formatPrice(depositPrice)}</span>
+                        <span>{t.planPackageFee}</span>
+                        <span>{formatPrice(planPackageFeePrice)}</span>
                     </div>
                     <div
                         className={`flex items-center justify-between gap-3 border-t border-dashed pt-3 text-base font-black sm:text-lg ${
@@ -200,7 +200,7 @@ export function BookingSection({
                     <button onClick={() => setPaymentDone(true)} className={primaryButton}>
                         <span className={overlaySpan} />
                         <span className={shineSpan} />
-                        <span className="relative z-10">{t.payDeposit}</span>
+                        <span className="relative z-10">{t.payPlanPackageFee}</span>
                     </button>
 
                     <button
@@ -231,18 +231,18 @@ export function BookingSection({
                         isDark ? "border-white/10 bg-slate-950" : "border-slate-200 bg-slate-100"
                     }`}
                 >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${selectedTour.gradient} opacity-20`} />
+                    <div className={`absolute inset-0 bg-gradient-to-br ${selectedPlan.gradient} opacity-20`} />
                     <div className="relative aspect-[16/10]">
                         <Image
-                            src={selectedTour.heroImage}
-                            alt={selectedTour.title[lang]}
+                            src={selectedPlan.heroImage}
+                            alt={selectedPlan.title[lang]}
                             fill
                             className="object-cover"
                             sizes="100vw"
                         />
                         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.08),rgba(15,23,42,0.24))]" />
                         <div className="absolute left-3 top-3 flex flex-wrap gap-2 sm:left-4 sm:top-4">
-                            {selectedTour.tags[lang].map((tag) => (
+                            {selectedPlan.tags[lang].map((tag) => (
                                 <span
                                     key={tag}
                                     className="rounded-full border border-white/25 bg-white/14 px-3 py-2 text-xs font-extrabold text-white backdrop-blur-sm"
@@ -256,10 +256,10 @@ export function BookingSection({
 
                 <div className="mt-5 sm:mt-6">
                     <h3 className={`text-2xl font-black tracking-tight sm:text-3xl ${isDark ? "text-white" : "text-slate-900"}`}>
-                        {selectedTour.title[lang]}
+                        {selectedPlan.title[lang]}
                     </h3>
                     <p className={`mt-3 text-sm leading-7 sm:text-base ${isDark ? "text-slate-300" : "text-slate-500"}`}>
-                        {selectedTour.desc[lang]}
+                        {selectedPlan.desc[lang]}
                     </p>
                 </div>
 
@@ -273,7 +273,7 @@ export function BookingSection({
                             {scheduleLabel}
                         </div>
                         <div className={`mt-2 text-base font-black sm:text-lg ${isDark ? "text-white" : "text-slate-900"}`}>
-                            {selectedTour.duration[lang]}
+                            {selectedPlan.duration[lang]}
                         </div>
                     </div>
 
@@ -286,7 +286,7 @@ export function BookingSection({
                             {t.priceLabel}
                         </div>
                         <div className={`mt-2 text-base font-black sm:text-lg ${isDark ? "text-white" : "text-slate-900"}`}>
-                            {formatPrice(selectedTour.price)}
+                            {formatPrice(selectedPlan.price)}
                         </div>
                     </div>
                 </div>
@@ -308,7 +308,7 @@ export function BookingSection({
                     </div>
 
                     <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                        {selectedTour.highlights[lang].map((spot) => (
+                        {selectedPlan.highlights[lang].map((spot) => (
                             <div
                                 key={spot}
                                 className={`rounded-[18px] border px-4 py-3 text-sm font-bold ${

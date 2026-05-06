@@ -1,15 +1,8 @@
 ﻿"use client";
 
 import Link from "next/link";
-import { useMemo, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
-
-function getClientAdminIds() {
-    return (process.env.NEXT_PUBLIC_BLUEWOLF_ADMIN_IDS || "admin,bluewolf")
-        .split(",")
-        .map((item) => item.trim().toLowerCase())
-        .filter(Boolean);
-}
 
 export function AdminGate({
     children,
@@ -19,8 +12,7 @@ export function AdminGate({
     isDark: boolean;
 }) {
     const { user, ready } = useAuth();
-    const adminIds = useMemo(() => getClientAdminIds(), []);
-    const isAdmin = Boolean(user && adminIds.includes(user.id.toLowerCase()));
+    const isAdmin = Boolean(user?.isAdmin);
     const panel = isDark ? "border-white/10 bg-slate-900 text-slate-100" : "border-slate-200 bg-white text-slate-950";
     const muted = isDark ? "text-slate-400" : "text-slate-500";
 

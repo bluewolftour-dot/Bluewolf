@@ -6,9 +6,11 @@ import {
     getCmsTourOptionsContent,
     getCmsTourThemesContent,
 } from "@/lib/cms-crm-db";
+import { type CmsCommunityContent } from "@/lib/cms-community";
 import { localizeCmsTourCustomizeContent } from "@/lib/cms-tour-customize";
-import { localizeTourOptions } from "@/lib/cms-tour-options";
-import { getCmsTourThemeLabel } from "@/lib/cms-tour-themes";
+import { localizeTourOptions, type CmsTourOptionsContent } from "@/lib/cms-tour-options";
+import { getCmsTourThemeLabel, type CmsTourThemesContent } from "@/lib/cms-tour-themes";
+import { type CmsTourCustomizeContent } from "@/lib/cms-tour-customize";
 
 export type ContactAssistantMessage = {
     role: "user" | "assistant";
@@ -17,11 +19,11 @@ export type ContactAssistantMessage = {
 
 type ContactAssistantKnowledge = {
     locale: Locale;
-    tours: ReturnType<typeof getAllCmsTours>;
+    tours: Awaited<ReturnType<typeof getAllCmsTours>>;
     options: ReturnType<typeof localizeTourOptions>;
     customize: ReturnType<typeof localizeCmsTourCustomizeContent>;
-    notices: ReturnType<typeof getCmsCommunityContent>["notices"][Locale];
-    themes: ReturnType<typeof getCmsTourThemesContent>;
+    notices: CmsCommunityContent["notices"][Locale];
+    themes: CmsTourThemesContent;
 };
 
 const regionLabels: Record<Locale, Record<Region, string>> = {
@@ -100,7 +102,7 @@ const intentKeywords = {
     notices: ["공지", "공지사항", "notice", "notices", "announcement", "お知らせ", "공지글"],
     price: ["가격", "금액", "비용", "얼마", "price", "cost", "料金", "値段"],
     recommend: ["추천", "어울려", "맞는", "recommend", "best", "おすすめ"],
-    booking: ["예약", "booking", "reserve", "reservation", "予約"],
+    booking: ["예약", "booking", "reserve", "reservation", "予約", "신청", "플랜 신청", "progress", "status"],
     contact: ["문의", "연락", "상담", "contact", "email", "phone", "営業時間", "メール", "전화"],
     community: ["커뮤니티", "후기", "리뷰", "동행", "질문", "community", "review", "mate", "qna", "口コミ"],
     faq: ["faq", "자주 묻는 질문", "질문", "faqページ", "frequently asked"],
@@ -156,17 +158,25 @@ function localizeContactLine(locale: Locale) {
         return `Human support: ${contactInfo.email} / ${contactInfo.phone} / ${contactInfo.hours}`;
     }
 
-    return `사람 상담: ${contactInfo.email} / ${contactInfo.phone} / ${contactInfo.hours}`;
+    return `상담: ${contactInfo.email} / ${contactInfo.phone} / ${contactInfo.hours}`;
 }
 
-function buildKnowledge(locale: Locale): ContactAssistantKnowledge {
+async function buildKnowledge(locale: Locale): Promise<ContactAssistantKnowledge> {
+    const [tours, optionsContent, customizeContent, communityContent, themes] = await Promise.all([
+        getAllCmsTours(),
+        getCmsTourOptionsContent(),
+        getCmsTourCustomizeContent(),
+        getCmsCommunityContent(),
+        getCmsTourThemesContent(),
+    ]);
+
     return {
         locale,
-        tours: getAllCmsTours(),
-        options: localizeTourOptions(getCmsTourOptionsContent(), locale),
-        customize: localizeCmsTourCustomizeContent(getCmsTourCustomizeContent(), locale),
-        notices: getCmsCommunityContent().notices[locale],
-        themes: getCmsTourThemesContent(),
+        tours,
+        options: localizeTourOptions(optionsContent as CmsTourOptionsContent, locale),
+        customize: localizeCmsTourCustomizeContent(customizeContent as CmsTourCustomizeContent, locale),
+        notices: communityContent.notices[locale],
+        themes: themes as CmsTourThemesContent,
     };
 }
 
@@ -240,7 +250,7 @@ function buildTourReply(knowledge: ContactAssistantKnowledge, tour: ContactAssis
             `- 日程タイプ: ${durationLabel}`,
             `- 期間: ${tour.duration[locale]}`,
             `- 価格: ${formatWon(locale, tour.price)}`,
-            `- 予約金: ${formatWon(locale, tour.deposit)}`,
+            `- プランパッケージ利用料: ${formatWon(locale, tour.deposit)}`,
             `- ハイライト: ${highlights}`,
             localizePathLabel(locale, `/tours/${tour.id}`),
         ].join("\n");
@@ -254,7 +264,7 @@ function buildTourReply(knowledge: ContactAssistantKnowledge, tour: ContactAssis
             `- Itinerary type: ${durationLabel}`,
             `- Duration: ${tour.duration[locale]}`,
             `- Price: ${formatWon(locale, tour.price)}`,
-            `- Deposit: ${formatWon(locale, tour.deposit)}`,
+            `- Plan package fee: ${formatWon(locale, tour.deposit)}`,
             `- Highlights: ${highlights}`,
             localizePathLabel(locale, `/tours/${tour.id}`),
         ].join("\n");
@@ -267,7 +277,7 @@ function buildTourReply(knowledge: ContactAssistantKnowledge, tour: ContactAssis
         `- 일정 유형: ${durationLabel}`,
         `- 기간: ${tour.duration[locale]}`,
         `- 가격: ${formatWon(locale, tour.price)}`,
-        `- 예약금: ${formatWon(locale, tour.deposit)}`,
+        `- 플랜 패키지 이용료: ${formatWon(locale, tour.deposit)}`,
         `- 하이라이트: ${highlights}`,
         localizePathLabel(locale, `/tours/${tour.id}`),
     ].join("\n");
@@ -474,7 +484,7 @@ function buildContactReply(locale: Locale) {
     }
 
     return [
-        `사람 상담 연락처를 안내드릴게요.`,
+        `상담 연락처를 안내드릴게요.`,
         `- 이메일: ${contactInfo.email}`,
         `- 전화: ${contactInfo.phone}`,
         `- 운영 시간: ${contactInfo.hours}`,
@@ -486,14 +496,14 @@ function buildContactReply(locale: Locale) {
 
 function buildBookingReply(locale: Locale) {
     if (locale === "ja") {
-        return [`예약 관련 안내는 예약 페이지에서 확인하실 수 있습니다.`, localizePathLabel(locale, "/booking"), localizeContactLine(locale)].join("\n");
+        return [`플랜 신청 및 진행 상태 조회 안내는 조회 페이지에서 확인하실 수 있습니다.`, localizePathLabel(locale, "/booking"), localizeContactLine(locale)].join("\n");
     }
 
     if (locale === "en") {
-        return [`For booking support, please check the booking page.`, localizePathLabel(locale, "/booking"), localizeContactLine(locale)].join("\n");
+        return [`For plan application support, please check the progress page.`, localizePathLabel(locale, "/booking"), localizeContactLine(locale)].join("\n");
     }
 
-    return [`예약 관련 안내는 예약 페이지에서 확인하실 수 있어요.`, localizePathLabel(locale, "/booking"), localizeContactLine(locale)].join("\n");
+    return [`플랜 신청 및 진행 상태 조회 안내는 조회 페이지에서 확인하실 수 있어요.`, localizePathLabel(locale, "/booking"), localizeContactLine(locale)].join("\n");
 }
 
 function buildCommunityReply(locale: Locale) {
@@ -543,18 +553,18 @@ function buildFallbackReply(knowledge: ContactAssistantKnowledge) {
     }
 
     return [
-        `현재 사이트 데이터 기준으로 투어 가격, 추가 옵션, 지역별 시작 금액, 공지사항, 예약 안내를 도와드릴 수 있어요.`,
+        `현재 사이트 데이터 기준으로 투어 가격, 추가 옵션, 지역별 시작 금액, 공지사항, 플랜 신청 안내를 도와드릴 수 있어요.`,
         `예시 투어: ${topTours}`,
         localizePathLabel(locale, "/tours"),
         localizeContactLine(locale),
     ].join("\n");
 }
 
-export function answerContactAssistantQuestion(
+export async function answerContactAssistantQuestion(
     locale: Locale,
     messages: ContactAssistantMessage[]
 ) {
-    const knowledge = buildKnowledge(locale);
+    const knowledge = await buildKnowledge(locale);
     const userMessages = messages
         .filter((message) => message.role === "user")
         .map((message) => message.content.trim())

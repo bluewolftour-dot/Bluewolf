@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /cms/
+Disallow: /crm/
+Disallow: /mypage/
+
+Sitemap: https://bluewolf-tour.com/sitemap.xml

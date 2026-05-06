@@ -126,28 +126,28 @@ export const sitePolicies: SitePolicy[] = [
     {
         slug: "refund",
         title: { ko: "취소와 환불", ja: "キャンセルと返金", en: "Cancellation and Refund" },
-        summary: { ko: "예약금, 취소 요청, 환불 확인 흐름을 안내합니다.", ja: "予約金、キャンセル申請、返金確認の流れを案内します。", en: "Deposit, cancellation request, and refund review flow." },
+        summary: { ko: "예약금, 취소 요청, 환불 확인 흐름을 안내합니다.", ja: "予約金、キャンセル申請、返金確認の流れを案内します。", en: "Plan package fee, plan fee refund inquiry, and refund review flow." },
         points: [
-            { ko: "취소 신청은 예약 조회 페이지에서 접수할 수 있습니다.", ja: "キャンセル申請は予約照会ページから行えます。", en: "Cancellation requests can be submitted from the booking lookup page." },
+            { ko: "취소 신청은 예약 조회 페이지에서 접수할 수 있습니다.", ja: "キャンセル申請は予約照会ページから行えます。", en: "Plan fee refund inquirys can be submitted from the application lookup page." },
             { ko: "담당자 확인 후 환불 가능 여부와 금액을 안내합니다.", ja: "担当者確認後、返金可否と金額をご案内します。", en: "A manager confirms eligibility and refund amount." },
         ],
     },
     {
         slug: "privacy",
         title: { ko: "개인정보처리방침", ja: "個人情報保護方針", en: "Privacy Policy" },
-        summary: { ko: "예약, 상담, 커뮤니티 운영을 위한 개인정보 처리 기준입니다.", ja: "予約、相談、コミュニティ運営のための個人情報取り扱い基準です。", en: "How personal data is handled for bookings, inquiries, and community features." },
+        summary: { ko: "예약, 상담, 커뮤니티 운영을 위한 개인정보 처리 기준입니다.", ja: "予約、相談、コミュニティ運営のための個人情報取り扱い基準です。", en: "How personal data is handled for applications, inquiries, and community features." },
         points: [
-            { ko: "예약 확인과 상담에 필요한 최소 정보만 수집합니다.", ja: "予約確認と相談に必要な最小限の情報のみ収集します。", en: "Only the minimum data needed for bookings and support is collected." },
+            { ko: "예약 확인과 상담에 필요한 최소 정보만 수집합니다.", ja: "予約確認と相談に必要な最小限の情報のみ収集します。", en: "Only the minimum data needed for applications and support is collected." },
             { ko: "운영 목적 외 사용은 제한합니다.", ja: "運営目的以外での利用を制限します。", en: "Use outside operational purposes is restricted." },
         ],
     },
     {
         slug: "terms",
         title: { ko: "이용약관", ja: "利用規約", en: "Terms of Service" },
-        summary: { ko: "서비스 이용, 예약, 커뮤니티 활동의 기본 약관입니다.", ja: "サービス利用、予約、コミュニティ活動に関する基本規約です。", en: "Basic terms for service use, bookings, and community activity." },
+        summary: { ko: "서비스 이용, 예약, 커뮤니티 활동의 기본 약관입니다.", ja: "サービス利用、予約、コミュニティ活動に関する基本規約です。", en: "Basic terms for service use, applications, and community activity." },
         points: [
-            { ko: "허위 예약, 스팸, 타인 비방 게시글은 제한될 수 있습니다.", ja: "虚偽予約、スパム、誹謗中傷投稿は制限される場合があります。", en: "Fake bookings, spam, and abusive posts may be restricted." },
-            { ko: "여행 상품의 세부 조건은 상품 상세와 예약 안내를 따릅니다.", ja: "旅行商品の詳細条件は商品詳細と予約案内に従います。", en: "Tour conditions follow the product details and booking guidance." },
+            { ko: "허위 예약, 스팸, 타인 비방 게시글은 제한될 수 있습니다.", ja: "虚偽予約、スパム、誹謗中傷投稿は制限される場合があります。", en: "Fake applications, spam, and abusive posts may be restricted." },
+            { ko: "여행 상품의 세부 조건은 상품 상세와 예약 안내를 따릅니다.", ja: "旅行商品の詳細条件は商品詳細と予約案内に従います。", en: "Plan conditions follow the product details and application guidance." },
         ],
     },
 ];

@@ -17,6 +17,9 @@ import { useCmsCommunityContent } from "@/lib/use-cms-community";
 import { useCmsTours } from "@/lib/use-cms-tours";
 import { Dropdown, type SelectOption } from "@/components/ui/Dropdown";
 import { StarIcon } from "@/components/ui/SafeIcons";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { executeRecaptcha } from "@/lib/recaptcha-client";
+import type { CmsCommunityContent } from "@/lib/cms-community";
 
 type CommunityBoard = Exclude<CommunityTab, "all">;
 type BoardSort = "latest" | "likes" | "rating" | "travelSoon" | "travelLate";
@@ -106,6 +109,7 @@ function BoardDetailModal({
     viewTourLabel,
     onClose,
     onMateApply,
+    onEditSaved,
 }: {
     item: CommunityItem;
     locale: Locale;
@@ -126,11 +130,32 @@ function BoardDetailModal({
     viewTourLabel: string;
     onClose: () => void;
     onMateApply: () => void;
+    onEditSaved: (community: CmsCommunityContent, item: CommunityItem) => void;
 }) {
+    const { user } = useAuth();
     const [commentText, setCommentText] = useState("");
     const [liked, setLiked] = useState(false);
     const [likeCount, setLikeCount] = useState(item.likes);
     const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editText, setEditText] = useState(item.text);
+    const [editTourTitle, setEditTourTitle] = useState(item.tourTitle ?? "");
+    const [editTravelDate, setEditTravelDate] = useState(item.travelDate ?? "");
+    const [editMaxPeople, setEditMaxPeople] = useState(String(item.maxPeople ?? 4));
+    const [editRating, setEditRating] = useState(item.rating ?? 5);
+    const [editError, setEditError] = useState("");
+    const [isSavingEdit, setIsSavingEdit] = useState(false);
+    const [isReportOpen, setIsReportOpen] = useState(false);
+    const [reportContent, setReportContent] = useState("");
+    const [reportError, setReportError] = useState("");
+    const [reportDone, setReportDone] = useState(false);
+    const [isSubmittingReport, setIsSubmittingReport] = useState(false);
+    const isOwner = Boolean(
+        user &&
+            (item.authorId?.toLowerCase() === user.id.toLowerCase() ||
+                item.author.toLowerCase() === user.id.toLowerCase() ||
+                item.author === user.name)
+    );
     const isMateFull = item.type === "mate" && (item.currentPeople ?? 0) >= (item.maxPeople ?? 1);
     const mateProgress =
         item.type === "mate" && item.maxPeople
@@ -141,6 +166,90 @@ function BoardDetailModal({
     const textMuted = isDark ? "text-slate-400" : "text-slate-500";
     const textMain = isDark ? "text-white" : "text-slate-900";
     const commentBg = isDark ? "bg-slate-950 border-white/10" : "bg-slate-50 border-slate-200";
+    const editLabel = locale === "ko" ? "수정" : locale === "ja" ? "編集" : "Edit";
+    const reportLabel = locale === "ko" ? "신고" : locale === "ja" ? "通報" : "Report";
+    const cancelLabel = locale === "ko" ? "취소" : locale === "ja" ? "キャンセル" : "Cancel";
+    const saveLabel = locale === "ko" ? "수정 저장" : locale === "ja" ? "編集を保存" : "Save edits";
+    const reportPlaceholder =
+        locale === "ko"
+            ? "신고 사유를 입력해주세요."
+            : locale === "ja"
+              ? "通報理由を入力してください。"
+              : "Describe the reason for this report.";
+    const reportDoneLabel =
+        locale === "ko" ? "신고가 접수되었습니다." : locale === "ja" ? "通報を受け付けました。" : "Report submitted.";
+
+    const handleSaveEdit = async () => {
+        const text = editText.trim();
+        if (!text) {
+            setEditError(locale === "ko" ? "내용을 입력해주세요." : locale === "ja" ? "内容を入力してください。" : "Please enter your message.");
+            return;
+        }
+
+        setIsSavingEdit(true);
+        setEditError("");
+
+        try {
+            const response = await fetch("/api/community/posts", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    locale,
+                    id: item.id,
+                    text,
+                    tourTitle: editTourTitle,
+                    travelDate: editTravelDate,
+                    maxPeople: Number(editMaxPeople),
+                    rating: editRating,
+                }),
+            });
+
+            if (!response.ok) throw new Error("COMMUNITY_POST_EDIT_FAILED");
+
+            const data = (await response.json()) as { community: CmsCommunityContent; item: CommunityItem };
+            onEditSaved(data.community, data.item);
+            setIsEditing(false);
+        } catch {
+            setEditError(locale === "ko" ? "게시글 수정에 실패했습니다." : locale === "ja" ? "投稿の編集に失敗しました。" : "Failed to edit this post.");
+        } finally {
+            setIsSavingEdit(false);
+        }
+    };
+
+    const handleSubmitReport = async () => {
+        const content = reportContent.trim();
+        if (content.length < 5) {
+            setReportError(reportPlaceholder);
+            return;
+        }
+
+        setIsSubmittingReport(true);
+        setReportError("");
+
+        try {
+            const recaptchaToken = await executeRecaptcha("report_submit").catch(() => "");
+            const response = await fetch("/api/report", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    targetType: "post",
+                    targetId: `${locale}:${item.id}`,
+                    reportType: "inappropriate",
+                    content,
+                    recaptchaToken,
+                }),
+            });
+
+            if (!response.ok) throw new Error("REPORT_FAILED");
+
+            setReportDone(true);
+            setReportContent("");
+        } catch {
+            setReportError(locale === "ko" ? "신고 접수에 실패했습니다." : locale === "ja" ? "通報に失敗しました。" : "Failed to submit the report.");
+        } finally {
+            setIsSubmittingReport(false);
+        }
+    };
 
     useBodyScrollLock(true);
 
@@ -165,15 +274,37 @@ function BoardDetailModal({
                             <p className={`text-xs ${textMuted}`}>{formatRelativeCommunityTime(item.date, locale)}</p>
                         </div>
                     </div>
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className={`rounded-full p-2 transition ${isDark ? "hover:bg-slate-800" : "hover:bg-slate-100"}`}
-                    >
-                        <svg className={`h-5 w-5 ${textMuted}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
+                    <div className="flex shrink-0 items-center gap-1.5">
+                        {isOwner ? (
+                            <button
+                                type="button"
+                                onClick={() => setIsEditing((value) => !value)}
+                                className={`rounded-full px-3 py-1.5 text-xs font-black transition ${
+                                    isDark ? "bg-slate-800 text-slate-100 hover:bg-slate-700" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                }`}
+                            >
+                                {editLabel}
+                            </button>
+                        ) : null}
+                        <button
+                            type="button"
+                            onClick={() => setIsReportOpen((value) => !value)}
+                            className={`rounded-full px-3 py-1.5 text-xs font-black transition ${
+                                isDark ? "bg-rose-500/10 text-rose-300 hover:bg-rose-500/20" : "bg-rose-50 text-rose-600 hover:bg-rose-100"
+                            }`}
+                        >
+                            {reportLabel}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className={`rounded-full p-2 transition ${isDark ? "hover:bg-slate-800" : "hover:bg-slate-100"}`}
+                        >
+                            <svg className={`h-5 w-5 ${textMuted}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 {item.type === "review" && item.rating ? (
@@ -228,9 +359,95 @@ function BoardDetailModal({
                     </div>
                 ) : null}
 
-                <p className={`mt-4 text-sm leading-7 sm:text-base ${isDark ? "text-slate-200" : "text-slate-700"}`}>
-                    {item.text}
-                </p>
+                {isEditing ? (
+                    <div className={`mt-4 rounded-[22px] border p-4 ${isDark ? "border-white/10 bg-slate-950" : "border-slate-200 bg-slate-50"}`}>
+                        {(item.type === "review" || item.type === "mate") ? (
+                            <input
+                                value={editTourTitle}
+                                onChange={(event) => setEditTourTitle(event.target.value)}
+                                className={`mb-3 h-11 w-full rounded-2xl border px-4 text-sm font-semibold outline-none focus:border-blue-300 focus:ring-4 focus:ring-blue-50 ${
+                                    isDark ? "border-white/10 bg-slate-900 text-slate-100" : "border-slate-200 bg-white text-slate-900"
+                                }`}
+                            />
+                        ) : null}
+                        {item.type === "review" ? (
+                            <div className="mb-3 flex gap-1">
+                                {Array.from({ length: 5 }).map((_, index) => (
+                                    <button key={index} type="button" onClick={() => setEditRating(index + 1)}>
+                                        <StarIcon className={`h-6 w-6 ${index < editRating ? "fill-amber-400 text-amber-400" : "fill-slate-200 text-slate-200"}`} />
+                                    </button>
+                                ))}
+                            </div>
+                        ) : null}
+                        {item.type === "mate" ? (
+                            <div className="mb-3 grid gap-3 sm:grid-cols-2">
+                                <input
+                                    value={editTravelDate}
+                                    onChange={(event) => setEditTravelDate(event.target.value)}
+                                    className={`h-11 rounded-2xl border px-4 text-sm font-semibold outline-none focus:border-blue-300 focus:ring-4 focus:ring-blue-50 ${
+                                        isDark ? "border-white/10 bg-slate-900 text-slate-100" : "border-slate-200 bg-white text-slate-900"
+                                    }`}
+                                />
+                                <input
+                                    type="number"
+                                    min={2}
+                                    value={editMaxPeople}
+                                    onChange={(event) => setEditMaxPeople(event.target.value)}
+                                    className={`h-11 rounded-2xl border px-4 text-sm font-semibold outline-none focus:border-blue-300 focus:ring-4 focus:ring-blue-50 ${
+                                        isDark ? "border-white/10 bg-slate-900 text-slate-100" : "border-slate-200 bg-white text-slate-900"
+                                    }`}
+                                />
+                            </div>
+                        ) : null}
+                        <textarea
+                            value={editText}
+                            onChange={(event) => setEditText(event.target.value)}
+                            rows={5}
+                            className={`w-full rounded-2xl border px-4 py-3 text-sm font-semibold leading-6 outline-none focus:border-blue-300 focus:ring-4 focus:ring-blue-50 ${
+                                isDark ? "border-white/10 bg-slate-900 text-slate-100" : "border-slate-200 bg-white text-slate-900"
+                            }`}
+                        />
+                        {editError ? <p className="mt-2 text-xs font-bold text-rose-500">{editError}</p> : null}
+                        <div className="mt-3 flex justify-end gap-2">
+                            <button type="button" onClick={() => setIsEditing(false)} className={`rounded-2xl px-4 py-2 text-sm font-black ${isDark ? "bg-slate-800 text-slate-100" : "bg-slate-200 text-slate-700"}`}>
+                                {cancelLabel}
+                            </button>
+                            <button type="button" onClick={handleSaveEdit} disabled={isSavingEdit} className="rounded-2xl bg-blue-600 px-4 py-2 text-sm font-black text-white transition hover:bg-blue-500 disabled:opacity-60">
+                                {isSavingEdit ? "..." : saveLabel}
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <p className={`mt-4 text-sm leading-7 sm:text-base ${isDark ? "text-slate-200" : "text-slate-700"}`}>
+                        {item.text}
+                    </p>
+                )}
+
+                {isReportOpen ? (
+                    <div className={`mt-4 rounded-[22px] border p-4 ${isDark ? "border-rose-500/20 bg-rose-500/5" : "border-rose-100 bg-rose-50/70"}`}>
+                        {reportDone ? (
+                            <p className={`text-sm font-bold ${isDark ? "text-rose-200" : "text-rose-700"}`}>{reportDoneLabel}</p>
+                        ) : (
+                            <>
+                                <textarea
+                                    value={reportContent}
+                                    onChange={(event) => setReportContent(event.target.value)}
+                                    rows={3}
+                                    placeholder={reportPlaceholder}
+                                    className={`w-full rounded-2xl border px-4 py-3 text-sm font-semibold outline-none focus:border-rose-300 focus:ring-4 focus:ring-rose-100 ${
+                                        isDark ? "border-white/10 bg-slate-950 text-slate-100" : "border-rose-100 bg-white text-slate-900"
+                                    }`}
+                                />
+                                {reportError ? <p className="mt-2 text-xs font-bold text-rose-500">{reportError}</p> : null}
+                                <div className="mt-3 flex justify-end">
+                                    <button type="button" onClick={handleSubmitReport} disabled={isSubmittingReport} className="rounded-2xl bg-rose-600 px-4 py-2 text-sm font-black text-white transition hover:bg-rose-500 disabled:opacity-60">
+                                        {isSubmittingReport ? "..." : reportLabel}
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                ) : null}
 
                 {item.type === "mate" ? (
                     <div className={`mt-5 rounded-[22px] border p-4 ${isDark ? "border-white/10 bg-slate-950" : "border-slate-200 bg-slate-50"}`}>
@@ -455,7 +672,7 @@ function BoardDetailModal({
 export function CommunityBoardPage({ board, referenceNowKst }: { board: CommunityBoard; referenceNowKst?: string }) {
     const { lang, isDark } = usePage();
     const { tourItems } = useCmsTours();
-    const { communityContent } = useCmsCommunityContent();
+    const { communityContent, setCommunityContent } = useCmsCommunityContent();
     const sourceItems = communityContent.items[lang].filter((item) => item.type === board);
     const [sortBy, setSortBy] = useState<BoardSort>("latest");
     const [appliedMateIds, setAppliedMateIds] = useState<number[]>([]);
@@ -725,6 +942,10 @@ export function CommunityBoardPage({ board, referenceNowKst }: { board: Communit
 
         setAppliedMateIds((current) => [...current, targetItem.id]);
     };
+    const handleEditSaved = (nextCommunity: CmsCommunityContent, updatedItem: CommunityItem) => {
+        setCommunityContent(nextCommunity);
+        setSelectedItemId(updatedItem.id);
+    };
 
     const visibleItems = useMemo(
         () =>
@@ -957,6 +1178,7 @@ export function CommunityBoardPage({ board, referenceNowKst }: { board: Communit
                     viewTourLabel={displayCopy.viewTour}
                     onClose={() => setSelectedItemId(null)}
                     onMateApply={() => handleMateApply(selectedItem)}
+                    onEditSaved={handleEditSaved}
                 />
             ) : null}
         </div>

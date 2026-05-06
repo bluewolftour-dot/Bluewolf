@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
     }
 
-    const booking = findCrmBookingByNoForEmail(bookingNo, user.email);
+    const booking = await findCrmBookingByNoForEmail(bookingNo, user.email);
     if (!booking) {
         return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
     }
@@ -47,16 +47,16 @@ export async function POST(request: NextRequest) {
         `예약자: ${booking.customerName}`,
         `이메일: ${booking.email}`,
         `전화번호: ${booking.phone}`,
-        businessInfo ? `사업자/발급 정보: ${businessInfo}` : "",
+        businessInfo ? `사업자 발급 정보: ${businessInfo}` : "",
     ]
         .filter(Boolean)
         .join("\n");
 
-    const inquiryId = createCrmInquiry({
+    const inquiryId = await createCrmInquiry({
         name: booking.customerName,
         email: booking.email,
         phone: booking.phone,
-        subject: `${label} 발급 요청 · ${booking.bookingNo}`,
+        subject: `${label} 발급 요청 - ${booking.bookingNo}`,
         message,
         locale: booking.locale,
     });

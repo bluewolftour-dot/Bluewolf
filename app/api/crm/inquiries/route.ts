@@ -7,7 +7,7 @@ export async function GET() {
     if (forbidden) return forbidden;
 
     return NextResponse.json({
-        inquiries: getCrmInquiries(),
+        inquiries: await getCrmInquiries(),
     });
 }
 
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
     }
 
-    const id = createCrmInquiry({
+    const id = await createCrmInquiry({
         name: body.name.trim(),
         email: body.email.trim(),
         phone: (body.phone ?? "").trim(),
@@ -53,7 +53,7 @@ export async function PATCH(request: Request) {
         return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
     }
 
-    const inquiry = updateCrmInquiryStatus(id, status);
+    const inquiry = await updateCrmInquiryStatus(id, status);
     if (!inquiry) {
         return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
     }

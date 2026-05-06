@@ -4,7 +4,7 @@ import { requireAdminResponse } from "@/lib/admin-auth";
 
 export async function GET() {
     return NextResponse.json({
-        tours: getAllCmsTours(),
+        tours: await getAllCmsTours(),
     });
 }
 
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     if (forbidden) return forbidden;
 
     const body = (await request.json()) as CmsTourRecord;
-    const saved = saveCmsTour(body);
+    const saved = await saveCmsTour(body);
 
     return NextResponse.json({
         tour: saved,
@@ -31,7 +31,7 @@ export async function DELETE(request: Request) {
         return NextResponse.json({ error: "INVALID_ID" }, { status: 400 });
     }
 
-    const deleted = deleteCmsTour(id);
+    const deleted = await deleteCmsTour(id);
     if (!deleted) {
         return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
     }

@@ -10,21 +10,21 @@ export type AccountMenuItem = {
 const accountMenuCopy = {
     ko: {
         mypage: "마이페이지",
-        bookings: "예약내역",
+        applications: "예약내역",
         community: "커뮤니티 관리",
         mates: "참가 신청 내역",
         notifications: "알림센터",
     },
     ja: {
         mypage: "マイページ",
-        bookings: "予約履歴",
+        applications: "予約履歴",
         community: "コミュニティ管理",
         mates: "参加申請履歴",
         notifications: "通知センター",
     },
     en: {
         mypage: "My page",
-        bookings: "Bookings",
+        applications: "Applications",
         community: "Community",
         mates: "Companion applications",
         notifications: "Notifications",
@@ -36,7 +36,7 @@ export function buildAccountMenuItems(locale: Locale): AccountMenuItem[] {
 
     return [
         { key: "mypage", href: withLocaleQuery("/mypage", locale), label: copy.mypage },
-        { key: "bookings", href: withLocaleQuery("/mypage/bookings", locale), label: copy.bookings },
+        { key: "applications", href: withLocaleQuery("/mypage/applications", locale), label: copy.applications },
         { key: "community", href: withLocaleQuery("/community", locale), label: copy.community },
         { key: "mates", href: withLocaleQuery("/community/mates", locale), label: copy.mates },
         { key: "notifications", href: withLocaleQuery("/notifications", locale), label: copy.notifications },

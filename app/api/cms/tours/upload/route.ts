@@ -1,21 +1,11 @@
-import { mkdir, readdir, unlink, writeFile } from "node:fs/promises";
-import path from "node:path";
 import { NextResponse } from "next/server";
 import { requireAdminResponse } from "@/lib/admin-auth";
+import { storePublicImageUpload } from "@/lib/upload-storage";
 
 export const runtime = "nodejs";
 
-const uploadDir = path.join(process.cwd(), "public", "uploads", "cms", "tours");
 const allowedSlotPattern =
     /^(tour-(\d+)-(hero|gallery-\d+|detail-\d+)|tour-region-(south|north|central|west))$/;
-
-function normalizeExtension(filename: string, mimeType: string) {
-    const lowerName = filename.toLowerCase();
-    if (lowerName.endsWith(".png") || mimeType === "image/png") return ".png";
-    if (lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg") || mimeType === "image/jpeg") return ".jpg";
-    if (lowerName.endsWith(".webp") || mimeType === "image/webp") return ".webp";
-    return null;
-}
 
 export async function POST(request: Request) {
     const forbidden = await requireAdminResponse();
@@ -33,32 +23,18 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "INVALID_SLOT" }, { status: 400 });
     }
 
-    const extension = normalizeExtension(file.name, file.type);
-    if (!extension) {
-        return NextResponse.json({ error: "UNSUPPORTED_FILE_TYPE" }, { status: 400 });
+    const stored = await storePublicImageUpload({
+        file,
+        directory: "cms/tours",
+        baseName: slot,
+        replaceExistingForBaseName: true,
+    });
+
+    if (!stored.ok) {
+        return NextResponse.json({ error: stored.error }, { status: 400 });
     }
 
-    await mkdir(uploadDir, { recursive: true });
-
-    const currentFiles = await readdir(uploadDir);
-    await Promise.all(
-        currentFiles
-            .filter(
-                (name) =>
-                    name === `${slot}.jpg` ||
-                    name === `${slot}.png` ||
-                    name === `${slot}.webp` ||
-                    name.startsWith(`${slot}-`)
-            )
-            .map((name) => unlink(path.join(uploadDir, name)).catch(() => undefined))
-    );
-
-    const fileName = `${slot}-${Date.now()}${extension}`;
-    const buffer = Buffer.from(await file.arrayBuffer());
-
-    await writeFile(path.join(uploadDir, fileName), buffer);
-
     return NextResponse.json({
-        path: `/uploads/cms/tours/${fileName}`,
+        path: stored.upload.path,
     });
 }

@@ -9,9 +9,40 @@ import { getPrimaryTourBadgeTags, getSecondaryTourTags } from "@/lib/tour-tags";
 import { formatPrice } from "@/lib/bluewolf-utils";
 
 type CopyValue = (typeof copy)[Locale];
+type TourViewMode = "default" | "twoColumn" | "list";
 
 const inputClass =
     "h-12 w-full rounded-2xl border px-4 text-[15px] font-semibold outline-none transition focus:border-blue-300 focus:ring-4 focus:ring-blue-50";
+
+function DefaultViewIcon({ className = "h-4 w-4" }: { className?: string }) {
+    return (
+        <svg className={className} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+            <rect x="3" y="3" width="14" height="14" rx="3" />
+            <path d="M6 7h8M6 10h8M6 13h5" strokeLinecap="round" />
+        </svg>
+    );
+}
+
+function TwoColumnViewIcon({ className = "h-4 w-4" }: { className?: string }) {
+    return (
+        <svg className={className} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+            <rect x="3" y="3" width="6" height="6" rx="1.5" />
+            <rect x="11" y="3" width="6" height="6" rx="1.5" />
+            <rect x="3" y="11" width="6" height="6" rx="1.5" />
+            <rect x="11" y="11" width="6" height="6" rx="1.5" />
+        </svg>
+    );
+}
+
+function ListViewIcon({ className = "h-4 w-4" }: { className?: string }) {
+    return (
+        <svg className={className} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+            <rect x="3" y="4" width="4" height="4" rx="1" />
+            <rect x="3" y="12" width="4" height="4" rx="1" />
+            <path d="M10 5h7M10 8h5M10 13h7M10 16h5" strokeLinecap="round" />
+        </svg>
+    );
+}
 
 
 export function ToursSection({
@@ -56,6 +87,7 @@ export function ToursSection({
     resolveThemeLabel: (themeKey: string) => string;
 }) {
     const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+    const [viewMode, setViewMode] = useState<TourViewMode>("default");
 
     const panelBase = `rounded-[24px] border shadow-sm transition-colors duration-300 sm:rounded-[28px] ${
         isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"
@@ -65,6 +97,21 @@ export function ToursSection({
 
     const hasActiveFilters =
         keyword !== "" || duration !== "all" || region !== "all" || theme !== "all";
+
+    const viewModeOptions: Array<{ value: TourViewMode; label: string; Icon: typeof DefaultViewIcon }> = [
+        { value: "default", label: lang === "en" ? "Default" : lang === "ja" ? "基本" : "기본형", Icon: DefaultViewIcon },
+        { value: "twoColumn", label: lang === "en" ? "2 columns" : lang === "ja" ? "2列" : "2열 정렬형", Icon: TwoColumnViewIcon },
+        { value: "list", label: lang === "en" ? "List" : lang === "ja" ? "リスト" : "목록형", Icon: ListViewIcon },
+    ];
+
+    const regionLabelByKey: Record<Tour["region"], string> = {
+        south: t.south,
+        central: t.central,
+        north: t.north,
+        west: t.west,
+    };
+
+    const priceFromLabel = lang === "en" ? "from" : lang === "ja" ? "から" : "부터";
 
     const filterPanel = (
         <div className="flex flex-col gap-5">
@@ -180,6 +227,36 @@ export function ToursSection({
                 )}
             </div>
 
+            <div className="flex justify-end lg:hidden">
+                <div className={`inline-flex rounded-2xl p-1 ${
+                    isDark ? "bg-slate-950/80" : "bg-slate-100"
+                }`}>
+                    {viewModeOptions.map((option) => {
+                        const active = viewMode === option.value;
+                        const Icon = option.Icon;
+
+                        return (
+                            <button
+                                key={option.value}
+                                type="button"
+                                onClick={() => setViewMode(option.value)}
+                                aria-label={option.label}
+                                title={option.label}
+                                className={`grid h-9 w-9 place-items-center rounded-xl transition ${
+                                    active
+                                        ? "bg-blue-600 text-white shadow-[0_8px_20px_rgba(37,99,235,0.22)]"
+                                        : isDark
+                                          ? "text-slate-300 hover:bg-white/5"
+                                          : "text-slate-600 hover:bg-white"
+                                }`}
+                            >
+                                <Icon className="h-4 w-4" />
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+
             {/* 데스크톱: 고정 사이드바 */}
             <aside className={`hidden lg:block lg:w-[260px] xl:w-[280px] shrink-0`}>
                 <div className={`sticky top-24 ${panelBase} p-5`}>
@@ -197,33 +274,59 @@ export function ToursSection({
             <div className="min-w-0 flex-1">
                 <div className={`${panelBase} p-4 sm:p-6`}>
                     {/* 헤더 */}
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="flex items-center gap-3">
-                            <div>
-                                <h2 className={`text-xl font-black tracking-tight sm:text-2xl ${isDark ? "text-white" : "text-slate-900"}`}>
+                    <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                                <h2 className={`!text-[1.25rem] font-black tracking-tight sm:!text-2xl ${isDark ? "text-white" : "text-slate-900"}`}>
                                     {t.featured}
                                 </h2>
                                 <p className={`mt-0.5 text-xs sm:text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                                     {filteredTours.length}{lang === "ja" ? "件" : lang === "en" ? " results" : "개 상품"}
                                 </p>
-                            </div>
                         </div>
 
-                        <div className="w-full sm:w-[200px]">
-                            <Dropdown
-                                value={sort}
-                                onChange={setSort}
-                                options={[
-                                    { value: "popular", label: t.popularSort },
-                                    { value: "priceLow", label: t.lowSort },
-                                    { value: "priceHigh", label: t.highSort },
-                                ]}
-                                isDark={isDark}
-                            />
+                        <div className="flex shrink-0 items-center gap-2">
+                            <div className="w-[132px] sm:w-[200px]">
+                                <Dropdown
+                                    value={sort}
+                                    onChange={setSort}
+                                    options={[
+                                        { value: "popular", label: t.popularSort },
+                                        { value: "priceLow", label: t.lowSort },
+                                        { value: "priceHigh", label: t.highSort },
+                                    ]}
+                                    isDark={isDark}
+                                />
+                            </div>
+                            <div className={`hidden rounded-2xl p-1 sm:inline-flex ${
+                                isDark ? "bg-slate-950/80" : "bg-slate-100"
+                            }`}>
+                                {viewModeOptions.map((option) => {
+                                    const active = viewMode === option.value;
+                                    const Icon = option.Icon;
+
+                                    return (
+                                        <button
+                                            key={option.value}
+                                            type="button"
+                                            onClick={() => setViewMode(option.value)}
+                                            aria-label={option.label}
+                                            title={option.label}
+                                            className={`grid h-9 w-9 place-items-center rounded-xl transition ${
+                                                active
+                                                    ? "bg-blue-600 text-white shadow-[0_8px_20px_rgba(37,99,235,0.22)]"
+                                                    : isDark
+                                                      ? "text-slate-300 hover:bg-white/5"
+                                                      : "text-slate-600 hover:bg-white"
+                                            }`}
+                                        >
+                                            <Icon className="h-4 w-4" />
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
 
-                    {/* 카드 그리드 */}
                     {filteredTours.length === 0 ? (
                         <div className={`mt-5 rounded-[22px] border p-8 text-center ${
                             isDark ? "border-white/10 bg-slate-950" : "border-slate-200 bg-slate-50"
@@ -245,13 +348,132 @@ export function ToursSection({
                             </button>
                         </div>
                     ) : (
-                        <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                        <div className={
+                            viewMode === "list"
+                                ? "mt-5 flex flex-col gap-3"
+                                : viewMode === "twoColumn"
+                                  ? "mt-5 grid grid-cols-2 gap-4"
+                                  : "mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
+                        }>
                             {filteredTours.map((tour) => {
                                 const topTags = getPrimaryTourBadgeTags(tour, lang, [
                                     resolveThemeLabel(tour.theme),
                                     tour.duration[lang],
                                 ]);
                                 const secondaryTags = getSecondaryTourTags(tour, lang).slice(0, 2);
+
+                                if (viewMode === "list") {
+                                    return (
+                                        <article
+                                            key={tour.id}
+                                            className={`group flex cursor-pointer overflow-hidden rounded-[18px] border text-left shadow-sm transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:shadow-xl active:scale-[0.99] ${
+                                                isDark ? "border-white/10 bg-slate-950" : "border-slate-200 bg-white"
+                                            }`}
+                                            onClick={() => setSelectedTourId(tour.id)}
+                                        >
+                                            <div className={`relative min-h-24 w-28 shrink-0 self-stretch overflow-hidden ${isDark ? "bg-slate-900" : "bg-slate-100"} sm:min-h-28 sm:w-36`}>
+                                                {showImages ? (
+                                                    <Image
+                                                        src={tour.heroImage}
+                                                        alt={tour.title[lang]}
+                                                        fill
+                                                        className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
+                                                        sizes="176px"
+                                                    />
+                                                ) : null}
+                                            </div>
+
+                                            <div className="flex min-w-0 flex-1 flex-col justify-between gap-2 p-3">
+                                                <div className="min-w-0">
+                                                    <div className="mb-1.5 flex flex-wrap gap-1">
+                                                        {topTags.map((tag, index) => (
+                                                            <span
+                                                                key={`${tour.id}-list-top-tag-${tag}`}
+                                                                className={`rounded-full px-2 py-0.5 text-[9px] font-extrabold text-white ${
+                                                                    index === 0 ? "bg-blue-600" : "bg-slate-700"
+                                                                }`}
+                                                            >
+                                                                {tag}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                    <h3 className={`line-clamp-1 !text-[13px] font-black leading-tight ${isDark ? "text-white" : "text-slate-900"}`}>
+                                                        {tour.title[lang]}
+                                                    </h3>
+                                                    <p className={`mt-1 line-clamp-2 !text-[10px] font-semibold leading-snug ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+                                                        {tour.desc[lang]}
+                                                    </p>
+                                                </div>
+
+                                                <div className="flex items-end justify-between gap-2">
+                                                    <div className="flex min-w-0 flex-wrap gap-1">
+                                                        {secondaryTags.map((tag) => (
+                                                            <span
+                                                                key={`${tour.id}-list-secondary-${tag}`}
+                                                                className={`rounded-full px-2 py-0.5 text-[9px] font-bold ${
+                                                                    isDark ? "bg-white/10 text-slate-200" : "bg-slate-100 text-slate-700"
+                                                                }`}
+                                                            >
+                                                                {tag}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                    <div className="shrink-0 text-right">
+                                                        <span className={`block text-[9px] font-extrabold leading-none ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                                                            {t.priceLabel}
+                                                        </span>
+                                                        <span className={`mt-0.5 block text-sm font-black leading-tight ${isDark ? "text-white" : "text-slate-950"}`}>
+                                                            {formatPrice(tour.price)}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </article>
+                                    );
+                                }
+
+                                if (viewMode === "twoColumn") {
+                                    return (
+                                        <article
+                                            key={tour.id}
+                                            className="group relative aspect-[0.9] min-h-[174px] cursor-pointer overflow-hidden rounded-[20px] bg-slate-200 text-white shadow-sm transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:shadow-xl active:scale-[0.98] sm:aspect-[4/3] sm:min-h-[220px] sm:rounded-[22px]"
+                                            onClick={() => setSelectedTourId(tour.id)}
+                                        >
+                                            {showImages ? (
+                                                <Image
+                                                    src={tour.heroImage}
+                                                    alt={tour.title[lang]}
+                                                    fill
+                                                    className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"
+                                                    sizes="(max-width: 640px) 50vw, 50vw"
+                                                />
+                                            ) : (
+                                                <div className={`absolute inset-0 ${isDark ? "bg-slate-950" : "bg-slate-100"}`} />
+                                            )}
+
+                                            <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/15 to-black/78" />
+
+                                            <span className="absolute left-3 top-3 rounded-full bg-white/25 px-3 py-1 text-[10px] font-black text-white shadow-[0_8px_18px_rgba(15,23,42,0.18)] backdrop-blur-md sm:left-4 sm:top-4 sm:text-xs">
+                                                {regionLabelByKey[tour.region]}
+                                            </span>
+
+                                            <div className="absolute inset-x-0 bottom-0 p-4 text-white sm:p-5">
+                                                <h3 className="!text-[1.2rem] font-black leading-tight tracking-tight text-white sm:!text-[1.35rem]">
+                                                    {tour.title[lang]}
+                                                </h3>
+                                                <div className="mt-2">
+                                                    <span className="block text-[10px] font-black leading-none text-white/85 sm:text-xs">
+                                                        {t.priceLabel}
+                                                    </span>
+                                                    <span className="mt-1 block text-[0.95rem] font-black leading-tight text-white sm:text-lg">
+                                                        {formatPrice(tour.price)}{" "}
+                                                        <span className="text-[0.9em]">{priceFromLabel}</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </article>
+                                    );
+                                }
 
                                 return (
                                     <article
@@ -290,13 +512,10 @@ export function ToursSection({
 
                                     {/* 하단 그라데이션 + 텍스트 */}
                                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent px-4 pb-4 pt-16 text-white sm:px-5 sm:pb-5 sm:pt-20">
-                                        <h3 className="text-sm font-black leading-tight tracking-tight sm:text-base">
+                                        <h3 className="!text-[1.2rem] font-black leading-tight tracking-tight">
                                             {tour.title[lang]}
                                         </h3>
-                                        <p className="mt-1 line-clamp-2 text-xs leading-5 text-white/75 sm:text-sm sm:leading-6">
-                                            {tour.desc[lang]}
-                                        </p>
-                                        <div className="mt-2.5 flex items-end justify-between gap-2">
+                                        <div className="mt-3 flex items-end justify-between gap-2">
                                             <div className="flex flex-wrap gap-1">
                                                 {secondaryTags.map((tag) => (
                                                     <span
@@ -307,9 +526,14 @@ export function ToursSection({
                                                     </span>
                                                 ))}
                                             </div>
-                                            <span className="shrink-0 text-lg font-black tracking-tight sm:text-xl">
-                                                {formatPrice(tour.price)}
-                                            </span>
+                                            <div className="shrink-0 text-right">
+                                                <span className="block text-[10px] font-extrabold leading-none text-white/70 sm:text-[11px]">
+                                                    {t.priceLabel}
+                                                </span>
+                                                <span className="mt-1 block text-lg font-black leading-tight sm:text-xl">
+                                                    {formatPrice(tour.price)}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                     </article>

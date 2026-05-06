@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { CmsSidebar, getCmsCategoryFromParam } from "@/components/cms/CmsSidebar";
 import { CommunityCmsEditor } from "@/components/cms/CommunityCmsEditor";
+import { CmsImageLibraryManager } from "@/components/cms/CmsImageLibraryManager";
 import { HomeCmsEditor } from "@/components/cms/HomeCmsEditor";
 import { TourCmsOverview } from "@/components/cms/TourCmsOverview";
 import { CmsUnsavedChangesGuard } from "@/components/cms/CmsUnsavedChangesGuard";
@@ -233,6 +234,10 @@ function CmsContent() {
                             error={communityError}
                             isDark={isDark}
                         />
+                    ) : null}
+
+                    {activeCategory === "library" ? (
+                        <CmsImageLibraryManager isDark={isDark} />
                     ) : null}
                 </section>
             </div>

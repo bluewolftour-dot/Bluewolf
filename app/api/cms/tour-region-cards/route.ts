@@ -8,7 +8,7 @@ import { requireAdminResponse } from "@/lib/admin-auth";
 
 export async function GET() {
     return NextResponse.json({
-        regionCards: getCmsTourRegionCardsContent(),
+        regionCards: await getCmsTourRegionCardsContent(),
     });
 }
 
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     if (forbidden) return forbidden;
 
     const body = (await request.json()) as CmsTourRegionCardsRecord;
-    const saved = saveCmsTourRegionCardsContent(body);
+    const saved = await saveCmsTourRegionCardsContent(body);
 
     return NextResponse.json({
         regionCards: saved,

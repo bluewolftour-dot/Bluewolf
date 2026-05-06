@@ -6,6 +6,7 @@ import { type Locale } from "@/lib/bluewolf-data";
 import { cmsInternalLinkOptions, homeUploadSlots, type CmsHomeContent } from "@/lib/cms-home";
 import { type HomePreviewTarget } from "@/components/cms/HomePreview";
 import { Dropdown } from "@/components/ui/Dropdown";
+import { CmsImageLibraryModal } from "@/components/cms/CmsImageLibraryModal";
 
 const editableLocales = ["ko", "ja", "en"] as const satisfies readonly Locale[];
 
@@ -150,6 +151,21 @@ export function HomeCmsSectionEditor({
     const inputTone = isDark ? "border-white/10 bg-slate-950 text-slate-100" : "border-slate-200 bg-white text-slate-900";
     const mutedTone = isDark ? "text-slate-400" : "text-slate-500";
     const [activeLocale, setActiveLocale] = useState<Locale>("ko");
+    const [libraryTarget, setLibraryTarget] = useState<{ type: "hero" | "promo"; index: number } | null>(null);
+
+    const libraryModal = libraryTarget ? (
+        <CmsImageLibraryModal
+            isDark={isDark}
+            onClose={() => setLibraryTarget(null)}
+            onSelect={(path) => {
+                if (libraryTarget.type === "hero") {
+                    onSlideImageChange(libraryTarget.index, path);
+                } else {
+                    onPromoImageChange(libraryTarget.index, path);
+                }
+            }}
+        />
+    ) : null;
 
     if (section === "hero") {
         return (
@@ -169,6 +185,14 @@ export function HomeCmsSectionEditor({
                                         <p className="text-sm font-black">슬라이드 {index + 1}</p>
                                         <p className={`mt-1 text-xs ${mutedTone}`}>자동 파일명: {homeUploadSlots.heroSlides[index]}.jpg, .png 또는 .webp</p>
                                     </div>
+                                    <div className="flex flex-wrap justify-end gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setLibraryTarget({ type: "hero", index })}
+                                        className={`inline-flex items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold transition-colors ${isDark ? "bg-slate-800 text-slate-100 hover:bg-slate-700" : "bg-slate-200 text-slate-900 hover:bg-slate-300"}`}
+                                    >
+                                        라이브러리 선택
+                                    </button>
                                     <label className={`inline-flex cursor-pointer items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold transition-colors ${isDark ? "bg-slate-800 text-slate-100 hover:bg-slate-700" : "bg-slate-200 text-slate-900 hover:bg-slate-300"}`}>
                                         {uploadingSlot === homeUploadSlots.heroSlides[index] ? "업로드 중..." : "이미지 업로드"}
                                         <input
@@ -183,6 +207,7 @@ export function HomeCmsSectionEditor({
                                             }}
                                         />
                                     </label>
+                                    </div>
                                 </div>
 
                                 <div className="mt-4 grid gap-4 xl:grid-cols-[320px_minmax(0,1fr)]">
@@ -226,6 +251,7 @@ export function HomeCmsSectionEditor({
                         );
                     })}
                 </div>
+                {libraryModal}
             </div>
         );
     }
@@ -244,6 +270,14 @@ export function HomeCmsSectionEditor({
                                 <p className="text-sm font-black">배너 {index + 1}</p>
                                 <p className={`mt-1 text-xs ${mutedTone}`}>자동 파일명: {homeUploadSlots.promoBanners[index]}.jpg, .png 또는 .webp</p>
                             </div>
+                            <div className="flex flex-wrap justify-end gap-2">
+                            <button
+                                type="button"
+                                onClick={() => setLibraryTarget({ type: "promo", index })}
+                                className={`inline-flex items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold transition-colors ${isDark ? "bg-slate-800 text-slate-100 hover:bg-slate-700" : "bg-slate-200 text-slate-900 hover:bg-slate-300"}`}
+                            >
+                                라이브러리 선택
+                            </button>
                             <label className={`inline-flex cursor-pointer items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold transition-colors ${isDark ? "bg-slate-800 text-slate-100 hover:bg-slate-700" : "bg-slate-200 text-slate-900 hover:bg-slate-300"}`}>
                                 {uploadingSlot === homeUploadSlots.promoBanners[index] ? "업로드 중..." : "이미지 업로드"}
                                 <input
@@ -258,6 +292,7 @@ export function HomeCmsSectionEditor({
                                     }}
                                 />
                             </label>
+                            </div>
                         </div>
 
                         <div className="relative mt-4 aspect-[16/10] overflow-hidden rounded-[22px] border border-current/10">
@@ -281,6 +316,7 @@ export function HomeCmsSectionEditor({
                     </div>
                 ))}
             </div>
+            {libraryModal}
         </div>
     );
 }

@@ -14,6 +14,7 @@ type CalendarPickerProps = {
     isDark?: boolean;
     minDate?: string;
     defaultViewDate?: string;
+    compactOnMobile?: boolean;
 };
 
 function useClickOutside<T extends HTMLElement>(onOutside: () => void) {
@@ -53,6 +54,7 @@ export function CalendarPicker({
     isDark = false,
     minDate = "",
     defaultViewDate = "",
+    compactOnMobile = false,
 }: CalendarPickerProps) {
     const [open, setOpen] = useState(false);
     const close = useCallback(() => setOpen(false), []);
@@ -123,7 +125,13 @@ export function CalendarPicker({
         });
     }
 
-    const triggerClass = `h-14 w-full rounded-2xl border px-5 pr-14 text-left text-[16px] font-semibold outline-none transition ${isDark
+    const triggerSizeClass = compactOnMobile
+        ? "h-11 rounded-[14px] px-4 pr-12 text-sm sm:h-14 sm:rounded-2xl sm:px-5 sm:pr-14 sm:text-[16px]"
+        : "h-14 rounded-2xl px-5 pr-14 text-[16px]";
+    const iconClass = compactOnMobile ? "right-4 sm:right-5" : "right-5";
+    const iconSizeClass = compactOnMobile ? "h-4 w-4 sm:h-5 sm:w-5" : "h-5 w-5";
+
+    const triggerClass = `${triggerSizeClass} w-full border text-left font-semibold outline-none transition ${isDark
             ? `border-white/10 bg-slate-950 ${open
                 ? "border-blue-400 bg-slate-900 ring-4 ring-blue-500/10"
                 : "hover:border-white/15"
@@ -142,10 +150,10 @@ export function CalendarPicker({
             <button type="button" onClick={() => setOpen((v) => !v)} className={triggerClass}>
                 {value ? toLabel(value) : placeholder}
                 <span
-                    className={`pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 ${isDark ? "text-slate-300" : "text-slate-500"
+                    className={`pointer-events-none absolute ${iconClass} top-1/2 -translate-y-1/2 ${isDark ? "text-slate-300" : "text-slate-500"
                         }`}
                 >
-                    <svg viewBox="0 0 20 20" fill="none" className="h-5 w-5 stroke-current stroke-[2]">
+                    <svg viewBox="0 0 20 20" fill="none" className={`${iconSizeClass} stroke-current stroke-[2]`}>
                         <path d="M6.5 2.5V5" strokeLinecap="round" />
                         <path d="M13.5 2.5V5" strokeLinecap="round" />
                         <rect x="3" y="4.5" width="14" height="12.5" rx="2.5" />

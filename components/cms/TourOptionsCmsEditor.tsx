@@ -6,6 +6,7 @@ import { type Locale } from "@/lib/bluewolf-data";
 import { type CmsTourOption } from "@/lib/cms-tour-options";
 import { CmsLocaleTabs, localeLabels } from "@/components/cms/CmsLocaleTabs";
 import { CMS_NULL_IMAGE } from "@/lib/cms-image";
+import { CmsImageLibraryModal } from "@/components/cms/CmsImageLibraryModal";
 
 function TextField({
     label,
@@ -77,6 +78,7 @@ function OptionImageCard({
     uploading,
     onChange,
     onUpload,
+    onOpenLibrary,
     onRemove,
 }: {
     title: string;
@@ -86,6 +88,7 @@ function OptionImageCard({
     uploading: boolean;
     onChange: (value: string) => void;
     onUpload: (file: File) => void;
+    onOpenLibrary: () => void;
     onRemove: () => void;
 }) {
     return (
@@ -97,6 +100,17 @@ function OptionImageCard({
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="text-sm font-black">{title}</p>
                 <div className="flex flex-wrap items-center gap-2">
+                <button
+                    type="button"
+                    onClick={onOpenLibrary}
+                    className={`inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm font-bold transition-colors ${
+                        isDark
+                            ? "bg-slate-800 text-slate-100 hover:bg-slate-700"
+                            : "bg-slate-200 text-slate-900 hover:bg-slate-300"
+                    }`}
+                >
+                    라이브러리 선택
+                </button>
                 <label
                     className={`inline-flex cursor-pointer items-center justify-center rounded-2xl px-4 py-2 text-sm font-bold transition-colors ${
                         isDark
@@ -181,6 +195,7 @@ export function TourOptionsCmsEditor({
     const [activeLocale, setActiveLocale] = useState<Locale>("ko");
     const [uploadingSlot, setUploadingSlot] = useState<string | null>(null);
     const [uploadError, setUploadError] = useState<string | null>(null);
+    const [libraryTarget, setLibraryTarget] = useState<{ optionIndex: number; photoIndex: number } | null>(null);
 
     const updatePhotos = (
         optionIndex: number,
@@ -423,6 +438,7 @@ export function TourOptionsCmsEditor({
                                             onUpload={(file) =>
                                                 void uploadPhoto(index, photoIndex, file)
                                             }
+                                            onOpenLibrary={() => setLibraryTarget({ optionIndex: index, photoIndex })}
                                             onRemove={() =>
                                                 updatePhotos(index, (photos) =>
                                                     photos.filter((_, currentIndex) => currentIndex !== photoIndex)
@@ -436,6 +452,19 @@ export function TourOptionsCmsEditor({
                     </div>
                 ))}
             </div>
+            {libraryTarget ? (
+                <CmsImageLibraryModal
+                    isDark={isDark}
+                    onClose={() => setLibraryTarget(null)}
+                    onSelect={(path) =>
+                        updatePhotos(libraryTarget.optionIndex, (photos) =>
+                            photos.map((photo, index) =>
+                                index === libraryTarget.photoIndex ? path : photo
+                            )
+                        )
+                    }
+                />
+            ) : null}
         </div>
     );
 }
