@@ -27,7 +27,12 @@ import {
     normalizeCmsTourThemesContent,
     type CmsTourThemesContent,
 } from "@/lib/cms-tour-themes";
-import { ensureSqliteColumn, getSqliteDatabase, withSqliteInitLock } from "@/lib/cms-crm/sqlite-client";
+import {
+    ensureSqliteColumn,
+    getSqliteDatabase,
+    withSqliteInitLock,
+    type Database,
+} from "@/lib/cms-crm/sqlite-client";
 import type {
     CmsCommunityRecord,
     CmsHomeRecord,
@@ -53,7 +58,13 @@ export type {
     CrmPaymentOrderRecord,
 } from "@/lib/cms-crm/types";
 
-const db = getSqliteDatabase();
+const db = new Proxy({} as Database, {
+    get(_target, prop) {
+        const target = getSqliteDatabase();
+        const value = Reflect.get(target, prop);
+        return typeof value === "function" ? value.bind(target) : value;
+    },
+});
 
 function serializeTour(tour: Tour) {
     const normalizedTour = normalizeCmsTourImages(tour);
