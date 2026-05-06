@@ -167,7 +167,7 @@ function HomeContent() {
             }`}
         >
             <div
-                className="pointer-events-none absolute inset-x-0 top-0 h-[760px]"
+                className="pointer-events-none absolute inset-x-0 top-0 h-[1100px] lg:h-[760px]"
                 style={{
                     background: isDark ? "#06102e" : "transparent",
                     opacity: !heroDestinationImage && isDark ? 1 : 0,
@@ -177,7 +177,7 @@ function HomeContent() {
                 <StarField />
             </div>
             <div
-                className="pointer-events-none absolute inset-x-0 top-0 h-[760px]"
+                className="pointer-events-none absolute inset-x-0 top-0 h-[1100px] lg:h-[760px]"
                 style={{
                     opacity: !heroDestinationImage && !isDark ? 1 : 0,
                     transition: "opacity 0.85s ease",
@@ -186,7 +186,7 @@ function HomeContent() {
                 <CloudField />
             </div>
             <div
-                className="pointer-events-none absolute inset-x-0 top-0 h-[760px] overflow-hidden"
+                className="pointer-events-none absolute inset-x-0 top-0 h-[1100px] overflow-hidden lg:h-[760px]"
                 style={{
                     opacity: heroDestinationImage ? 1 : 0,
                     transition: "opacity 0.85s ease",
@@ -232,7 +232,7 @@ function HomeContent() {
             >
                 {/* BlueWolf 배경 단독 섹션 */}
                 <section
-                    className="relative left-1/2 z-30 min-h-[430px] w-screen -translate-x-1/2 overflow-visible lg:min-h-[560px]"
+                    className="relative left-1/2 z-30 w-screen -translate-x-1/2 overflow-visible"
                     style={{
                         background: "transparent",
                         transition: "background 0.85s ease",

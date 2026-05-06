@@ -216,14 +216,14 @@ export function HeroSection({
 
     return (
         <>
-                <div className="relative z-30 flex min-h-0 flex-col justify-start overflow-visible rounded-[24px] border border-white/10 bg-slate-950/28 p-5 backdrop-blur-[2px] sm:rounded-[28px] sm:px-7 md:min-h-[360px] md:justify-center md:py-6 lg:min-h-[460px] lg:px-8">
+                <div className="relative z-30 flex min-h-0 flex-col items-center justify-start overflow-visible rounded-[24px] border border-white/10 bg-slate-950/28 p-5 backdrop-blur-[2px] sm:rounded-[28px] sm:px-7 md:min-h-[360px] md:items-stretch md:justify-center md:py-6 lg:min-h-[460px] lg:px-8">
                     <h1
-                        className="relative whitespace-pre-line !text-[1.8rem] font-black leading-tight tracking-tight text-white"
+                        className="relative whitespace-pre-line !text-[1.8rem] font-black leading-tight tracking-tight text-white text-center md:text-left"
                     >
                         {searchCopy.title}
                     </h1>
 
-                    <form onSubmit={handleSearch} className="relative mt-6 grid max-w-md gap-3">
+                    <form onSubmit={handleSearch} className="relative mt-6 grid w-full max-w-md gap-3 mx-auto md:mx-0">
                         <HeroDestinationDropdown
                             value={destination}
                             placeholder={searchCopy.destinationPlaceholder}
