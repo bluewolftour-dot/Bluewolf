@@ -58,9 +58,20 @@ export type {
     CrmPaymentOrderRecord,
 } from "@/lib/cms-crm/types";
 
+let needsBootstrap = true;
+function bootstrapIfNeeded(target: Database) {
+    if (!needsBootstrap) return;
+    needsBootstrap = false;
+    const existing = target.prepare("SELECT value FROM cms_meta WHERE key = ?").get("full-init-complete");
+    if (!existing) {
+        initDb();
+    }
+}
+
 const db = new Proxy({} as Database, {
     get(_target, prop) {
         const target = getSqliteDatabase();
+        bootstrapIfNeeded(target);
         const value = Reflect.get(target, prop);
         return typeof value === "function" ? value.bind(target) : value;
     },
@@ -421,10 +432,6 @@ function initDb() {
     });
 }
 
-const initialized = db.prepare("SELECT value FROM cms_meta WHERE key = ?").get("full-init-complete");
-if (!initialized) {
-    initDb();
-}
 
 export function getCmsHomeContent(): CmsHomeRecord {
     const row = db.prepare("SELECT content FROM cms_home_content WHERE id = 1").get();
