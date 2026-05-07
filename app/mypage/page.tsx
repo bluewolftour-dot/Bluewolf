@@ -471,7 +471,7 @@ function MyPageContent() {
 
     return (
         <>
-            <section className={`rounded-[32px] border p-6 sm:p-8 ${panel}`}>
+            <section className={`rounded-[32px] border px-6 pb-6 pt-5 sm:px-8 sm:pb-8 sm:pt-6 ${panel}`}>
                 <p className="text-sm font-black text-blue-500">
                     {c.loggedInAs} · {user.id}
                 </p>
