@@ -279,7 +279,7 @@ export function ToursCustomizeContent() {
             emailLabel: "이메일",
             inquiryLabel: "문의 사항",
             inquiryPlaceholder: "추가 요청 사항이나 확인이 필요한 내용을 입력해주세요.",
-            depositLabel: "지금 결제할 플랜 패키지 이용료",
+            depositLabel: "플랜료",
             depositDesc: "플랜 패키지 이용료는 1인 기준 50,000원으로 계산됩니다.",
             payLabel: "플랜 패키지 결제하기",
             cancelLabel: "닫기",

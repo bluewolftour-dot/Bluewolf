@@ -607,7 +607,7 @@ function PaymentContent() {
                                 <div className={`border-t pt-4 ${isDark ? "border-white/10" : "border-slate-200"}`}>
                                     <div className="flex items-center justify-between"><span className={`text-sm font-bold ${isDark ? "text-slate-300" : "text-slate-700"}`}>{pick(lang, "예상 총액", "想定総額", "Estimated total")}</span><span className={`text-lg font-black ${isDark ? "text-white" : "text-slate-900"}`}>{formatPrice(estimatedTotal)}</span></div>
                                 </div>
-                                <div className="flex items-center justify-between"><span className="text-sm font-bold text-blue-500">{pick(lang, "지금 결제할 플랜 패키지 이용료", "今支払うプランパッケージ利用料", "Plan package fee due now")}</span><span className="text-lg font-black text-blue-500">{formatPrice(depositDue)}</span></div>
+                                <div className="flex items-center justify-between"><span className="text-sm font-bold text-blue-500">{pick(lang, "플랜료", "今支払うプランパッケージ利用料", "Plan package fee due now")}</span><span className="text-lg font-black text-blue-500">{formatPrice(depositDue)}</span></div>
                             </div>
                         </section>
 
