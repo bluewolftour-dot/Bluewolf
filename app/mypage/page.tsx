@@ -610,17 +610,19 @@ function MyPageContent() {
                         >
                             {isProfileEditing ? c.cancelEdit : c.editProfile}
                         </button>
-                        <button
-                            type="button"
-                            onClick={() => setWithdrawOpen(true)}
-                            className={`inline-flex h-10 items-center rounded-2xl border px-4 text-sm font-black transition ${
-                                isDark
-                                    ? "border-red-400/30 bg-red-500/10 text-red-300 hover:bg-red-500/20"
-                                    : "border-red-200 bg-red-50 text-red-600 hover:bg-red-100"
-                            }`}
-                        >
-                            {c.withdrawBtn}
-                        </button>
+                        {isProfileEditing ? (
+                            <button
+                                type="button"
+                                onClick={() => setWithdrawOpen(true)}
+                                className={`inline-flex h-10 items-center rounded-2xl border px-4 text-sm font-black transition ${
+                                    isDark
+                                        ? "border-red-400/30 bg-red-500/10 text-red-300 hover:bg-red-500/20"
+                                        : "border-red-200 bg-red-50 text-red-600 hover:bg-red-100"
+                                }`}
+                            >
+                                {c.withdrawBtn}
+                            </button>
+                        ) : null}
                     </div>
                 </div>
             </section>
