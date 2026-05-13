@@ -611,33 +611,30 @@ function PaymentContent() {
                             </div>
                         </section>
 
-                        <section className={sectionClass}>
-                            <StepTitle step={6} title={pick(lang, "BlueWolf Mongolia 확인 단계", "BlueWolf Mongolia 確認段階", "BlueWolf Mongolia review step")} isDark={isDark} />
-                            {error ? <p className="mt-4 text-sm font-semibold text-red-500">{error}</p> : null}
-                            {(paymentMethod === "card" || paymentMethod === "simple") && !sdkReady ? (
-                                <p className={`mt-4 rounded-2xl border px-4 py-3 text-xs font-bold ${
-                                    sdkLoadFailed
-                                        ? isDark
-                                            ? "border-red-500/30 bg-red-500/10 text-red-200"
-                                            : "border-red-200 bg-red-50 text-red-600"
-                                        : isDark
-                                          ? "border-white/10 bg-slate-900 text-slate-300"
-                                          : "border-slate-200 bg-slate-50 text-slate-500"
-                                }`}>
-                                    {sdkLoadFailed ? text.sdkLoadFail : text.sdkLoading}
-                                </p>
-                            ) : null}
-                            <button type="button" onClick={handleSubmit} disabled={submitting || ((paymentMethod === "card" || paymentMethod === "simple") && !sdkReady)} className="mt-5 inline-flex w-full items-center justify-center rounded-2xl bg-blue-600 px-6 py-4 text-base font-black text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-blue-400">
-                                {submitting
-                                    ? pick(lang, "처리 중...", "処理中...", "Processing...")
-                                    : (paymentMethod === "card" || paymentMethod === "simple") && !sdkReady
-                                      ? pick(lang, "결제창 로딩 중", "決済画面読み込み中", "Loading payment")
-                                      : paymentMethod === "bank"
-                                        ? pick(lang, "플랜 신청하기", "プラン申請を送信する", "Submit plan application")
-                                        : pick(lang, "플랜 패키지 결제하기", "プランパッケージ決済へ", "Pay plan package fee")}
-                            </button>
-                            <Link href={detailHref} className={`mt-3 inline-flex w-full items-center justify-center rounded-2xl border px-6 py-3.5 text-sm font-bold transition ${isDark ? "border-white/10 bg-slate-900 text-slate-200 hover:bg-slate-800" : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"}`}>{text.goTour}</Link>
-                        </section>
+                        {error ? <p className="text-sm font-semibold text-red-500">{error}</p> : null}
+                        {(paymentMethod === "card" || paymentMethod === "simple") && !sdkReady ? (
+                            <p className={`rounded-2xl border px-4 py-3 text-xs font-bold ${
+                                sdkLoadFailed
+                                    ? isDark
+                                        ? "border-red-500/30 bg-red-500/10 text-red-200"
+                                        : "border-red-200 bg-red-50 text-red-600"
+                                    : isDark
+                                      ? "border-white/10 bg-slate-900 text-slate-300"
+                                      : "border-slate-200 bg-slate-50 text-slate-500"
+                            }`}>
+                                {sdkLoadFailed ? text.sdkLoadFail : text.sdkLoading}
+                            </p>
+                        ) : null}
+                        <button type="button" onClick={handleSubmit} disabled={submitting || ((paymentMethod === "card" || paymentMethod === "simple") && !sdkReady)} className="inline-flex w-full items-center justify-center rounded-2xl bg-blue-600 px-6 py-4 text-base font-black text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-blue-400">
+                            {submitting
+                                ? pick(lang, "처리 중...", "処理中...", "Processing...")
+                                : (paymentMethod === "card" || paymentMethod === "simple") && !sdkReady
+                                  ? pick(lang, "결제창 로딩 중", "決済画面読み込み中", "Loading payment")
+                                  : paymentMethod === "bank"
+                                    ? pick(lang, "플랜 신청하기", "プラン申請を送信する", "Submit plan application")
+                                    : pick(lang, "플랜료 결제하기", "プランパッケージ決済へ", "Pay plan package fee")}
+                        </button>
+                        <Link href={detailHref} className={`inline-flex w-full items-center justify-center rounded-2xl border px-6 py-3.5 text-sm font-bold transition ${isDark ? "border-white/10 bg-slate-900 text-slate-200 hover:bg-slate-800" : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"}`}>{text.goTour}</Link>
                     </aside>
                 </div>
             </section>
