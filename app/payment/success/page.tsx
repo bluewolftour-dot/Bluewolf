@@ -151,7 +151,7 @@ function PaymentSuccessContent() {
             <p className={`mx-auto mt-3 max-w-xl text-sm sm:text-base ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                 {pick(
                     lang,
-                    "플랜 패키지 이용료 결제가 완료되었습니다. BlueWolf Mongolia 검토 후 진행 상태가 갱신됩니다.",
+                    "플랜료 결제가 완료되었습니다. BlueWolf Mongolia 검토 후 진행 상태가 갱신됩니다.",
                     "プランパッケージ利用料の決済が完了しました。BlueWolf Mongolia の確認後に進行状況が更新されます。",
                     "Your plan package fee payment is complete. BlueWolf Mongolia will review this request and update the progress."
                 )}
@@ -172,7 +172,7 @@ function PaymentSuccessContent() {
                 <div className={`mt-4 border-t pt-4 ${isDark ? "border-white/10" : "border-slate-200"}`}>
                     <div className="flex items-center justify-between">
                         <span className={`text-sm font-bold ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-                            {pick(lang, "플랜 패키지 이용료", "プランパッケージ利用料", "Plan package fee paid")}
+                            {pick(lang, "플랜료", "プランパッケージ利用料", "Plan package fee paid")}
                         </span>
                         <span className={`text-lg font-black ${isDark ? "text-white" : "text-slate-900"}`}>
                             {formatPrice(Number(result.payment?.amount ?? 0))}

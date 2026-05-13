@@ -344,7 +344,7 @@ function TourDetailContent() {
     const perPersonPriceLabel =
         lang === "ko" ? "1인 기준 가격" : lang === "ja" ? "1名あたり料金" : "Per-person price";
     const perPersonDepositLabel =
-        lang === "ko" ? "1인 기준 플랜 패키지 이용료" : lang === "ja" ? "1名基準プランパッケージ利用料" : "Per-person plan package fee";
+        lang === "ko" ? "1인 기준 플랜료" : lang === "ja" ? "1名基準プランパッケージ利用料" : "Per-person plan package fee";
     const grandTotalLabel =
         lang === "ko" ? "1인당 총 합계" : lang === "ja" ? "1名あたり合計" : "Per-person total";
     const optionUnitLabel =
@@ -941,7 +941,7 @@ function TourDetailContent() {
                                         value: tour.duration[lang],
                                     },
                                     {
-                                        label: lang === "ko" ? "플랜 패키지 이용료" : lang === "ja" ? "プランパッケージ利用料" : "Plan package fee",
+                                        label: lang === "ko" ? "플랜료" : lang === "ja" ? "プランパッケージ利用料" : "Plan package fee",
                                         value: formatPrice(tour.deposit),
                                     },
                                 ].map(({ label, value }) => (

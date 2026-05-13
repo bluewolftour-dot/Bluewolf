@@ -57,7 +57,7 @@ export const copy = {
         priceLabel: "1인 기준",
         selectedPlan: "선택 상품",
         totalPrice: "예상 총액",
-        planPackageFee: "플랜 패키지 이용료",
+        planPackageFee: "플랜료",
         guestsLabel: "인원 수",
         noResults: "검색 결과가 없습니다.",
         noResultsDesc: "다른 조건으로 다시 검색해보세요.",

@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
 
         await markCrmPaymentOrderCancelledByBookingNo(target.bookingNo);
         refundStatus = "refunded";
-        refundMessage = `결제된 플랜 패키지 이용료 ${formatWon(paymentOrder.amount)}는 결제 수단으로 환불 처리됩니다. 카드사나 결제사 사정에 따라 실제 반영까지 시간이 걸릴 수 있습니다.`;
+        refundMessage = `결제된 플랜료 ${formatWon(paymentOrder.amount)}는 결제 수단으로 환불 처리됩니다. 카드사나 결제사 사정에 따라 실제 반영까지 시간이 걸릴 수 있습니다.`;
     } else if (paymentOrder?.status === "paid") {
         refundStatus = "manual_required";
         refundMessage = "결제 확인은 완료되었지만 자동 환불 정보가 없어 담당자가 수동 환불 절차를 진행합니다.";

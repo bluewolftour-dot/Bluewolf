@@ -280,7 +280,7 @@ export function ToursCustomizeContent() {
             inquiryLabel: "문의 사항",
             inquiryPlaceholder: "추가 요청 사항이나 확인이 필요한 내용을 입력해주세요.",
             depositLabel: "플랜료",
-            depositDesc: "플랜 패키지 이용료는 1인 기준 50,000원으로 계산됩니다.",
+            depositDesc: "플랜료는 1인 기준 50,000원으로 계산됩니다.",
             payLabel: "플랜 패키지 결제하기",
             cancelLabel: "닫기",
             datesRequired: "출발일과 도착일을 먼저 선택해주세요.",
@@ -290,7 +290,7 @@ export function ToursCustomizeContent() {
             processingLabel: "결제 준비 중...",
             customTitleSuffix: "커스텀 플랜",
             noInquiry: "문의 사항 없음",
-            notice: "본 결제는 BlueWolf KR이 제공하는 몽골 여행 플랜 패키지 이용료입니다. 본 금액은 여행상품 예약금, 계약금 또는 여행대금이 아니며, 결제 완료만으로 여행 일정, 숙박, 차량, 가이드 또는 여행상품 예약이 확정되지 않습니다. 실제 여행계약, 일정 확정, 잔금 결제, 취소·환불 및 현지 운영은 BlueWolf Mongolia와 별도로 진행됩니다.",
+            notice: "본 결제는 BlueWolf KR이 제공하는 몽골 여행 플랜료입니다. 본 금액은 여행상품 예약금, 계약금 또는 여행대금이 아니며, 결제 완료만으로 여행 일정, 숙박, 차량, 가이드 또는 여행상품 예약이 확정되지 않습니다. 실제 여행계약, 일정 확정, 잔금 결제, 취소·환불 및 현지 운영은 BlueWolf Mongolia와 별도로 진행됩니다.",
         },
         ja: {
             title: "選択したプラン確認",

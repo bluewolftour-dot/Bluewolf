@@ -34,7 +34,7 @@ const SESSION_COOKIE = "bluewolf_session";
 function buildOrderName(locale: string, title: string) {
     if (locale === "ja") return `${title} プランパッケージ利用料`;
     if (locale === "en") return `${title} plan package fee`;
-    return `${title} 플랜 패키지 이용료`;
+    return `${title} 플랜료`;
 }
 
 function resolveLocale(locale: string) {

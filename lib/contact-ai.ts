@@ -277,7 +277,7 @@ function buildTourReply(knowledge: ContactAssistantKnowledge, tour: ContactAssis
         `- 일정 유형: ${durationLabel}`,
         `- 기간: ${tour.duration[locale]}`,
         `- 가격: ${formatWon(locale, tour.price)}`,
-        `- 플랜 패키지 이용료: ${formatWon(locale, tour.deposit)}`,
+        `- 플랜료: ${formatWon(locale, tour.deposit)}`,
         `- 하이라이트: ${highlights}`,
         localizePathLabel(locale, `/tours/${tour.id}`),
     ].join("\n");

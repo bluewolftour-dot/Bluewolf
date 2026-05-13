@@ -179,7 +179,7 @@ const bookingSummaryCopy = {
         departDate: "출발일",
         guests: "인원",
         guestsUnit: "명",
-        deposit: "플랜 패키지 이용료",
+        deposit: "플랜료",
         empty: "아직 플랜 신청 내역이 없습니다.",
         pending: "BlueWolf Mongolia 검토 중",
         confirmed: "BlueWolf Mongolia 확인 완료",

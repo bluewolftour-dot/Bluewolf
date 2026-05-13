@@ -30,7 +30,7 @@ const copy = {
         guestsLabel: "인원",
         statusLabel: "진행 상태",
         totalLabel: "예상 현지 여행비",
-        depositLabel: "플랜 패키지 이용료",
+        depositLabel: "플랜료",
         remainLabel: "현지 잔금 안내",
         createdLabel: "플랜 신청일",
         statusConfirmed: "BlueWolf Mongolia 확인 완료",

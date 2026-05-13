@@ -268,7 +268,7 @@ function PaymentContent() {
         invalidDesc: pick(lang, "투어 페이지에서 다시 예약을 시작해주세요.", "ツアーページから予約を始めてください。", "Please restart the booking flow from the tours page."),
         backToTours: pick(lang, "투어로 돌아가기", "ツアーへ戻る", "Back to tours"),
         title: pick(lang, "플랜 패키지 결제", "プランパッケージ決済", "Plan package payment"),
-        desc: pick(lang, "상품 정보와 신청자 정보를 확인하고 플랜 패키지 이용료를 결제하거나 플랜 신청을 접수하세요.", "商品情報と申請者情報を確認し、プランパッケージ利用料を決済するかプラン申請を送信してください。", "Review the trip details, then pay the plan package fee or submit your application."),
+        desc: pick(lang, "상품 정보와 신청자 정보를 확인하고 플랜료를 결제하거나 플랜 신청을 접수하세요.", "商品情報と申請者情報を確認し、プランパッケージ利用料を決済するかプラン申請を送信してください。", "Review the trip details, then pay the plan package fee or submit your application."),
         travelerDesc: pick(lang, "신청자 정보를 입력해주세요", "申請者情報を入力してください", "Enter the applicant details"),
         extraDesc: pick(lang, "선택한 옵션과 요청 사항을 마지막으로 확인합니다.", "選択したオプションとご要望を最後に確認します。", "Review selected options and special requests."),
         methodDesc: pick(lang, "카드와 간편결제는 토스 결제창으로, 계좌 이체는 수동 확인 예약으로 진행됩니다.", "カードと簡単決済はトス決済画面で、銀行振込は手動確認予約として進行します。", "Card and simple pay open Toss Payments. Bank transfer stays as a manual confirmation flow."),

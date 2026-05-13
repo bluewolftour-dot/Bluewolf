@@ -46,7 +46,7 @@ const myBookingsCopy = {
         guestsLabel: "인원",
         guests: (n: number) => `${n}명`,
         totalLabel: "예상 현지 여행비",
-        depositLabel: "플랜 패키지 이용료",
+        depositLabel: "플랜료",
         remainLabel: "현지 잔금 안내",
         statusConfirmed: "BlueWolf Mongolia 확인 완료",
         statusPending: "BlueWolf Mongolia 검토 중",

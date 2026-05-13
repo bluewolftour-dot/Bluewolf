@@ -65,7 +65,7 @@ function buildRefundMessage(status: RefundStatus, amount: number, locale: Refund
         if (locale === "en") {
             return `Your paid deposit of ${formatAmount(amount, locale)} will be refunded to the original payment method. Posting times depend on your card issuer and payment provider.`;
         }
-        return `결제된 플랜 패키지 이용료 ${formatAmount(amount, locale)}는 결제 수단으로 환불 처리됩니다. 카드사나 결제사 사정에 따라 실제 반영까지 시간이 걸릴 수 있습니다.`;
+        return `결제된 플랜료 ${formatAmount(amount, locale)}는 결제 수단으로 환불 처리됩니다. 카드사나 결제사 사정에 따라 실제 반영까지 시간이 걸릴 수 있습니다.`;
     }
 
     if (status === "manual_required") {
