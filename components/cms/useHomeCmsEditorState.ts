@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { type Locale } from "@/lib/bluewolf-data";
+import { resolveUploadErrorMessage } from "@/lib/cms-upload-errors";
 import {
     defaultCmsHomeContent,
     normalizeCmsHomeContent,
@@ -188,15 +189,17 @@ export function useHomeCmsEditorState() {
             });
 
             if (!response.ok) {
-                throw new Error("CMS_HOME_UPLOAD_FAILED");
+                const data = (await response.json().catch(() => ({}))) as { error?: string };
+                throw new Error(data.error || "UPLOAD_FAILED");
             }
 
             const data = (await response.json()) as { path: string };
             onApply(data.path);
             setSaved(false);
             setError(null);
-        } catch {
-            setError("이미지 업로드에 실패했습니다. JPG, PNG 또는 WEBP 파일만 업로드할 수 있습니다.");
+        } catch (err) {
+            const code = err instanceof Error ? err.message : "";
+            setError(resolveUploadErrorMessage(code));
         } finally {
             setUploadingSlot(null);
         }

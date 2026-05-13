@@ -8,6 +8,7 @@ import { CmsLocaleTabs, localeLabels } from "@/components/cms/CmsLocaleTabs";
 import { CmsImageLibraryModal } from "@/components/cms/CmsImageLibraryModal";
 import { getCmsTourRegionMeta } from "@/lib/cms-tour-admin";
 import { tourRegionCardMeta, tourRegionOrder } from "@/lib/tour-region-cards";
+import { resolveUploadErrorMessage } from "@/lib/cms-upload-errors";
 
 function TextField({
     label,
@@ -188,13 +189,15 @@ export function TourRegionImageCmsEditor({
             });
 
             if (!response.ok) {
-                throw new Error("CMS_TOUR_REGION_IMAGE_UPLOAD_FAILED");
+                const data = (await response.json().catch(() => ({}))) as { error?: string };
+                throw new Error(data.error || "UPLOAD_FAILED");
             }
 
             const data = (await response.json()) as { path: string };
             onUpdate(region, data.path);
-        } catch {
-            setUploadError("이미지 업로드에 실패했습니다. JPG, PNG 또는 WEBP 파일만 업로드할 수 있습니다.");
+        } catch (err) {
+            const code = err instanceof Error ? err.message : "";
+            setUploadError(resolveUploadErrorMessage(code));
         } finally {
             setUploadingSlot(null);
         }

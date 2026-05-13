@@ -16,6 +16,7 @@ import {
     tourTagColorOptions,
 } from "@/lib/tour-tags";
 import { getCmsTourThemeOptions, type CmsTourThemesContent } from "@/lib/cms-tour-themes";
+import { resolveUploadErrorMessage } from "@/lib/cms-upload-errors";
 
 const normalizeTagKey = (tag: string) => tag.trim().toLocaleLowerCase();
 
@@ -230,11 +231,15 @@ export function TourCmsEditor({
 
         try {
             const response = await fetch("/api/cms/tours/upload", { method: "POST", body: formData });
-            if (!response.ok) throw new Error("CMS_TOUR_UPLOAD_FAILED");
+            if (!response.ok) {
+                const data = (await response.json().catch(() => ({}))) as { error?: string };
+                throw new Error(data.error || "UPLOAD_FAILED");
+            }
             const data = (await response.json()) as { path: string };
             onApply(data.path);
-        } catch {
-            setUploadError("투어 이미지 업로드에 실패했습니다. JPG, PNG 또는 WEBP 파일만 업로드할 수 있습니다.");
+        } catch (err) {
+            const code = err instanceof Error ? err.message : "";
+            setUploadError(resolveUploadErrorMessage(code));
         } finally {
             setUploadingSlot(null);
         }

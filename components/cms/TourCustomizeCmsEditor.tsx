@@ -12,6 +12,7 @@ import {
 import { type Locale, type Region } from "@/lib/bluewolf-data";
 import { CMS_NULL_IMAGE } from "@/lib/cms-image";
 import { CmsImageLibraryModal } from "@/components/cms/CmsImageLibraryModal";
+import { resolveUploadErrorMessage } from "@/lib/cms-upload-errors";
 
 function TextField({
     label,
@@ -460,7 +461,8 @@ export function TourCustomizeCmsEditor({
             });
 
             if (!response.ok) {
-                throw new Error("CMS_TOUR_CUSTOMIZE_UPLOAD_FAILED");
+                const data = (await response.json().catch(() => ({}))) as { error?: string };
+                throw new Error(data.error || "UPLOAD_FAILED");
             }
 
             const data = (await response.json()) as { path: string };
@@ -468,10 +470,9 @@ export function TourCustomizeCmsEditor({
                 ...current,
                 image: data.path,
             }));
-        } catch {
-            setUploadError(
-                "이미지 업로드에 실패했습니다. JPG, PNG 또는 WEBP 파일만 업로드할 수 있습니다."
-            );
+        } catch (err) {
+            const code = err instanceof Error ? err.message : "";
+            setUploadError(resolveUploadErrorMessage(code));
         } finally {
             setUploadingSlot(null);
         }
@@ -493,7 +494,8 @@ export function TourCustomizeCmsEditor({
             });
 
             if (!response.ok) {
-                throw new Error("CMS_TOUR_CUSTOMIZE_UPLOAD_FAILED");
+                const data = (await response.json().catch(() => ({}))) as { error?: string };
+                throw new Error(data.error || "UPLOAD_FAILED");
             }
 
             const data = (await response.json()) as { path: string };
@@ -501,10 +503,9 @@ export function TourCustomizeCmsEditor({
                 ...current,
                 image: data.path,
             }));
-        } catch {
-            setUploadError(
-                "이미지 업로드에 실패했습니다. JPG, PNG 또는 WEBP 파일만 업로드할 수 있습니다."
-            );
+        } catch (err) {
+            const code = err instanceof Error ? err.message : "";
+            setUploadError(resolveUploadErrorMessage(code));
         } finally {
             setUploadingSlot(null);
         }
