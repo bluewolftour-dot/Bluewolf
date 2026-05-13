@@ -585,11 +585,11 @@ function PaymentContent() {
                                     <div className="mt-4 grid gap-3">
                                         <div className={`rounded-2xl border px-4 py-3 ${isDark ? "border-white/10 bg-slate-950" : "border-slate-200 bg-white"}`}>
                                             <div className={`text-xs font-bold ${isDark ? "text-slate-400" : "text-slate-500"}`}>{pick(lang, "예금주", "口座名義", "Account holder")}</div>
-                                            <div className={`mt-1 text-sm font-black ${isDark ? "text-slate-100" : "text-slate-900"}`}>BlueWolf</div>
+                                            <div className={`mt-1 text-sm font-black ${isDark ? "text-slate-100" : "text-slate-900"}`}>블루울프 코리아(BlueWolf KR)</div>
                                         </div>
                                         <div className={`rounded-2xl border px-4 py-3 ${isDark ? "border-white/10 bg-slate-950" : "border-slate-200 bg-white"}`}>
                                             <div className={`text-xs font-bold ${isDark ? "text-slate-400" : "text-slate-500"}`}>{pick(lang, "계좌번호", "口座番号", "Account number")}</div>
-                                            <div className={`mt-1 text-sm font-black tracking-wide ${isDark ? "text-slate-100" : "text-slate-900"}`}>신한은행 110-482-913204</div>
+                                            <div className={`mt-1 text-sm font-black tracking-wide ${isDark ? "text-slate-100" : "text-slate-900"}`}>토스뱅크 1002-5461-3978</div>
                                         </div>
                                     </div>
                                     <div className={`mt-4 rounded-2xl border px-4 py-3 text-sm font-bold ${isDark ? "border-amber-500/30 bg-amber-500/10 text-amber-200" : "border-amber-200 bg-amber-50 text-amber-700"}`}>{pick(lang, "BlueWolf Mongolia 확인 후 진행 상태가 갱신됩니다.", "BlueWolf Mongolia の確認後に進行状況が更新されます。", "BlueWolf Mongolia will review this transfer and update the progress.")}</div>
