@@ -16,7 +16,7 @@ import {
     tourTagColorOptions,
 } from "@/lib/tour-tags";
 import { getCmsTourThemeOptions, type CmsTourThemesContent } from "@/lib/cms-tour-themes";
-import { resolveUploadErrorMessage } from "@/lib/cms-upload-errors";
+import { CMS_UPLOAD_MAX_BYTES, resolveUploadErrorMessage } from "@/lib/cms-upload-errors";
 
 const normalizeTagKey = (tag: string) => tag.trim().toLocaleLowerCase();
 
@@ -225,6 +225,13 @@ export function TourCmsEditor({
     const uploadImage = async (slot: string, file: File, onApply: (path: string) => void) => {
         setUploadingSlot(slot);
         setUploadError(null);
+
+        if (file.size > CMS_UPLOAD_MAX_BYTES) {
+            setUploadError(resolveUploadErrorMessage("FILE_TOO_LARGE"));
+            setUploadingSlot(null);
+            return;
+        }
+
         const formData = new FormData();
         formData.append("slot", slot);
         formData.append("file", file);
@@ -232,6 +239,7 @@ export function TourCmsEditor({
         try {
             const response = await fetch("/api/cms/tours/upload", { method: "POST", body: formData });
             if (!response.ok) {
+                if (response.status === 413) throw new Error("FILE_TOO_LARGE");
                 const data = (await response.json().catch(() => ({}))) as { error?: string };
                 throw new Error(data.error || "UPLOAD_FAILED");
             }

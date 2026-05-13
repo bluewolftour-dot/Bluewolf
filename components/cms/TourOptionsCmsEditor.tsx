@@ -7,7 +7,7 @@ import { type CmsTourOption } from "@/lib/cms-tour-options";
 import { CmsLocaleTabs, localeLabels } from "@/components/cms/CmsLocaleTabs";
 import { CMS_NULL_IMAGE } from "@/lib/cms-image";
 import { CmsImageLibraryModal } from "@/components/cms/CmsImageLibraryModal";
-import { resolveUploadErrorMessage } from "@/lib/cms-upload-errors";
+import { CMS_UPLOAD_MAX_BYTES, resolveUploadErrorMessage } from "@/lib/cms-upload-errors";
 
 function TextField({
     label,
@@ -213,6 +213,12 @@ export function TourOptionsCmsEditor({
         setUploadingSlot(slot);
         setUploadError(null);
 
+        if (file.size > CMS_UPLOAD_MAX_BYTES) {
+            setUploadError(resolveUploadErrorMessage("FILE_TOO_LARGE"));
+            setUploadingSlot(null);
+            return;
+        }
+
         const formData = new FormData();
         formData.append("slot", slot);
         formData.append("file", file);
@@ -224,6 +230,7 @@ export function TourOptionsCmsEditor({
             });
 
             if (!response.ok) {
+                if (response.status === 413) throw new Error("FILE_TOO_LARGE");
                 const data = (await response.json().catch(() => ({}))) as { error?: string };
                 throw new Error(data.error || "UPLOAD_FAILED");
             }

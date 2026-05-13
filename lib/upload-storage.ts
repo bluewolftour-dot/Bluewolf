@@ -4,7 +4,7 @@ import path from "node:path";
 import { readOptionalEnv, readRequiredEnv } from "@/lib/env";
 
 const PUBLIC_UPLOAD_ROOT = path.join(process.cwd(), "public", "uploads");
-const DEFAULT_MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const DEFAULT_MAX_IMAGE_SIZE = 4 * 1024 * 1024;
 const IMAGE_EXTENSIONS = [".jpg", ".png", ".webp"] as const;
 
 export type PublicUploadDirectory =

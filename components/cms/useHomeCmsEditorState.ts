@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { type Locale } from "@/lib/bluewolf-data";
-import { resolveUploadErrorMessage } from "@/lib/cms-upload-errors";
+import { CMS_UPLOAD_MAX_BYTES, resolveUploadErrorMessage } from "@/lib/cms-upload-errors";
 import {
     defaultCmsHomeContent,
     normalizeCmsHomeContent,
@@ -177,10 +177,17 @@ export function useHomeCmsEditorState() {
         file: File,
         onApply: (path: string) => void
     ) => {
+        setUploadingSlot(slot);
+
+        if (file.size > CMS_UPLOAD_MAX_BYTES) {
+            setError(resolveUploadErrorMessage("FILE_TOO_LARGE"));
+            setUploadingSlot(null);
+            return;
+        }
+
         const formData = new FormData();
         formData.append("slot", slot);
         formData.append("file", file);
-        setUploadingSlot(slot);
 
         try {
             const response = await fetch("/api/cms/home/upload", {
@@ -189,6 +196,7 @@ export function useHomeCmsEditorState() {
             });
 
             if (!response.ok) {
+                if (response.status === 413) throw new Error("FILE_TOO_LARGE");
                 const data = (await response.json().catch(() => ({}))) as { error?: string };
                 throw new Error(data.error || "UPLOAD_FAILED");
             }
