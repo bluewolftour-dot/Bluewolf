@@ -19,6 +19,8 @@ import {
 import { withLocaleQuery } from "@/lib/locale-routing";
 import { useCmsTourOptions } from "@/lib/use-cms-tour-options";
 import { useCmsTourCustomize } from "@/lib/use-cms-tour-customize";
+import { useCmsTourRegionCards } from "@/lib/use-cms-tour-region-cards";
+import { CMS_NULL_IMAGE } from "@/lib/cms-image";
 import { formatPrice } from "@/lib/bluewolf-utils";
 import { type LocalizedTourOption } from "@/lib/cms-tour-options";
 
@@ -362,8 +364,17 @@ export function ToursCustomizeContent() {
     const travelerSectionRef = useRef<HTMLDivElement>(null);
     const { localizedOptions: optionChoices, loaded: optionsLoaded } = useCmsTourOptions(lang);
     const { localizedRegions: customizeRegions, loaded: customizeLoaded } = useCmsTourCustomize(lang);
+    const { regionCardsContent } = useCmsTourRegionCards();
 
-    const regionInfo = regionMeta[lang][region];
+    const staticRegionInfo = regionMeta[lang][region];
+    const cmsRegionImage = regionCardsContent.images[region];
+    const regionInfo = {
+        ...staticRegionInfo,
+        image:
+            cmsRegionImage && cmsRegionImage !== CMS_NULL_IMAGE
+                ? cmsRegionImage
+                : staticRegionInfo.image,
+    };
     const regionCustomize = customizeRegions[region];
     const destinationOptions = regionCustomize.destinations;
     const activityOptions = regionCustomize.activities;
