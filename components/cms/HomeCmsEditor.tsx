@@ -30,7 +30,7 @@ export function HomeCmsEditor({
     return (
         <div className="space-y-6">
             <div>
-                <h2 className="text-2xl font-black tracking-tight">홈 관리</h2>
+                <h2 className="type-title-lg">홈 관리</h2>
                 <p className={`mt-1 text-sm ${mutedTone}`}>프리뷰에서 슬라이더 영역을 클릭하면 전용 편집 페이지로 이동합니다.</p>
             </div>
 
@@ -47,7 +47,7 @@ export function HomeCmsEditor({
             <div className={`rounded-[24px] border p-5 ${softPanelTone}`}>
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <h3 className="text-lg font-black">홈 페이지 프리뷰</h3>
+                        <h3 className="type-title-md">홈 페이지 프리뷰</h3>
                         <p className={`mt-1 text-sm ${mutedTone}`}>실제 홈 화면 흐름에 가깝게 미리보기를 확인하고, 슬라이더 영역만 선택해 편집할 수 있습니다.</p>
                     </div>
                 </div>

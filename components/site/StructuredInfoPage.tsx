@@ -68,7 +68,7 @@ function StructuredInfoPageContent({
                 <p className="text-sm font-black text-blue-500">{eyebrow}</p>
                 <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                     <div>
-                        <h1 className={`text-3xl font-black tracking-tight sm:text-4xl ${textMain}`}>
+                        <h1 className={`type-display ${textMain}`}>
                             {title}
                         </h1>
                         <p className={`mt-4 max-w-3xl text-sm leading-7 sm:text-base ${textMuted}`}>
@@ -95,7 +95,7 @@ function StructuredInfoPageContent({
                 {cards.map((card) => {
                     const content = (
                         <article className={`h-full rounded-[28px] border p-6 transition ${subPanel}`}>
-                            <h2 className={`text-xl font-black tracking-tight ${textMain}`}>
+                            <h2 className={`type-title-md ${textMain}`}>
                                 {card.title}
                             </h2>
                             <p className="mt-3 text-sm leading-7">{card.body}</p>

@@ -64,7 +64,7 @@ export function CmsSidebar({
         <section
             className={`sticky top-[88px] z-20 self-start rounded-[24px] border p-4 shadow-sm sm:p-5 ${panelTone}`}
         >
-            <h1 className="text-2xl font-black tracking-tight">CMS</h1>
+            <h1 className="type-title-lg">CMS</h1>
             <p className={`mt-2 text-sm leading-6 ${mutedTone}`}>
                 카테고리별로 운영 화면과 콘텐츠를 관리할 수 있습니다.
             </p>

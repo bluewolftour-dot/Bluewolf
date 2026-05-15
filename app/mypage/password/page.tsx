@@ -117,7 +117,7 @@ function ChangePasswordContent() {
     if (!user) {
         return (
             <section className={`rounded-[32px] border p-10 text-center ${panel}`}>
-                <h1 className={`text-3xl font-black ${textMain}`}>{c.title}</h1>
+                <h1 className={`type-display ${textMain}`}>{c.title}</h1>
                 <p className={`mt-3 ${textMuted}`}>{c.loginRequired}</p>
                 <Link
                     href={withLocaleQuery("/login", lang)}
@@ -203,7 +203,7 @@ function ChangePasswordContent() {
                 {c.backToMypage}
             </Link>
 
-            <h1 className={`mt-3 text-3xl font-black tracking-tight ${textMain}`}>{c.title}</h1>
+            <h1 className={`type-display mt-3 ${textMain}`}>{c.title}</h1>
             <p className={`mt-2 text-sm leading-7 ${textMuted}`}>{c.desc}</p>
 
             {done ? (

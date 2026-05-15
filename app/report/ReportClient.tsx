@@ -55,7 +55,7 @@ export function ReportClient() {
             <div className="mx-auto w-full max-w-2xl py-10 px-4">
                 <header className="mb-10 text-center">
                     <p className="text-sm font-black text-blue-500">Community Safety</p>
-                    <h1 className="mt-2 text-4xl font-black tracking-tight">커뮤니티 신고</h1>
+                    <h1 className="type-display mt-2">커뮤니티 신고</h1>
                     <p className={`mt-3 text-sm leading-7 ${mutedTone}`}>
                         부적절한 게시글이나 사용자를 발견하셨나요? 상세 내용을 보내주시면 운영팀에서 신속히 검토하겠습니다.
                     </p>

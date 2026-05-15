@@ -46,7 +46,7 @@ function CommunityNoticesContent() {
                         <p className={`text-sm font-bold ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                             Community Notices
                         </p>
-                        <h1 className={`mt-1 text-2xl font-black tracking-tight sm:text-3xl ${isDark ? "text-white" : "text-slate-900"}`}>
+                        <h1 className={`type-display mt-1 ${isDark ? "text-white" : "text-slate-900"}`}>
                             {copy.title}
                         </h1>
                         <p className={`mt-2 text-sm sm:text-base ${isDark ? "text-slate-300" : "text-slate-600"}`}>
@@ -94,7 +94,7 @@ function CommunityNoticesContent() {
                                                 {notice.date}
                                             </span>
                                         </div>
-                                        <h2 className={`mt-2 text-base font-black sm:text-lg ${isDark ? "text-white" : "text-slate-900"}`}>
+                                        <h2 className={`type-title-md mt-2 ${isDark ? "text-white" : "text-slate-900"}`}>
                                             {notice.title}
                                         </h2>
                                         <p className={`mt-1 text-sm leading-6 ${isDark ? "text-slate-300" : "text-slate-600"}`}>

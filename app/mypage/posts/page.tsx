@@ -60,7 +60,7 @@ export default function MyPostsPage() {
                         >
                             ← {labels.back}
                         </Link>
-                        <h1 className="mt-2 text-4xl font-black tracking-tight">{labels.title}</h1>
+                        <h1 className="type-display mt-2">{labels.title}</h1>
                     </div>
                 </header>
 

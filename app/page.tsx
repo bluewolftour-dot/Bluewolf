@@ -162,7 +162,7 @@ function HomeContent() {
 
     return (
         <div
-            className={`relative flex min-h-screen flex-col overflow-x-hidden [font-family:var(--font-noto-sans-cjk),sans-serif] transition-colors duration-300 ${
+            className={`relative flex min-h-screen flex-col overflow-x-hidden transition-colors duration-300 ${
                 isDark ? "bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-900"
             }`}
         >
@@ -267,10 +267,10 @@ function HomeContent() {
                 >
                     <div className="mx-auto flex w-[var(--featured-content-width)] items-start justify-between gap-4 px-5 sm:px-8 lg:px-12">
                         <div className="min-w-0">
-                            <h2 className={`text-[28px] font-black leading-tight tracking-[-0.03em] sm:text-[40px] ${isDark ? "text-white" : "text-black"}`}>
+                            <h2 className={`type-display ${isDark ? "text-white" : "text-black"}`}>
                                 {h.featuredTitle}
                             </h2>
-                            <p className={`text-[14px] font-semibold leading-6 ${isDark ? "text-slate-300" : "text-slate-600"}`}>
+                            <p className={`type-body-sm font-semibold ${isDark ? "text-slate-300" : "text-slate-600"}`}>
                                 {h.featuredDesc}
                             </p>
                         </div>
@@ -398,7 +398,7 @@ function HomeContent() {
                         } as CSSProperties}
                     >
                         <div className="mx-auto mb-4 flex w-[var(--review-content-width)] items-center justify-between gap-3 px-5 sm:px-8 lg:px-12">
-                            <h2 className={`text-2xl font-black tracking-tight sm:text-3xl ${isDark ? "text-white" : "text-slate-900"}`}>
+                            <h2 className={`type-title-lg ${isDark ? "text-white" : "text-slate-900"}`}>
                                 {h.reviewTitle}
                             </h2>
                             <Link
@@ -484,7 +484,7 @@ function HomeContent() {
                         }`}
                     >
                         <div className="flex items-center gap-3 px-5 py-6 sm:px-8">
-                            <h2 className={`text-2xl font-black tracking-tight sm:text-3xl ${isDark ? "text-white" : "text-slate-950"}`}>
+                            <h2 className={`type-title-lg ${isDark ? "text-white" : "text-slate-950"}`}>
                                 {noticeText.title}
                             </h2>
                             <Link

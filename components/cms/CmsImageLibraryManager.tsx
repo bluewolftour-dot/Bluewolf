@@ -101,7 +101,7 @@ export function CmsImageLibraryManager({ isDark }: { isDark: boolean }) {
         <div className="space-y-5">
             <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                    <h2 className="text-2xl font-black tracking-tight">이미지 라이브러리</h2>
+                    <h2 className="type-title-lg">이미지 라이브러리</h2>
                     <p className={`mt-1 text-sm ${mutedTone}`}>
                         CMS에 업로드된 이미지를 확인하고 스토리지에서 삭제할 수 있습니다.
                     </p>
@@ -194,7 +194,7 @@ export function CmsImageLibraryManager({ isDark }: { isDark: boolean }) {
             {pendingDelete ? (
                 <div className="fixed inset-0 z-[220] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
                     <div className={`w-full max-w-lg rounded-[28px] border p-5 shadow-2xl ${isDark ? "border-white/10 bg-slate-900 text-slate-100" : "border-slate-200 bg-white text-slate-900"}`}>
-                        <h3 className="text-lg font-black">이미지가 사용 중입니다</h3>
+                        <h3 className="type-title-md">이미지가 사용 중입니다</h3>
                         <p className={`mt-2 text-sm leading-6 ${mutedTone}`}>
                             아래 위치에서 이 이미지가 적용되어 있습니다. 삭제하면 해당 화면의 이미지가 깨질 수 있습니다. 정말 삭제할까요?
                         </p>

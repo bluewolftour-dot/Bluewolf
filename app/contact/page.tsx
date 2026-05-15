@@ -273,7 +273,7 @@ function ContactAiAssistant({ lang, isDark }: { lang: Locale; isDark: boolean })
                         {copy.badge}
                     </span>
                     <h1
-                        className={`mt-4 text-2xl font-black tracking-tight sm:text-3xl ${
+                        className={`type-display mt-4 ${
                             isDark ? "text-white" : "text-slate-900"
                         }`}
                     >
@@ -532,7 +532,7 @@ function ContactContent() {
             <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr] lg:gap-5">
                 <section className={sectionBase}>
                     <h2
-                        className={`text-2xl font-black tracking-tight sm:text-3xl ${
+                        className={`type-title-lg ${
                             isDark ? "text-white" : "text-slate-900"
                         }`}
                     >
@@ -675,7 +675,7 @@ function ContactContent() {
                 <div className="flex flex-col gap-4">
                     <section className={sectionBase}>
                         <h2
-                            className={`text-xl font-black tracking-tight sm:text-2xl ${
+                            className={`type-title-md ${
                                 isDark ? "text-white" : "text-slate-900"
                             }`}
                         >

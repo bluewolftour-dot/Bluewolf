@@ -320,7 +320,7 @@ function BookingLookupContent() {
                 <span className="inline-flex items-center rounded-full bg-blue-600/10 px-3 py-1 text-xs font-black text-blue-600">
                     {text.badge}
                 </span>
-                <h1 className={`mt-3 text-3xl font-black tracking-tight sm:text-4xl ${isDark ? "text-white" : "text-slate-900"}`}>
+                <h1 className={`type-display mt-3 ${isDark ? "text-white" : "text-slate-900"}`}>
                     {text.title}
                 </h1>
                 <p className={`mt-2 text-sm leading-7 sm:text-base ${mutedClass(isDark)}`}>{text.desc}</p>
@@ -381,7 +381,7 @@ function BookingLookupContent() {
                         </div>
                     </div>
 
-                    <h2 className={`text-lg font-black tracking-tight sm:text-xl ${isDark ? "text-white" : "text-slate-900"}`}>
+                    <h2 className={`type-title-md ${isDark ? "text-white" : "text-slate-900"}`}>
                         {text.bookingInfo}
                     </h2>
                     <div className={`mt-4 divide-y rounded-[20px] border ${isDark ? "divide-white/5 border-white/10 bg-slate-950" : "divide-slate-100 border-slate-200 bg-slate-50"}`}>
@@ -439,7 +439,7 @@ function BookingLookupContent() {
 
             {booking && state === "cancel-form" ? (
                 <section className={cardClass(isDark)}>
-                    <h2 className={`text-lg font-black tracking-tight sm:text-xl ${isDark ? "text-white" : "text-slate-900"}`}>
+                    <h2 className={`type-title-md ${isDark ? "text-white" : "text-slate-900"}`}>
                         {text.cancelTitle}
                     </h2>
                     <div className="mt-4">

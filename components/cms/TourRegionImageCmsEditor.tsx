@@ -67,7 +67,7 @@ function RegionImageCard({
         >
             <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                    <h3 className="text-lg font-black">{regionInfo.label} 카드 이미지</h3>
+                    <h3 className="type-title-md">{regionInfo.label} 카드 이미지</h3>
                     <p className={`mt-1 text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                         투어상품 페이지 상단 지역 선택 카드의 이미지를 수정합니다.
                     </p>
@@ -214,7 +214,7 @@ export function TourRegionImageCmsEditor({
         <div className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                    <h2 className="text-2xl font-black tracking-tight">여행지 선택 카드 이미지</h2>
+                    <h2 className="type-title-lg">여행지 선택 카드 이미지</h2>
                     <p className={`mt-1 text-sm ${mutedTone}`}>
                         &quot;어디로 여행을 떠나고 싶으신가요?&quot; 영역의 카드 이미지를 관리합니다.
                     </p>

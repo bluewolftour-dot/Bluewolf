@@ -464,7 +464,7 @@ function TourCmsSectionContent() {
                                     <span aria-hidden>←</span>
                                     <span>투어상품 CMS로 돌아가기</span>
                                 </Link>
-                                <h1 className="mt-3 text-3xl font-black tracking-tight">
+                                <h1 className="type-display mt-3">
                                     {sectionTitle}
                                 </h1>
                                 <p className={`mt-2 text-sm ${mutedTone}`}>{sectionDescription}</p>

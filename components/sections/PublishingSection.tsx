@@ -21,7 +21,7 @@ export function PublishingSection({
             }`}
         >
             <div>
-                <h2 className={`text-2xl font-black tracking-tight sm:text-3xl ${isDark ? "text-white" : "text-slate-900"}`}>
+                <h2 className={`type-title-lg ${isDark ? "text-white" : "text-slate-900"}`}>
                     {title}
                 </h2>
                 <p className={`mt-2 text-sm sm:text-base ${isDark ? "text-slate-300" : "text-slate-500"}`}>{desc}</p>
@@ -36,7 +36,7 @@ export function PublishingSection({
                         }`}
                     >
                         <div className="text-sm font-black text-blue-600">0{index + 1}</div>
-                        <h3 className={`mt-2 text-lg font-black tracking-tight sm:text-xl ${isDark ? "text-white" : "text-slate-900"}`}>
+                        <h3 className={`type-title-md mt-2 ${isDark ? "text-white" : "text-slate-900"}`}>
                             {item.title}
                         </h3>
                         <p className={`mt-3 text-sm leading-7 sm:text-base ${isDark ? "text-slate-300" : "text-slate-500"}`}>

@@ -50,7 +50,7 @@ export function CmsImageLibraryModal({
             <div className={`relative z-10 flex h-full max-h-[800px] w-full max-w-5xl flex-col overflow-hidden rounded-[32px] border shadow-2xl ${panelTone}`}>
                 <header className="flex items-center justify-between border-b border-current/10 px-6 py-5">
                     <div>
-                        <h2 className="text-xl font-black">이미지 라이브러리</h2>
+                        <h2 className="type-title-md">이미지 라이브러리</h2>
                         <p className="mt-1 text-xs font-bold opacity-60">서버에 저장된 기존 이미지를 선택합니다.</p>
                     </div>
                     <button

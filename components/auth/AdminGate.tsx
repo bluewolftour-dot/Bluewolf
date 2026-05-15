@@ -24,7 +24,7 @@ export function AdminGate({
         return (
             <section className={`rounded-[32px] border p-8 text-center ${panel}`}>
                 <p className="text-sm font-black text-blue-500">Admin</p>
-                <h1 className="mt-2 text-2xl font-black">관리자 권한이 필요합니다.</h1>
+                <h1 className="type-title-lg mt-2">관리자 권한이 필요합니다.</h1>
                 <p className={`mt-3 text-sm ${muted}`}>
                     CMS/CRM은 관리자 계정으로 로그인한 경우에만 접근할 수 있습니다.
                 </p>

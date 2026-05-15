@@ -620,9 +620,9 @@ function CrmContent() {
                 <section className={`rounded-[28px] border p-6 shadow-sm ${panelTone}`}>
                     <div className="flex flex-wrap items-start justify-between gap-4">
                         <div>
-                            <p className="text-sm font-black text-blue-500">CRM</p>
-                            <h1 className="mt-2 text-3xl font-black tracking-tight">고객 운영 CRM</h1>
-                            <p className={`mt-2 text-sm ${mutedTone}`}>
+                            <p className="type-label text-blue-500">CRM</p>
+                            <h1 className="type-display mt-2">고객 운영 CRM</h1>
+                            <p className={`type-body-sm mt-2 ${mutedTone}`}>
                                 고객명단, 예약, 문의, 결제, 후속 조치를 한 곳에서 확인하고 관리합니다.
                             </p>
                         </div>
@@ -733,8 +733,8 @@ function CrmContent() {
                                     <section className={`rounded-3xl border p-5 ${surfaceTone}`}>
                                         <div className="flex items-start justify-between gap-3">
                                             <div>
-                                                <p className={`text-xs font-black ${mutedTone}`}>오늘 처리해야 할 일</p>
-                                                <h2 className="mt-2 text-lg font-black">처리 대기 큐</h2>
+                                                <p className={`type-caption ${mutedTone}`}>오늘 처리해야 할 일</p>
+                                                <h2 className="type-title-md mt-2">처리 대기 큐</h2>
                                             </div>
                                             <span className="rounded-full bg-blue-600 px-3 py-1 text-xs font-black text-white">
                                                 {followUpItems.length}건
@@ -761,8 +761,8 @@ function CrmContent() {
                                     <section className={`rounded-3xl border p-5 ${surfaceTone}`}>
                                         <div className="flex items-start justify-between gap-3">
                                             <div>
-                                                <p className={`text-xs font-black ${mutedTone}`}>고객 운영 요약</p>
-                                                <h2 className="mt-2 text-lg font-black">최근 고객</h2>
+                                                <p className={`type-caption ${mutedTone}`}>고객 운영 요약</p>
+                                                <h2 className="type-title-md mt-2">최근 고객</h2>
                                             </div>
                                             <button
                                                 type="button"
@@ -1131,7 +1131,7 @@ function RevenueDonutCard({
                 </div>
                 <div>
                     <p className="text-sm font-black text-blue-500">매출 구성</p>
-                    <h2 className="mt-2 text-2xl font-black tracking-tight">예약금과 잔여 매출을 분리해서 봅니다.</h2>
+                    <h2 className="type-title-lg mt-2">예약금과 잔여 매출을 분리해서 봅니다.</h2>
                     <div className="mt-5 grid gap-3">
                         <RevenueLegend
                             colorClass="bg-blue-600"
@@ -1225,7 +1225,7 @@ function BookingCancelModal({
                 <div className="flex items-start justify-between gap-4">
                     <div>
                         <p className="text-sm font-black text-red-500">예약 취소</p>
-                        <h2 className="mt-2 text-2xl font-black tracking-tight">{getTourTitle(booking)}</h2>
+                        <h2 className="type-title-lg mt-2">{getTourTitle(booking)}</h2>
                         <p className={`mt-2 text-sm ${mutedTone}`}>
                             취소 사유와 고객에게 보낼 메시지를 입력하면 취소 이메일을 발송하고 가능한 경우 Toss 환불을 진행합니다.
                         </p>
@@ -1330,7 +1330,7 @@ function BookingDetailModal({
                 <div className="flex items-start justify-between gap-4">
                     <div>
                         <p className="text-sm font-black text-blue-500">예약 상세보기</p>
-                        <h2 className="mt-2 text-2xl font-black tracking-tight">{getTourTitle(booking)}</h2>
+                        <h2 className="type-title-lg mt-2">{getTourTitle(booking)}</h2>
                     </div>
                     <button
                         type="button"

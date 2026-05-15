@@ -53,7 +53,7 @@ function SectionCard({
             }`}
         >
             <div className="mb-4">
-                <h3 className="text-base font-black">{title}</h3>
+                <h3 className="type-label">{title}</h3>
                 {desc ? (
                     <p className={`mt-1 text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                         {desc}
@@ -197,7 +197,7 @@ export function CommunityCmsEditor({
         <div className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                    <h2 className="text-2xl font-black tracking-tight">커뮤니티 관리</h2>
+                    <h2 className="type-title-lg">커뮤니티 관리</h2>
                     <p className={`mt-1 text-sm ${mutedTone}`}>
                         유저가 작성한 글과 댓글을 확인하고, 필요한 경우 삭제 후 저장할 수 있습니다.
                     </p>

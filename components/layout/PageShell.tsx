@@ -82,7 +82,7 @@ function PageShellContent({
     return (
         <PageContext.Provider value={{ lang, isDark, t }}>
             <div
-                className={`flex min-h-screen flex-col [font-family:var(--font-noto-sans-cjk),sans-serif] transition-colors duration-300 ${
+                className={`flex min-h-screen flex-col transition-colors duration-300 ${
                     isDark ? "bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-900"
                 }`}
             >

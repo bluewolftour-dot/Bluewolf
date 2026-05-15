@@ -113,7 +113,7 @@ function FAQContent() {
             </section>
 
             <section className="rounded-[28px] border border-blue-500/20 bg-blue-600 p-8 text-white shadow-sm">
-                <h2 className="text-2xl font-black tracking-tight">{copy.ctaTitle}</h2>
+                <h2 className="type-title-lg">{copy.ctaTitle}</h2>
 
                 <p className="mt-3 max-w-2xl leading-8 text-blue-100">{copy.ctaDesc}</p>
 

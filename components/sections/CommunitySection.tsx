@@ -30,7 +30,7 @@ export function CommunitySection({
                     isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"
                 }`}
             >
-                <h2 className={`text-2xl font-black tracking-tight sm:text-3xl ${isDark ? "text-white" : "text-slate-900"}`}>
+                <h2 className={`type-title-lg ${isDark ? "text-white" : "text-slate-900"}`}>
                     {t.communityTitle}
                 </h2>
 
@@ -93,7 +93,7 @@ export function CommunitySection({
                     isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"
                 }`}
             >
-                <h2 className={`text-2xl font-black tracking-tight sm:text-3xl ${isDark ? "text-white" : "text-slate-900"}`}>
+                <h2 className={`type-title-lg ${isDark ? "text-white" : "text-slate-900"}`}>
                     {t.faqTitle}
                 </h2>
 

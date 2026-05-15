@@ -53,7 +53,7 @@ export function AboutPageTemplate({
 
     return (
         <div
-            className={`flex min-h-screen flex-col [font-family:var(--font-noto-sans-cjk),sans-serif] transition-colors duration-300 ${
+            className={`flex min-h-screen flex-col transition-colors duration-300 ${
                 isDark ? "bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-900"
             }`}
         >
@@ -80,7 +80,7 @@ export function AboutPageTemplate({
                     </span>
 
                     <h1
-                        className={`mt-5 max-w-4xl text-4xl font-black tracking-tight lg:text-6xl ${
+                        className={`type-display mt-5 max-w-4xl ${
                             isDark ? "text-white" : "text-slate-900"
                         }`}
                     >
@@ -88,7 +88,7 @@ export function AboutPageTemplate({
                     </h1>
 
                     <p
-                        className={`mt-5 max-w-3xl text-base leading-8 lg:text-lg ${
+                        className={`type-body mt-5 max-w-3xl ${
                             isDark ? "text-slate-300" : "text-slate-500"
                         }`}
                     >
@@ -102,10 +102,10 @@ export function AboutPageTemplate({
                             isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"
                         }`}
                     >
-                        <h2 className={`text-2xl font-black tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>
+                        <h2 className={`type-title-lg ${isDark ? "text-white" : "text-slate-900"}`}>
                             {t.missionTitle}
                         </h2>
-                        <p className={`mt-4 leading-8 ${isDark ? "text-slate-300" : "text-slate-500"}`}>
+                        <p className={`type-body mt-4 ${isDark ? "text-slate-300" : "text-slate-500"}`}>
                             {t.missionDesc}
                         </p>
                     </div>
@@ -115,7 +115,7 @@ export function AboutPageTemplate({
                             isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"
                         }`}
                     >
-                        <h2 className={`text-2xl font-black tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>
+                        <h2 className={`type-title-lg ${isDark ? "text-white" : "text-slate-900"}`}>
                             {t.processTitle}
                         </h2>
                         <div className="mt-4 grid gap-3">
@@ -138,7 +138,7 @@ export function AboutPageTemplate({
                         isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"
                     }`}
                 >
-                    <h2 className={`text-2xl font-black tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>
+                    <h2 className={`type-title-lg ${isDark ? "text-white" : "text-slate-900"}`}>
                         {t.valuesTitle}
                     </h2>
 
@@ -150,10 +150,10 @@ export function AboutPageTemplate({
                                     isDark ? "border-white/10 bg-slate-950" : "border-slate-200 bg-slate-50"
                                 }`}
                             >
-                                <h3 className={`text-xl font-black tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>
+                                <h3 className={`type-title-md ${isDark ? "text-white" : "text-slate-900"}`}>
                                     {value.title}
                                 </h3>
-                                <p className={`mt-3 leading-7 ${isDark ? "text-slate-300" : "text-slate-500"}`}>
+                                <p className={`type-body mt-3 ${isDark ? "text-slate-300" : "text-slate-500"}`}>
                                     {value.desc}
                                 </p>
                             </div>
@@ -162,8 +162,8 @@ export function AboutPageTemplate({
                 </section>
 
                 <section className="rounded-[28px] border border-blue-500/20 bg-blue-600 p-8 text-white shadow-sm">
-                    <h2 className="text-3xl font-black tracking-tight">{t.ctaTitle}</h2>
-                    <p className="mt-3 max-w-2xl leading-8 text-blue-100">{t.ctaDesc}</p>
+                    <h2 className="type-title-lg">{t.ctaTitle}</h2>
+                    <p className="type-body mt-3 max-w-2xl text-blue-100">{t.ctaDesc}</p>
 
                     <div className="mt-6 flex flex-wrap gap-3">
                         <Link

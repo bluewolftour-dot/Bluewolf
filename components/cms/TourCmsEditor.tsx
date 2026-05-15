@@ -161,7 +161,7 @@ function SectionCard({
         >
             <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                    <h3 className="text-lg font-black">{title}</h3>
+                    <h3 className="type-title-md">{title}</h3>
                     <p className={`mt-1 text-sm leading-6 ${mutedTone}`}>{desc}</p>
                 </div>
                 {actions}
@@ -434,7 +434,7 @@ export function TourCmsEditor({
                     <div className="space-y-8">
                         <div className="flex flex-wrap items-center justify-between gap-3">
                             <div>
-                                <h2 className="text-2xl font-black tracking-tight">{selectedTour.title[activeLocale]}</h2>
+                                <h2 className="type-title-lg">{selectedTour.title[activeLocale]}</h2>
                                 <p className={`mt-1 text-sm ${mutedTone}`}>상품 정보와 상세 페이지의 모든 이미지를 이 화면에서 수정할 수 있습니다.</p>
                             </div>
                             <div className="flex flex-wrap gap-2">

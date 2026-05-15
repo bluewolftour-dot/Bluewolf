@@ -31,7 +31,7 @@ function ThemeLandingContent() {
         <>
             <section className={`rounded-[32px] border p-8 ${panel}`}>
                 <p className="text-sm font-black text-blue-500">Theme</p>
-                <h1 className={`mt-2 text-3xl font-black tracking-tight sm:text-4xl ${isDark ? "text-white" : "text-slate-950"}`}>
+                <h1 className={`type-display mt-2 ${isDark ? "text-white" : "text-slate-950"}`}>
                     {theme.label[lang]}
                 </h1>
                 <p className={`mt-4 max-w-3xl leading-7 ${isDark ? "text-slate-300" : "text-slate-600"}`}>
@@ -47,7 +47,7 @@ function ThemeLandingContent() {
                 {items.map((tour) => (
                     <Link key={tour.id} href={withLocaleQuery(`/tours/${tour.id}`, lang)} className={`rounded-[28px] border p-6 transition hover:border-blue-400 ${card}`}>
                         <p className="text-sm font-black text-blue-500">{tour.duration[lang]}</p>
-                        <h2 className={`mt-2 text-xl font-black ${isDark ? "text-white" : "text-slate-950"}`}>{tour.title[lang]}</h2>
+                        <h2 className={`type-title-md mt-2 ${isDark ? "text-white" : "text-slate-950"}`}>{tour.title[lang]}</h2>
                         <p className={`mt-3 line-clamp-3 text-sm leading-7 ${isDark ? "text-slate-400" : "text-slate-600"}`}>{tour.desc[lang]}</p>
                         <div className="mt-4 text-blue-500">
                             <span className="block text-[11px] font-extrabold leading-none">{perPersonLabel}</span>

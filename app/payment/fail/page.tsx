@@ -31,7 +31,7 @@ function PaymentFailContent() {
             <div className="inline-flex rounded-full bg-red-50 px-4 py-1.5 text-sm font-bold text-red-600">
                 {pick(lang, "결제 실패", "決済失敗", "Payment failed")}
             </div>
-            <h1 className={`mt-4 text-3xl font-black ${isDark ? "text-white" : "text-slate-900"}`}>
+            <h1 className={`type-display mt-4 ${isDark ? "text-white" : "text-slate-900"}`}>
                 {pick(lang, "결제가 완료되지 않았습니다", "決済が完了しませんでした", "The payment was not completed")}
             </h1>
             <p className={`mx-auto mt-3 max-w-xl text-sm sm:text-base ${isDark ? "text-slate-400" : "text-slate-500"}`}>

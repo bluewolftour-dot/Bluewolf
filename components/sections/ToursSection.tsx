@@ -260,7 +260,7 @@ export function ToursSection({
             {/* 데스크톱: 고정 사이드바 */}
             <aside className={`hidden lg:block lg:w-[260px] xl:w-[280px] shrink-0`}>
                 <div className={`sticky top-24 ${panelBase} p-5`}>
-                    <h3 className={`mb-5 text-base font-black ${isDark ? "text-white" : "text-slate-900"}`}>
+                    <h3 className={`type-label mb-5 ${isDark ? "text-white" : "text-slate-900"}`}>
                         <span className="inline-flex items-center gap-2">
                             <SearchIcon className="h-4 w-4" />
                             필터
@@ -276,7 +276,7 @@ export function ToursSection({
                     {/* 헤더 */}
                     <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                                <h2 className={`!text-[1.25rem] font-black tracking-tight sm:!text-2xl ${isDark ? "text-white" : "text-slate-900"}`}>
+                                <h2 className={`type-title-md ${isDark ? "text-white" : "text-slate-900"}`}>
                                     {t.featured}
                                 </h2>
                                 <p className={`mt-0.5 text-xs sm:text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
@@ -334,7 +334,7 @@ export function ToursSection({
                             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white">
                                 <SearchIcon className="h-5 w-5" />
                             </div>
-                            <h3 className={`mt-3 text-lg font-black ${isDark ? "text-white" : "text-slate-900"}`}>
+                            <h3 className={`type-title-md mt-3 ${isDark ? "text-white" : "text-slate-900"}`}>
                                 {t.noResults}
                             </h3>
                             <p className={`mt-2 text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>

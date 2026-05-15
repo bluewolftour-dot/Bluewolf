@@ -85,7 +85,7 @@ function LoginContent() {
                     <span className="inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-extrabold tracking-[0.18em] text-white/90">
                         BLUEWOLF ACCOUNT
                     </span>
-                    <h1 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">{t.loginTitle}</h1>
+                    <h1 className="type-display mt-5">{t.loginTitle}</h1>
                     <p className="mt-4 max-w-md text-sm leading-7 text-blue-50 sm:text-base">
                         {t.loginDesc}
                     </p>
@@ -96,7 +96,7 @@ function LoginContent() {
                         <div className="flex h-full flex-col justify-between gap-8">
                             <div>
                                 <p className="text-sm font-bold text-blue-600">{t.loggedIn}</p>
-                                <h2 className="mt-3 text-3xl font-black tracking-tight">{user.id}</h2>
+                                <h2 className="type-title-lg mt-3">{user.id}</h2>
                             </div>
 
                             <div className="flex flex-col gap-3 sm:flex-row">

@@ -143,7 +143,7 @@ function OptionInfoModal({
                         <span className="inline-flex rounded-full bg-blue-600 px-3 py-1.5 text-xs font-extrabold text-white">
                             +{formatPrice(option.price)} / {optionUnitLabel}
                         </span>
-                        <h3 className="mt-3 text-2xl font-black tracking-tight">{option.title}</h3>
+                        <h3 className="type-title-lg mt-3">{option.title}</h3>
                         <p className={`mt-3 text-sm leading-7 ${isDark ? "text-slate-300" : "text-slate-600"}`}>{option.desc}</p>
                     </div>
                     <button
@@ -267,7 +267,9 @@ function TourDetailContent() {
     const [footerOverlap, setFooterOverlap] = useState(0);
 
     useEffect(() => {
-        setMounted(true);
+        const frame = window.requestAnimationFrame(() => setMounted(true));
+
+        return () => window.cancelAnimationFrame(frame);
     }, []);
 
     useEffect(() => {
@@ -429,7 +431,7 @@ function TourDetailContent() {
                         </span>
                     </div>
 
-                    <h1 className="text-xl font-black tracking-tight text-white sm:text-2xl lg:text-4xl">
+                    <h1 className="type-display text-white">
                         {tour.title[lang]}
                     </h1>
                 </div>
@@ -469,7 +471,7 @@ function TourDetailContent() {
                         {activeTab === "intro" && (
                             <div className="flex flex-col gap-8">
                                 <div>
-                                    <h2 className={`text-xl font-black tracking-tight sm:text-2xl ${isDark ? "text-white" : "text-slate-900"}`}>
+                                    <h2 className={`type-title-md ${isDark ? "text-white" : "text-slate-900"}`}>
                                         {tabLabels.intro[lang]}
                                     </h2>
                                     <p className={`mt-3 text-base leading-8 ${isDark ? "text-slate-300" : "text-slate-600"}`}>
@@ -591,7 +593,7 @@ function TourDetailContent() {
                         {/* ── 여행 일정 ── */}
                         {activeTab === "itinerary" && (
                             <div>
-                                <h2 className={`mb-6 text-xl font-black tracking-tight sm:text-2xl ${isDark ? "text-white" : "text-slate-900"}`}>
+                                <h2 className={`type-title-md mb-6 ${isDark ? "text-white" : "text-slate-900"}`}>
                                     {tabLabels.itinerary[lang]}
                                 </h2>
                                 <div className="flex flex-col gap-3">
@@ -653,7 +655,7 @@ function TourDetailContent() {
                         {/* ── 포함/불포함 ── */}
                         {activeTab === "includes" && (
                             <div className="flex flex-col gap-6">
-                                <h2 className={`text-xl font-black tracking-tight sm:text-2xl ${isDark ? "text-white" : "text-slate-900"}`}>
+                                <h2 className={`type-title-md ${isDark ? "text-white" : "text-slate-900"}`}>
                                     {tabLabels.includes[lang]}
                                 </h2>
                                 <div className="grid gap-4 sm:grid-cols-2">
@@ -703,7 +705,7 @@ function TourDetailContent() {
                         {/* ── 이용약관 ── */}
                         {activeTab === "terms" && (
                             <div>
-                                <h2 className={`mb-6 text-xl font-black tracking-tight sm:text-2xl ${isDark ? "text-white" : "text-slate-900"}`}>
+                                <h2 className={`type-title-md mb-6 ${isDark ? "text-white" : "text-slate-900"}`}>
                                     {lang === "ko" ? "취소 및 환불 정책" : lang === "ja" ? "キャンセル・返金ポリシー" : "Cancellation Policy"}
                                 </h2>
 

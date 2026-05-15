@@ -376,7 +376,7 @@ function WriteForm({
 
     return (
         <div className={`relative z-[140] rounded-[22px] border p-5 ${isModal ? "mt-0" : "mt-5"} ${isDark ? "border-white/10 bg-slate-950" : "border-slate-200 bg-slate-50"}`}>
-            <h2 className={`mb-4 text-base font-black ${isDark ? "text-white" : "text-slate-900"}`}>{h.writeTitle}</h2>
+            <h2 className={`type-label mb-4 ${isDark ? "text-white" : "text-slate-900"}`}>{h.writeTitle}</h2>
 
             {/* 게시판 선택 */}
             <div className="mb-4">
@@ -1398,7 +1398,7 @@ function CommunityContent() {
                                 </svg>
                             </span>
                             <div>
-                                <h2 className={`text-lg font-black ${isDark ? "text-white" : "text-slate-900"}`}>
+                                <h2 className={`type-title-md ${isDark ? "text-white" : "text-slate-900"}`}>
                                     {noticeTitle}
                                 </h2>
                                 <p className={`text-xs sm:text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
@@ -1453,7 +1453,7 @@ function CommunityContent() {
                                                     {notice.date}
                                                 </span>
                                             </div>
-                                            <h3 className={`mt-2 text-base font-black sm:text-lg ${isDark ? "text-white" : "text-slate-900"}`}>
+                                            <h3 className={`type-title-md mt-2 ${isDark ? "text-white" : "text-slate-900"}`}>
                                                 {notice.title}
                                             </h3>
                                             <p className={`mt-1 text-sm leading-6 ${isDark ? "text-slate-300" : "text-slate-600"}`}>
@@ -1494,7 +1494,7 @@ function CommunityContent() {
                 <div className={`relative ${showForm ? "z-[120]" : "z-10"} animate-fade-up ${sectionBase} p-5 sm:p-7`} style={{ animationDelay: "0ms" }}>
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                            <h1 className={`text-2xl font-black tracking-tight sm:text-3xl ${isDark ? "text-white" : "text-slate-900"}`}>
+                            <h1 className={`type-display ${isDark ? "text-white" : "text-slate-900"}`}>
                                 {activeTab === "all" ? "커뮤니티"
                                     : activeTab === "review" ? h.boardTitle.review
                                     : activeTab === "mate" ? h.boardTitle.mate
@@ -1552,7 +1552,7 @@ function CommunityContent() {
                                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                     </svg>
                                 </span>
-                                <h2 className={`text-lg font-black ${isDark ? "text-white" : "text-slate-900"}`}>{h.boardTitle.review}</h2>
+                                <h2 className={`type-title-md ${isDark ? "text-white" : "text-slate-900"}`}>{h.boardTitle.review}</h2>
                                 <span className={`ml-1 text-sm font-bold ${isDark ? "text-slate-400" : "text-slate-500"}`}>{reviewItems.length}</span>
                                 </div>
                                 <Link
@@ -1596,7 +1596,7 @@ function CommunityContent() {
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M16 4.13a4 4 0 010 7.75" />
                                     </svg>
                                 </span>
-                                <h2 className={`text-lg font-black ${isDark ? "text-white" : "text-slate-900"}`}>{h.boardTitle.mate}</h2>
+                                <h2 className={`type-title-md ${isDark ? "text-white" : "text-slate-900"}`}>{h.boardTitle.mate}</h2>
                                 <span className={`ml-1 text-sm font-bold ${isDark ? "text-slate-400" : "text-slate-500"}`}>{mateItems.length}</span>
                                 </div>
                                 <Link
@@ -1648,7 +1648,7 @@ function CommunityContent() {
                                         <circle cx="12" cy="17" r="1" fill="currentColor" stroke="none" />
                                     </svg>
                                 </span>
-                                <h2 className={`text-lg font-black ${isDark ? "text-white" : "text-slate-900"}`}>{h.boardTitle.qna}</h2>
+                                <h2 className={`type-title-md ${isDark ? "text-white" : "text-slate-900"}`}>{h.boardTitle.qna}</h2>
                                 <span className={`ml-1 text-sm font-bold ${isDark ? "text-slate-400" : "text-slate-500"}`}>{qnaItems.length}</span>
                                 </div>
                                 <Link

@@ -16,7 +16,7 @@ export default function Error({
 
     return (
         <div className="flex min-h-[60vh] flex-col items-center justify-center px-6 text-center">
-            <h2 className="text-3xl font-black text-slate-900">문제가 발생했습니다.</h2>
+            <h2 className="type-title-lg text-slate-900">문제가 발생했습니다.</h2>
             <p className="mt-4 text-slate-600">
                 페이지를 불러오는 중 예상치 못한 오류가 발생했습니다.
             </p>

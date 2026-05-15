@@ -591,15 +591,15 @@ export function ToursCustomizeContent() {
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent" />
                         <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-8">
                             <span className="inline-flex rounded-full bg-white/15 px-3 py-1.5 text-xs font-extrabold backdrop-blur-sm">{regionInfo.label}</span>
-                            <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">{copy.title}</h1>
-                            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-100 sm:text-base">{copy.desc}</p>
+                            <h1 className="type-display mt-3">{copy.title}</h1>
+                            <p className="type-body mt-3 max-w-2xl text-slate-100">{copy.desc}</p>
                         </div>
                     </div>
 
                     <div className="grid gap-8 p-6 sm:p-8">
                         <div ref={periodSectionRef} className="scroll-mt-28">
-                            <h2 className={`text-lg font-black tracking-tight sm:text-xl ${isDark ? "text-white" : "text-slate-900"}`}>{periodCopy.sectionLabel}</h2>
-                            <p className={`mt-1.5 text-xs leading-6 sm:mt-2 sm:text-sm sm:leading-7 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{copy.nightsDesc}</p>
+                            <h2 className={`type-title-md ${isDark ? "text-white" : "text-slate-900"}`}>{periodCopy.sectionLabel}</h2>
+                            <p className={`type-body-sm mt-1.5 sm:mt-2 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{copy.nightsDesc}</p>
                             <div className="mt-3 grid gap-3 sm:mt-5 sm:gap-4 sm:grid-cols-2">
                                 <div>
                                     <div className={`mb-1.5 text-xs font-extrabold sm:mb-2 sm:text-sm ${isDark ? "text-slate-100" : "text-slate-900"}`}>{periodCopy.startLabel}</div>
@@ -637,8 +637,8 @@ export function ToursCustomizeContent() {
                         </div>
 
                         <div>
-                            <h2 className={`text-xl font-black tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>{guestCopy.sectionLabel}</h2>
-                            <p className={`mt-2 text-sm leading-7 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{guestCopy.desc}</p>
+                            <h2 className={`type-title-md ${isDark ? "text-white" : "text-slate-900"}`}>{guestCopy.sectionLabel}</h2>
+                            <p className={`type-body-sm mt-2 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{guestCopy.desc}</p>
                             <div className={`mt-3 rounded-[18px] border p-3.5 sm:mt-4 sm:rounded-[24px] sm:p-5 ${isDark ? "border-white/10 bg-slate-950" : "border-slate-200 bg-slate-50"}`}>
                                 <div className={`mb-2 text-[11px] font-bold sm:mb-3 sm:text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}>{t.guestsLabel}</div>
                                 <div className="flex items-center justify-between gap-3">
@@ -671,8 +671,8 @@ export function ToursCustomizeContent() {
                         </div>
 
                         <div>
-                            <h2 className={`text-xl font-black tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>{destinationCopy.sectionLabel}</h2>
-                            <p className={`mt-2 text-sm leading-7 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{destinationCopy.desc}</p>
+                            <h2 className={`type-title-md ${isDark ? "text-white" : "text-slate-900"}`}>{destinationCopy.sectionLabel}</h2>
+                            <p className={`type-body-sm mt-2 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{destinationCopy.desc}</p>
                             <div className="mt-3 grid grid-cols-2 gap-2.5 sm:mt-4 sm:grid-cols-1 sm:gap-3">
                                 {destinationOptions.map((destination: (typeof destinationOptions)[number]) => {
                                     const active = activeSelectedDestinations.includes(destination.id);
@@ -728,8 +728,8 @@ export function ToursCustomizeContent() {
                         </div>
 
                         <div>
-                            <h2 className={`text-xl font-black tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>{activityCopy.sectionLabel}</h2>
-                            <p className={`mt-2 text-sm leading-7 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{activityCopy.desc}</p>
+                            <h2 className={`type-title-md ${isDark ? "text-white" : "text-slate-900"}`}>{activityCopy.sectionLabel}</h2>
+                            <p className={`type-body-sm mt-2 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{activityCopy.desc}</p>
                             <div className="mt-3 grid grid-cols-2 gap-2.5 sm:mt-4 sm:gap-3 md:grid-cols-2">
                                 {activityOptions.map((activity) => {
                                     const active = selectedActivities.includes(activity.id);
@@ -779,8 +779,8 @@ export function ToursCustomizeContent() {
                         </div>
 
                         <div>
-                            <h2 className={`text-xl font-black tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>{copy.optionsTitle}</h2>
-                            <p className={`mt-2 text-sm leading-7 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{copy.optionsDesc}</p>
+                            <h2 className={`type-title-md ${isDark ? "text-white" : "text-slate-900"}`}>{copy.optionsTitle}</h2>
+                            <p className={`type-body-sm mt-2 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{copy.optionsDesc}</p>
                             <div className="mt-3 grid gap-2 sm:mt-4 sm:gap-3">
                                 {optionChoices.map((option) => {
                                     const active = selectedOptions.includes(option.key);
@@ -926,7 +926,7 @@ export function ToursCustomizeContent() {
                                 <span className="inline-flex rounded-full bg-white/15 px-3 py-1.5 text-xs font-extrabold backdrop-blur-md">
                                     {regionInfo.label}
                                 </span>
-                                <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">{checkoutCopy.title}</h2>
+                                <h2 className="type-title-lg mt-3">{checkoutCopy.title}</h2>
                                 <p className="mt-2 max-w-xl text-sm leading-6 text-white/80">{checkoutCopy.desc}</p>
                             </div>
                         </div>

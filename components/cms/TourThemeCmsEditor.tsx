@@ -52,7 +52,7 @@ function SectionCard({
         >
             <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                    <h3 className="text-lg font-black">{title}</h3>
+                    <h3 className="type-title-md">{title}</h3>
                     <p className={`mt-1 text-sm leading-6 ${mutedTone}`}>{desc}</p>
                 </div>
                 {actions}
@@ -132,7 +132,7 @@ export function TourThemeCmsEditor({
         <div className="space-y-8">
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                    <h2 className="text-2xl font-black tracking-tight">테마 관리</h2>
+                    <h2 className="type-title-lg">테마 관리</h2>
                     <p className={`mt-1 text-sm ${mutedTone}`}>
                         상품 카드와 상세 페이지에 쓰이는 공통 테마를 언어별로 관리합니다.
                     </p>

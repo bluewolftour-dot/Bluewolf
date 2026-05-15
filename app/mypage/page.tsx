@@ -457,7 +457,7 @@ function MyPageContent() {
     if (!user) {
         return (
             <section className={`rounded-[32px] border p-8 text-center ${panel}`}>
-                <h1 className={`text-3xl font-black ${textMain}`}>{c.title}</h1>
+                <h1 className={`type-display ${textMain}`}>{c.title}</h1>
                 <p className={`mt-3 ${textMuted}`}>{c.loginRequired}</p>
                 <Link
                     href={withLocaleQuery("/login", lang)}
@@ -475,10 +475,10 @@ function MyPageContent() {
                 <p className="text-sm font-black text-blue-500">
                     {c.loggedInAs} · {user.id}
                 </p>
-                <h1 className={`mt-2 text-3xl font-black ${textMain}`}>{c.title}</h1>
+                <h1 className={`type-display mt-2 ${textMain}`}>{c.title}</h1>
                 <p className={`mt-3 ${textMuted}`}>{c.desc}</p>
                 <div className={`mt-6 rounded-[24px] border p-5 ${subPanel}`}>
-                    <h2 className={`text-xl font-black ${textMain}`}>{c.profileTitle}</h2>
+                    <h2 className={`type-title-md ${textMain}`}>{c.profileTitle}</h2>
 
                     {!isProfileEditing ? (
                         <div className="mt-5 grid gap-3 text-sm">
@@ -637,7 +637,7 @@ function MyPageContent() {
                         <span className="inline-flex items-center rounded-full bg-blue-600/10 px-3 py-1 text-xs font-black text-blue-600">
                             {c.bookingsBadge}
                         </span>
-                        <h2 className={`mt-3 text-2xl font-black ${textMain}`}>{c.bookingsTitle}</h2>
+                        <h2 className={`type-title-lg mt-3 ${textMain}`}>{c.bookingsTitle}</h2>
                         <p className={`mt-2 max-w-xl text-sm leading-7 ${textMuted}`}>{c.bookingsDesc}</p>
                     </div>
                     <div className="flex items-center gap-4">
@@ -661,7 +661,7 @@ function MyPageContent() {
                                 </span>
                                 <span className={`text-xs font-bold ${textMuted}`}>{summaryText.recent}</span>
                             </div>
-                            <h3 className={`mt-3 text-xl font-black ${textMain}`}>
+                            <h3 className={`type-title-md mt-3 ${textMain}`}>
                                 {getBookingTitle(bookingOverview.recent, lang)}
                             </h3>
                             <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
@@ -821,7 +821,7 @@ function WithdrawModal({
                         <p className="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-black text-emerald-600">
                             BlueWolf
                         </p>
-                        <h2 id="withdraw-modal-title" className={`mt-3 text-2xl font-black tracking-tight ${textMain}`}>
+                        <h2 id="withdraw-modal-title" className={`type-title-lg mt-3 ${textMain}`}>
                             {c.withdrawDoneTitle}
                         </h2>
                         <p className={`mt-3 text-sm leading-7 ${textMuted}`}>{c.withdrawDoneDesc}</p>
@@ -831,7 +831,7 @@ function WithdrawModal({
                         <p className="inline-flex items-center rounded-full bg-red-500/10 px-3 py-1 text-xs font-black text-red-600">
                             {c.withdrawBtn}
                         </p>
-                        <h2 id="withdraw-modal-title" className={`mt-3 text-2xl font-black tracking-tight ${textMain}`}>
+                        <h2 id="withdraw-modal-title" className={`type-title-lg mt-3 ${textMain}`}>
                             {c.withdrawModalTitle}
                         </h2>
                         <p className={`mt-3 text-sm leading-7 ${textMuted}`}>{c.withdrawModalDesc}</p>

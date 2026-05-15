@@ -130,7 +130,7 @@ function StepTitle({
                 {step}
             </span>
             <div>
-                <h2 className={`text-base font-black ${isDark ? "text-white" : "text-slate-900"}`}>{title}</h2>
+                <h2 className={`type-label ${isDark ? "text-white" : "text-slate-900"}`}>{title}</h2>
                 {desc ? (
                     <p className={`mt-1 text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>{desc}</p>
                 ) : null}
@@ -536,7 +536,7 @@ function PaymentContent() {
         return (
             <section className={`${shellClass} p-8 text-center`}>
                 <div className="inline-flex rounded-full bg-blue-50 px-4 py-1.5 text-sm font-bold text-blue-600">{text.badge}</div>
-                <h1 className={`mt-4 text-3xl font-black ${isDark ? "text-white" : "text-slate-900"}`}>{text.invalidTitle}</h1>
+                <h1 className={`type-display mt-4 ${isDark ? "text-white" : "text-slate-900"}`}>{text.invalidTitle}</h1>
                 <p className={`mx-auto mt-3 max-w-xl text-sm sm:text-base ${isDark ? "text-slate-400" : "text-slate-500"}`}>{text.invalidDesc}</p>
                 <Link href={withLocaleQuery("/tours", lang)} className="mt-6 inline-flex items-center justify-center rounded-2xl bg-blue-600 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-blue-500">
                     {text.backToTours}
@@ -549,7 +549,7 @@ function PaymentContent() {
         return (
             <section className={`${shellClass} p-8 text-center`}>
                 <div className="inline-flex rounded-full bg-emerald-50 px-4 py-1.5 text-sm font-bold text-emerald-600">{text.badge}</div>
-                <h1 className={`mt-4 text-3xl font-black ${isDark ? "text-white" : "text-slate-900"}`}>{text.pendingTitle}</h1>
+                <h1 className={`type-display mt-4 ${isDark ? "text-white" : "text-slate-900"}`}>{text.pendingTitle}</h1>
                 <p className={`mx-auto mt-3 max-w-xl text-sm sm:text-base ${isDark ? "text-slate-400" : "text-slate-500"}`}>{text.pendingDesc}</p>
                 <div className={`mx-auto mt-6 max-w-md rounded-[28px] border px-6 py-7 ${isDark ? "border-white/10 bg-slate-950" : "border-slate-200 bg-slate-50"}`}>
                     <div className={`text-sm font-bold ${isDark ? "text-slate-400" : "text-slate-500"}`}>{text.bookingNoLabel}</div>
@@ -588,7 +588,7 @@ function PaymentContent() {
                 <div className={`border-b px-6 py-4 ${isDark ? "border-white/10 bg-slate-950" : "border-slate-100 bg-slate-50"}`}>
                     <div className="mt-4">
                         <div className="inline-flex rounded-full bg-blue-50 px-4 py-1.5 text-sm font-bold text-blue-600">{text.badge}</div>
-                        <h1 className={`mt-3 text-3xl font-black ${isDark ? "text-white" : "text-slate-900"}`}>{text.title}</h1>
+                        <h1 className={`type-display mt-3 ${isDark ? "text-white" : "text-slate-900"}`}>{text.title}</h1>
                         <p className={`mt-2 text-sm sm:text-base ${isDark ? "text-slate-400" : "text-slate-500"}`}>{text.desc}</p>
                     </div>
                 </div>
@@ -608,7 +608,7 @@ function PaymentContent() {
                                     />
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                    <h3 className={`text-lg font-black ${isDark ? "text-white" : "text-slate-900"}`}>{customPlan?.title ?? tour?.title[lang]}</h3>
+                                    <h3 className={`type-title-md ${isDark ? "text-white" : "text-slate-900"}`}>{customPlan?.title ?? tour?.title[lang]}</h3>
                                     <p className={`mt-2 whitespace-pre-line text-sm leading-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                                         {customPlan?.summary ?? tour?.desc[lang]}
                                     </p>

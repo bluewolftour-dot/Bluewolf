@@ -4,12 +4,50 @@ html {
     scroll-behavior: smooth;
 }
 
+:root {
+    --font-body: var(--font-noto-sans-cjk), sans-serif;
+    --font-title: var(--font-noto-sans-cjk), sans-serif;
+    --font-display: var(--font-noto-sans-cjk), sans-serif;
+
+    --type-display-size: clamp(1.65rem, 3.2vw, 2.25rem);
+    --type-title-lg-size: clamp(1.35rem, 2.4vw, 1.9rem);
+    --type-title-md-size: clamp(1.08rem, 1.8vw, 1.35rem);
+    --type-body-size: 0.95rem;
+    --type-body-sm-size: 0.875rem;
+    --type-caption-size: 0.75rem;
+
+    --type-display-weight: 900;
+    --type-title-weight: 900;
+    --type-body-weight: 400;
+    --type-label-weight: 700;
+
+    --type-display-line-height: 1.12;
+    --type-title-line-height: 1.25;
+    --type-body-line-height: 1.6;
+    --type-caption-line-height: 1.45;
+}
+
 body {
     margin: 0;
     background: #f8fafc;
     color: #222222;
-    font-family: var(--font-noto-sans-cjk), sans-serif;
+    font-family: var(--font-body);
+    font-size: var(--type-body-size);
+    line-height: var(--type-body-line-height);
     transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+h1 {
+    font-family: var(--font-display);
+}
+
+h2,
+h3 {
+    font-family: var(--font-title);
+}
+
+:is(p, li, label, input, textarea, select, button, a) {
+    font-family: var(--font-body);
 }
 
 html.dark body {
@@ -221,26 +259,59 @@ html:not(.dark) :is(.text-black, .text-slate-900, .text-slate-950) {
 }
 
 main {
-    font-size: 0.95rem;
+    font-size: inherit;
 }
 
-main h1[class] {
-    font-size: clamp(1.65rem, 3.2vw, 2.25rem);
-    letter-spacing: 0;
+.type-display {
+    font-family: var(--font-display);
+    font-size: var(--type-display-size);
+    font-weight: var(--type-display-weight);
+    line-height: var(--type-display-line-height);
+    letter-spacing: -0.03em;
 }
 
-main h2[class] {
-    font-size: clamp(1.35rem, 2.4vw, 1.9rem);
-    letter-spacing: 0;
+.type-title-lg {
+    font-family: var(--font-title);
+    font-size: var(--type-title-lg-size);
+    font-weight: var(--type-title-weight);
+    line-height: var(--type-title-line-height);
+    letter-spacing: -0.02em;
 }
 
-main h3[class] {
-    font-size: clamp(1.08rem, 1.8vw, 1.35rem);
-    letter-spacing: 0;
+.type-title-md {
+    font-family: var(--font-title);
+    font-size: var(--type-title-md-size);
+    font-weight: var(--type-title-weight);
+    line-height: var(--type-title-line-height);
+    letter-spacing: -0.01em;
 }
 
-main :is(p, li, label, input, textarea, select, button, a)[class] {
-    font-size: clamp(0.78rem, 1em, 0.95rem);
+.type-body {
+    font-family: var(--font-body);
+    font-size: var(--type-body-size);
+    font-weight: var(--type-body-weight);
+    line-height: var(--type-body-line-height);
+}
+
+.type-body-sm {
+    font-family: var(--font-body);
+    font-size: var(--type-body-sm-size);
+    font-weight: var(--type-body-weight);
+    line-height: var(--type-body-line-height);
+}
+
+.type-label {
+    font-family: var(--font-body);
+    font-size: var(--type-body-sm-size);
+    font-weight: var(--type-label-weight);
+    line-height: var(--type-caption-line-height);
+}
+
+.type-caption {
+    font-family: var(--font-body);
+    font-size: var(--type-caption-size);
+    font-weight: var(--type-label-weight);
+    line-height: var(--type-caption-line-height);
 }
 
 main :is(section, article, div)[class*="rounded-[32px]"],
@@ -277,16 +348,10 @@ main :is(section, article, div)[class~="p-6"] {
 }
 
 @media (max-width: 639px) {
-    main {
-        font-size: 0.93rem;
-    }
-
-    main h1[class] {
-        font-size: clamp(1.45rem, 7vw, 1.9rem);
-    }
-
-    main h2[class] {
-        font-size: clamp(1.25rem, 6vw, 1.6rem);
+    :root {
+        --type-display-size: clamp(1.45rem, 7vw, 1.9rem);
+        --type-title-lg-size: clamp(1.25rem, 6vw, 1.6rem);
+        --type-body-size: 0.93rem;
     }
 
     main :is(section, article, div)[class~="p-8"],

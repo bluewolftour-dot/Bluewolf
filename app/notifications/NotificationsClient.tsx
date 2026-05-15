@@ -75,7 +75,7 @@ export function NotificationsClient() {
                 <header className="mb-10 flex items-end justify-between px-4 sm:px-0">
                     <div>
                         <p className="text-sm font-black text-blue-500">Notifications</p>
-                        <h1 className="mt-2 text-4xl font-black tracking-tight">알림 센터</h1>
+                        <h1 className="type-display mt-2">알림 센터</h1>
                     </div>
                     {user && notifications.some((n) => !n.isRead) && (
                         <button
@@ -121,7 +121,7 @@ export function NotificationsClient() {
                                     <span className="absolute right-6 top-6 size-2 rounded-full bg-blue-600 shadow-[0_0_8px_rgba(37,99,235,0.6)]" />
                                 )}
                                 <div className="flex flex-col gap-1">
-                                    <h3 className="text-lg font-black">{n.title[lang as keyof typeof n.title]}</h3>
+                                    <h3 className="type-title-md">{n.title[lang as keyof typeof n.title]}</h3>
                                     <p className={`mt-1 text-sm leading-7 ${strongMuted(isDark)}`}>
                                         {n.content[lang as keyof typeof n.content]}
                                     </p>

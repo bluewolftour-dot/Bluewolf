@@ -103,7 +103,7 @@ function PaymentSuccessContent() {
                 <div className="inline-flex rounded-full bg-blue-50 px-4 py-1.5 text-sm font-bold text-blue-600">
                     {pick(lang, "결제 확인 중", "決済確認中", "Confirming payment")}
                 </div>
-                <h1 className={`mt-4 text-3xl font-black ${isDark ? "text-white" : "text-slate-900"}`}>
+                <h1 className={`type-display mt-4 ${isDark ? "text-white" : "text-slate-900"}`}>
                     {pick(lang, "결제를 확인하고 있어요", "決済内容を確認しています", "We're confirming your payment")}
                 </h1>
                 <p className={`mx-auto mt-3 max-w-xl text-sm sm:text-base ${isDark ? "text-slate-400" : "text-slate-500"}`}>
@@ -124,7 +124,7 @@ function PaymentSuccessContent() {
                 <div className="inline-flex rounded-full bg-red-50 px-4 py-1.5 text-sm font-bold text-red-600">
                     {pick(lang, "결제 실패", "決済失敗", "Payment failed")}
                 </div>
-                <h1 className={`mt-4 text-3xl font-black ${isDark ? "text-white" : "text-slate-900"}`}>
+                <h1 className={`type-display mt-4 ${isDark ? "text-white" : "text-slate-900"}`}>
                     {pick(lang, "승인 중 문제가 발생했습니다", "承認中に問題が発生しました", "We couldn't confirm the payment")}
                 </h1>
                 <p className={`mx-auto mt-3 max-w-xl text-sm sm:text-base ${isDark ? "text-slate-400" : "text-slate-500"}`}>
@@ -145,7 +145,7 @@ function PaymentSuccessContent() {
             <div className="inline-flex rounded-full bg-emerald-50 px-4 py-1.5 text-sm font-bold text-emerald-600">
                 {pick(lang, "플랜 패키지 결제 완료", "プランパッケージ決済完了", "Plan package payment completed")}
             </div>
-            <h1 className={`mt-4 text-3xl font-black ${isDark ? "text-white" : "text-slate-900"}`}>
+            <h1 className={`type-display mt-4 ${isDark ? "text-white" : "text-slate-900"}`}>
                 {pick(lang, "BlueWolf Mongolia 검토 중입니다", "BlueWolf Mongolia 確認中です", "BlueWolf Mongolia is reviewing your request")}
             </h1>
             <p className={`mx-auto mt-3 max-w-xl text-sm sm:text-base ${isDark ? "text-slate-400" : "text-slate-500"}`}>

@@ -529,7 +529,7 @@ export function TourCustomizeCmsEditor({
         <div className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                    <h2 className="text-2xl font-black tracking-tight">
+                    <h2 className="type-title-lg">
                         여행지 리스트 / 예상 시작 금액
                     </h2>
                     <p className={`mt-1 text-sm ${mutedTone}`}>
@@ -635,7 +635,7 @@ export function TourCustomizeCmsEditor({
                                     <div className="border-t border-current/10 px-5 pb-5 pt-5 sm:px-6 sm:pb-6">
                                         <div className="flex flex-wrap items-start justify-between gap-3">
                                             <div>
-                                                <h3 className="text-lg font-black">
+                                                <h3 className="type-title-md">
                                                     {regionMeta.label} 여행지 관리
                                                 </h3>
                                                 <p className={`mt-1 text-sm ${mutedTone}`}>
@@ -725,7 +725,7 @@ export function TourCustomizeCmsEditor({
 
                                         <div className="mt-8 flex flex-wrap items-start justify-between gap-3 border-t border-current/10 pt-6">
                                             <div>
-                                                <h3 className="text-lg font-black">
+                                                <h3 className="type-title-md">
                                                     {regionMeta.label} 액티비티 관리
                                                 </h3>
                                                 <p className={`mt-1 text-sm ${mutedTone}`}>

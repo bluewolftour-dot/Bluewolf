@@ -59,7 +59,7 @@ function RegionSelector({
             }`}
         >
             <h1
-                className={`flex items-center gap-2 !text-[23px] font-black tracking-tight sm:!text-xl lg:!text-2xl ${
+                className={`type-title-lg flex items-center gap-2 ${
                     isDark ? "text-white" : "text-slate-900"
                 }`}
             >

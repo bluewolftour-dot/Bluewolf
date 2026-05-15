@@ -189,7 +189,7 @@ export function CmsUnsavedChangesGuard({
                         : "translate-y-4 scale-[0.96] opacity-0"
                 }`}
             >
-                <h2 id="cms-unsaved-title" className="text-2xl font-black tracking-tight">
+                <h2 id="cms-unsaved-title" className="type-title-lg">
                     저장되지 않은 변경 사항이 있어요
                 </h2>
                 <p

@@ -47,7 +47,7 @@ function SearchContent() {
         <>
             <section className={`rounded-[32px] border p-8 ${panel}`}>
                 <p className="text-sm font-black text-blue-500">Search</p>
-                <h1 className={`mt-2 text-3xl font-black ${isDark ? "text-white" : "text-slate-950"}`}>통합 검색</h1>
+                <h1 className={`type-display mt-2 ${isDark ? "text-white" : "text-slate-950"}`}>통합 검색</h1>
                 <input
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
@@ -61,7 +61,7 @@ function SearchContent() {
                 {results.map((item, index) => (
                     <Link key={`${item.type}-${index}`} href={withLocaleQuery(item.href, lang)} className={`rounded-[24px] border p-5 transition hover:border-blue-400 ${card}`}>
                         <p className="text-xs font-black text-blue-500">{item.type}</p>
-                        <h2 className={`mt-1 text-lg font-black ${isDark ? "text-white" : "text-slate-950"}`}>{item.title}</h2>
+                        <h2 className={`type-title-md mt-1 ${isDark ? "text-white" : "text-slate-950"}`}>{item.title}</h2>
                         <p className={`mt-2 line-clamp-2 text-sm leading-6 ${isDark ? "text-slate-400" : "text-slate-600"}`}>{item.body}</p>
                     </Link>
                 ))}

@@ -67,7 +67,7 @@ export function TourCmsOverview({
     return (
         <div className="space-y-6">
             <div>
-                <h2 className="text-2xl font-black tracking-tight">투어상품 관리</h2>
+                <h2 className="type-title-lg">투어상품 관리</h2>
                 <p className={`mt-1 text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                     지역별 상품 편집 화면으로 이동해서 상품을 추가, 삭제, 수정할 수 있습니다.
                 </p>

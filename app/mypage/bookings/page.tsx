@@ -346,7 +346,7 @@ function MemberBookingsContent() {
                 <p className="inline-flex items-center rounded-full bg-blue-600/10 px-3 py-1 text-xs font-black text-blue-600">
                     {c.userBadge}
                 </p>
-                <h1 className={`mt-3 text-3xl font-black ${textMain}`}>{c.title}</h1>
+                <h1 className={`type-display mt-3 ${textMain}`}>{c.title}</h1>
                 <p className={`mt-3 ${textMuted}`}>{c.loginRequired}</p>
                 <Link
                     href={withLocaleQuery("/login", lang)}
@@ -680,7 +680,7 @@ function BookingCard({
                 </div>
 
                 <div className="grid gap-2">
-                    <h3 className={`text-xl font-black tracking-tight ${textMain}`}>{title}</h3>
+                    <h3 className={`type-title-md ${textMain}`}>{title}</h3>
                     <div className={`flex flex-wrap items-center gap-x-4 gap-y-1 text-sm ${textSubtle}`}>
                         <span>
                             <span className={textMuted}>{c.departLabel}</span>{" "}
@@ -870,7 +870,7 @@ function ReceiptModal({
                         <p className="inline-flex items-center rounded-full bg-blue-600/10 px-3 py-1 text-xs font-black text-blue-600">
                             {c.receiptTitle}
                         </p>
-                        <h2 id="receipt-modal-title" className={`mt-3 text-2xl font-black tracking-tight ${textMain}`}>
+                        <h2 id="receipt-modal-title" className={`type-title-lg mt-3 ${textMain}`}>
                             {title}
                         </h2>
                     </div>
@@ -1130,7 +1130,7 @@ function CancelModal({
                                 <p className="inline-flex items-center rounded-full bg-red-500/10 px-3 py-1 text-xs font-black text-red-600">
                                     {c.cancelModalTitle}
                                 </p>
-                                <h2 id="cancel-modal-title" className={`mt-3 text-2xl font-black tracking-tight ${textMain}`}>
+                                <h2 id="cancel-modal-title" className={`type-title-lg mt-3 ${textMain}`}>
                                     {title}
                                 </h2>
                                 <p className={`mt-1 text-xs ${textMuted}`}>

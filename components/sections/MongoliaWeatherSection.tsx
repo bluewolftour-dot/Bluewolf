@@ -185,7 +185,7 @@ export function MongoliaWeatherSection({ isDark, lang }: { isDark: boolean; lang
                         <p className={`text-xs font-black uppercase tracking-[0.18em] ${isDark ? "text-blue-300" : "text-blue-600"}`}>
                             {text.eyebrow}
                         </p>
-                        <h2 className={`mt-2 text-xl font-black tracking-tight sm:text-2xl ${isDark ? "text-white" : "text-slate-950"}`}>
+                        <h2 className={`type-title-md mt-2 ${isDark ? "text-white" : "text-slate-950"}`}>
                             {text.title}
                         </h2>
                         <p className={`mt-2 max-w-2xl text-sm font-semibold leading-relaxed ${isDark ? "text-slate-300" : "text-slate-600"}`}>

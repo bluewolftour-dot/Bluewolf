@@ -170,7 +170,7 @@ export function HomeCmsSectionEditor({
     if (section === "hero") {
         return (
             <div className={`rounded-[24px] border p-5 ${panelTone}`}>
-                <h3 className="text-lg font-black">{homeCmsSectionMeta.hero.title}</h3>
+                <h3 className="type-title-md">{homeCmsSectionMeta.hero.title}</h3>
                 <p className={`mt-1 text-sm ${mutedTone}`}>{homeCmsSectionMeta.hero.description}</p>
                 <LocaleTabs activeLocale={activeLocale} onChange={setActiveLocale} isDark={isDark} />
 
@@ -258,7 +258,7 @@ export function HomeCmsSectionEditor({
 
     return (
         <div className={`rounded-[24px] border p-5 ${panelTone}`}>
-            <h3 className="text-lg font-black">{homeCmsSectionMeta.promo.title}</h3>
+            <h3 className="type-title-md">{homeCmsSectionMeta.promo.title}</h3>
             <p className={`mt-1 text-sm ${mutedTone}`}>{homeCmsSectionMeta.promo.description}</p>
             <LocaleTabs activeLocale={activeLocale} onChange={setActiveLocale} isDark={isDark} />
 

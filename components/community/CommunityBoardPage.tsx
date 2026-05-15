@@ -1015,7 +1015,7 @@ export function CommunityBoardPage({ board, referenceNowKst }: { board: Communit
                         <p className={`text-sm font-bold ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                             {displayCopy.sectionLabel}
                         </p>
-                        <h1 className={`mt-1 text-2xl font-black tracking-tight sm:text-3xl ${isDark ? "text-white" : "text-slate-900"}`}>
+                        <h1 className={`type-display mt-1 ${isDark ? "text-white" : "text-slate-900"}`}>
                             {displayCopy.title[board]}
                         </h1>
                         <p className={`mt-2 text-sm sm:text-base ${isDark ? "text-slate-300" : "text-slate-600"}`}>

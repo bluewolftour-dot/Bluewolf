@@ -234,7 +234,7 @@ function SignupContent() {
     return (
         <PageShell activeKey="home">
             <section className="mx-auto w-full max-w-3xl rounded-[28px] border border-slate-200 bg-white p-6 text-slate-900 shadow-sm sm:p-8">
-                <h1 className="text-3xl font-black tracking-tight sm:text-4xl">{t.signupTitle}</h1>
+                <h1 className="type-display">{t.signupTitle}</h1>
                 <p className="mt-3 text-sm leading-7 text-slate-500 sm:text-base">{t.signupDesc}</p>
 
                 <form className="mt-8 flex flex-col gap-5" onSubmit={(event) => void handleSubmit(event)}>

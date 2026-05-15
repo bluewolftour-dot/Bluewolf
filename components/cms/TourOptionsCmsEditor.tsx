@@ -251,7 +251,7 @@ export function TourOptionsCmsEditor({
         <div className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                    <h2 className="text-2xl font-black tracking-tight">추가옵션 설정</h2>
+                    <h2 className="type-title-lg">추가옵션 설정</h2>
                     <p className={`mt-1 text-sm ${mutedTone}`}>
                         가격을 조정하고, 추가옵션 문구와 이미지 구성을 관리할 수 있습니다.
                     </p>

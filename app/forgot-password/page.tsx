@@ -211,7 +211,7 @@ function ForgotPasswordContent() {
     return (
         <PageShell activeKey="home">
             <section className="mx-auto w-full max-w-3xl rounded-[28px] border border-slate-200 bg-white p-6 text-slate-900 shadow-sm sm:p-8">
-                <h1 className="text-3xl font-black tracking-tight sm:text-4xl">{t.forgotTitle}</h1>
+                <h1 className="type-display">{t.forgotTitle}</h1>
                 <p className="mt-3 text-sm leading-7 text-slate-500 sm:text-base">{t.forgotDesc}</p>
 
                 <ol className="mt-6 grid gap-2 text-xs font-bold sm:grid-cols-3">

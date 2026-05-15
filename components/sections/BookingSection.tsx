@@ -78,7 +78,7 @@ export function ApplicationSection({
                     isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"
                 }`}
             >
-                <h2 className={`text-2xl font-black tracking-tight sm:text-3xl ${isDark ? "text-white" : "text-slate-900"}`}>
+                <h2 className={`type-title-lg ${isDark ? "text-white" : "text-slate-900"}`}>
                     {t.applicationTitle}
                 </h2>
                 <p className={`mt-3 text-sm leading-7 sm:text-base ${isDark ? "text-slate-300" : "text-slate-500"}`}>
@@ -255,7 +255,7 @@ export function ApplicationSection({
                 </div>
 
                 <div className="mt-5 sm:mt-6">
-                    <h3 className={`text-2xl font-black tracking-tight sm:text-3xl ${isDark ? "text-white" : "text-slate-900"}`}>
+                    <h3 className={`type-title-lg ${isDark ? "text-white" : "text-slate-900"}`}>
                         {selectedPlan.title[lang]}
                     </h3>
                     <p className={`mt-3 text-sm leading-7 sm:text-base ${isDark ? "text-slate-300" : "text-slate-500"}`}>
