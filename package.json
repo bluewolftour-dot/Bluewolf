@@ -12,6 +12,7 @@
     "export:supabase": "node scripts/export-supabase-seed.mjs"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "next": "16.2.0",
     "nodemailer": "^8.0.5",
     "react": "19.2.4",
