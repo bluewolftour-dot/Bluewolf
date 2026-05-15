@@ -1,8 +1,8 @@
 import FAQClient from "./FAQClient";
 
 export const metadata = {
-    title: "FAQ | BlueWolf",
-    description: "BlueWolf 자주 묻는 질문",
+    title: "고객센터 | BlueWolf",
+    description: "BlueWolf 고객센터",
 };
 
 export default function FaqPage() {

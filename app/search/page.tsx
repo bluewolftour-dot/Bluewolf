@@ -38,7 +38,12 @@ function SearchContent() {
 
         const faqResults = faq[lang]
             .filter(([question, answer]) => `${question} ${answer}`.toLowerCase().includes(q))
-            .map(([question, answer]) => ({ type: "FAQ", title: question, body: answer, href: "/faq" }));
+            .map(([question, answer]) => ({
+                type: lang === "ko" ? "고객센터" : lang === "ja" ? "サポート" : "Support",
+                title: question,
+                body: answer,
+                href: "/faq",
+            }));
 
         return [...tourResults, ...communityResults, ...faqResults];
     }, [communityContent.items, lang, q, tourItems]);
@@ -51,7 +56,7 @@ function SearchContent() {
                 <input
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
-                    placeholder="상품, 공지, FAQ, 커뮤니티를 검색하세요"
+                    placeholder="상품, 공지, 고객센터, 커뮤니티를 검색하세요"
                     className={`mt-6 h-14 w-full rounded-2xl border px-5 text-base font-bold outline-none transition focus:border-blue-400 ${
                         isDark ? "border-white/10 bg-slate-950 text-white" : "border-slate-200 bg-white text-slate-950"
                     }`}

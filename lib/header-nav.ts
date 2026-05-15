@@ -17,9 +17,9 @@ export type HeaderNavItem = {
 };
 
 const fixedHeaderLabel = {
-    ko: { home: "홈", contact: "문의" },
-    ja: { home: "ホーム", contact: "お問い合わせ" },
-    en: { home: "Home", contact: "Contact" },
+    ko: { home: "홈" },
+    ja: { home: "ホーム" },
+    en: { home: "Home" },
 } as const;
 
 export function buildHeaderNav({
@@ -42,6 +42,5 @@ export function buildHeaderNav({
         { key: "booking", href: bookingHref, label: t.navBooking ?? t.navApplication ?? "Booking" },
         { key: "community", href: withLocaleQuery("/community", locale), label: t.navCommunity },
         { key: "faq", href: withLocaleQuery("/faq", locale), label: t.navFaq },
-        { key: "contact", href: withLocaleQuery("/contact", locale), label: fixed.contact },
     ];
 }

@@ -909,7 +909,7 @@ function TourDetailContent() {
                                     {lang === "ko" ? "플랜 신청하기" : lang === "ja" ? "プラン申請する" : "Apply for this plan"}
                                 </Link>
                                 <Link
-                                    href={withLocaleQuery("/contact", lang)}
+                                    href={withLocaleQuery("/faq#contact-support", lang)}
                                     className={`flex items-center justify-center rounded-[18px] border px-5 py-3.5 text-sm font-bold transition-[transform,background-color] duration-700 ease-in-out active:scale-[0.97] active:translate-y-0 ${
                                         isDark
                                             ? "border-white/10 bg-slate-800 text-slate-100 hover:bg-slate-700"
@@ -1125,7 +1125,7 @@ function TourDetailContent() {
                                     {t.reserve}
                                 </Link>
                                 <Link
-                                    href={withLocaleQuery("/contact", lang)}
+                                    href={withLocaleQuery("/faq#contact-support", lang)}
                                     className={`flex items-center justify-center rounded-[18px] border px-5 py-3.5 text-sm font-bold transition-[transform,background-color] duration-700 ease-in-out active:scale-[0.97] active:translate-y-0 ${
                                         isDark
                                             ? "border-white/10 bg-slate-800 text-slate-100 hover:bg-slate-700"

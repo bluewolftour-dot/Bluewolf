@@ -14,7 +14,7 @@ import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
 import { useTheme } from "@/app/theme";
 import { useAuth } from "@/components/auth/AuthProvider";
 
-export type PageKey = "none" | "home" | "about" | "tours" | "booking" | "community" | "faq" | "contact";
+export type PageKey = "none" | "home" | "about" | "tours" | "booking" | "community" | "faq";
 
 type CopyValue = (typeof copy)[Locale];
 

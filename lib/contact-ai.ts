@@ -520,14 +520,14 @@ function buildCommunityReply(locale: Locale) {
 
 function buildFaqReply(locale: Locale) {
     if (locale === "ja") {
-        return [`よくある質問は FAQ ページで確認できます。`, localizePathLabel(locale, "/faq")].join("\n");
+        return [`よくある質問はサポートページで確認できます。`, localizePathLabel(locale, "/faq")].join("\n");
     }
 
     if (locale === "en") {
-        return [`You can check common questions on the FAQ page.`, localizePathLabel(locale, "/faq")].join("\n");
+        return [`You can check common questions in the Support Center.`, localizePathLabel(locale, "/faq")].join("\n");
     }
 
-    return [`자주 묻는 질문은 FAQ 페이지에서 확인하실 수 있어요.`, localizePathLabel(locale, "/faq")].join("\n");
+    return [`자주 묻는 질문은 고객센터에서 확인하실 수 있어요.`, localizePathLabel(locale, "/faq")].join("\n");
 }
 
 function buildFallbackReply(knowledge: ContactAssistantKnowledge) {

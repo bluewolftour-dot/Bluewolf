@@ -1686,7 +1686,7 @@ function CommunityContent() {
                     </div>
                 )}
 
-                {/* FAQ 링크 */}
+                {/* 고객센터 링크 */}
                 <div className={`order-5 animate-fade-up ${sectionBase} p-5 sm:p-6`} style={{ animationDelay: "240ms" }}>
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -1695,7 +1695,7 @@ function CommunityContent() {
                             </span>
                             <div>
                                 <p className={`text-sm font-black ${isDark ? "text-white" : "text-slate-900"}`}>
-                                    {lang === "ko" ? "자주 묻는 질문" : lang === "ja" ? "よくある質問" : "FAQ"}
+                                    {lang === "ko" ? "고객센터" : lang === "ja" ? "サポート" : "Support"}
                                 </p>
                                 <p className={`text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                                     {lang === "ko" ? "공식 답변을 한눈에 확인하세요." : lang === "ja" ? "公式回答を確認できます。" : "Find official answers quickly."}
@@ -1708,7 +1708,7 @@ function CommunityContent() {
                                 isDark ? "bg-slate-800 text-slate-100 hover:bg-slate-700" : "bg-slate-100 text-slate-900 hover:bg-slate-200"
                             }`}
                         >
-                            {lang === "ko" ? "FAQ 보기 →" : lang === "ja" ? "FAQ一覧 →" : "View FAQ →"}
+                            {lang === "ko" ? "고객센터 보기 →" : lang === "ja" ? "サポートを見る →" : "View support →"}
                         </Link>
                     </div>
                 </div>

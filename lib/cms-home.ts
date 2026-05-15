@@ -31,8 +31,7 @@ export const cmsInternalLinkOptions = [
     { value: "/tours", label: "투어상품" },
     { value: "/booking", label: "예약" },
     { value: "/community", label: "커뮤니티" },
-    { value: "/faq", label: "FAQ" },
-    { value: "/contact", label: "문의" },
+    { value: "/faq", label: "고객센터" },
     { value: "/about", label: "About" },
 ] as const;
 

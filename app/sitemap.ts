@@ -17,7 +17,6 @@ const staticRoutes = [
     "/community/qna",
     "/community/notices",
     "/faq",
-    "/contact",
     "/guides",
     "/policies",
     "/search",

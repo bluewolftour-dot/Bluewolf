@@ -33,7 +33,7 @@ export const faq = {
         ],
         [
             "[결제] 영수증·세금계산서 발급이 가능한가요?",
-            "신용카드 매출전표는 결제 즉시 발급되며, 추가로 현금영수증 또는 세금계산서가 필요하신 경우 문의 페이지에서 사업자/개인 정보와 함께 요청해 주세요.",
+            "신용카드 매출전표는 결제 즉시 발급되며, 추가로 현금영수증 또는 세금계산서가 필요하신 경우 고객센터에서 사업자/개인 정보와 함께 요청해 주세요.",
         ],
 
         // 출발 준비
@@ -183,7 +183,7 @@ export const faq = {
         ],
         [
             "[Payment] Can you issue receipts or tax invoices?",
-            "Card receipts are issued instantly at payment. For cash receipts or tax invoices, contact us through the inquiry page with your business or personal information and we will follow up.",
+            "Card receipts are issued instantly at payment. For cash receipts or tax invoices, contact us through Support with your business or personal information and we will follow up.",
         ],
 
         // Pre-departure

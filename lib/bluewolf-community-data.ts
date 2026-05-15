@@ -374,8 +374,8 @@ export const communityNotices: Record<Locale, CommunityNotice[]> = {
         },
         {
             id: 2,
-            title: "자주 묻는 질문은 FAQ에서 먼저 확인하실 수 있어요",
-            summary: "비자, 결제, 준비물, 환불 규정 같은 기본 문의는 FAQ에 정리되어 있어 빠르게 확인하실 수 있습니다.",
+            title: "기본 문의는 고객센터에서 먼저 확인하실 수 있어요",
+            summary: "비자, 결제, 준비물, 환불 규정 같은 기본 안내는 고객센터에 정리되어 있어 빠르게 확인하실 수 있습니다.",
             date: "2026-03-28",
             href: "/faq",
         },
@@ -388,10 +388,10 @@ export const communityNotices: Record<Locale, CommunityNotice[]> = {
         },
         {
             id: 4,
-            title: "상담 문의는 커뮤니티보다 문의 페이지가 더 빨라요",
-            summary: "견적, 단체 문의, 맞춤 일정 상담은 문의 페이지를 이용하시면 운영팀이 더 빠르게 확인해드립니다.",
+            title: "상담 문의는 커뮤니티보다 고객센터가 더 빨라요",
+            summary: "견적, 단체 문의, 맞춤 일정 상담은 고객센터를 이용하시면 운영팀이 더 빠르게 확인해드립니다.",
             date: "2026-03-20",
-            href: "/contact",
+            href: "/faq#contact-support",
         },
     ],
     ja: [
@@ -404,8 +404,8 @@ export const communityNotices: Record<Locale, CommunityNotice[]> = {
         },
         {
             id: 2,
-            title: "よくある質問はFAQで先に確認できます",
-            summary: "ビザ、決済、持ち物、返金規定などの基本的な案内はFAQで素早く確認できます。",
+            title: "基本的な案内はサポートで先に確認できます",
+            summary: "ビザ、決済、持ち物、返金規定などの案内はサポートで素早く確認できます。",
             date: "2026-03-28",
             href: "/faq",
         },
@@ -421,7 +421,7 @@ export const communityNotices: Record<Locale, CommunityNotice[]> = {
             title: "個別相談はお問い合わせページの方が早くご案内できます",
             summary: "見積もり、団体旅行、オーダーメイド相談はお問い合わせページから送っていただくと運営チームがより早く確認できます。",
             date: "2026-03-20",
-            href: "/contact",
+            href: "/faq#contact-support",
         },
     ],
     en: [
@@ -434,8 +434,8 @@ export const communityNotices: Record<Locale, CommunityNotice[]> = {
         },
         {
             id: 2,
-            title: "You can check common questions in the FAQ first",
-            summary: "Core topics like visas, payment, packing, and refund policy are already organized in the FAQ.",
+            title: "You can check common questions in Support first",
+            summary: "Core topics like visas, payment, packing, and refund policy are already organized in Support.",
             date: "2026-03-28",
             href: "/faq",
         },
@@ -448,10 +448,10 @@ export const communityNotices: Record<Locale, CommunityNotice[]> = {
         },
         {
             id: 4,
-            title: "For custom planning, the contact page is the fastest route",
-            summary: "For quotes, group trips, and custom itinerary requests, please use the contact page so our team can respond more quickly.",
+            title: "For custom planning, Support is the fastest route",
+            summary: "For quotes, group trips, and custom itinerary requests, please use Support so our team can respond more quickly.",
             date: "2026-03-20",
-            href: "/contact",
+            href: "/faq#contact-support",
         },
     ],
 };
