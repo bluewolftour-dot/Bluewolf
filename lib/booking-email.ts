@@ -1,5 +1,14 @@
 ﻿import nodemailer from "nodemailer";
 
+import {
+    createMailTransporter,
+    getMailConfig,
+    hasMailConfig,
+    type MailProfile,
+} from "@/lib/mail-config";
+
+void nodemailer;
+
 type BookingEmailLocale = "ko" | "ja" | "en";
 type BookingEmailStatus = "pending" | "confirmed";
 
@@ -54,42 +63,8 @@ function resolveLocale(locale: string): BookingEmailLocale {
     return "ko";
 }
 
-function getSmtpConfig() {
-    const host = process.env.SMTP_HOST?.trim() || "smtp.gmail.com";
-    const port = Number(process.env.SMTP_PORT ?? 465);
-    const user = process.env.SMTP_USER?.trim() ?? "";
-    const pass = process.env.SMTP_PASS?.trim() ?? "";
-    const from = process.env.SMTP_FROM?.trim() || user;
-    const secureEnv = process.env.SMTP_SECURE?.trim() ?? "";
-    const secure = secureEnv ? secureEnv.toLowerCase() === "true" : port === 465;
-
-    return {
-        host,
-        port,
-        user,
-        pass,
-        from,
-        secure,
-    };
-}
-
-export function hasBookingEmailConfig() {
-    const config = getSmtpConfig();
-    return Boolean(config.host && config.port && config.user && config.pass && config.from);
-}
-
-function createTransporter() {
-    const config = getSmtpConfig();
-
-    return nodemailer.createTransport({
-        host: config.host,
-        port: config.port,
-        secure: config.secure,
-        auth: {
-            user: config.user,
-            pass: config.pass,
-        },
-    });
+export function hasBookingEmailConfig(profile: MailProfile = "kr") {
+    return hasMailConfig(profile);
 }
 
 function pickStatusCopy(locale: BookingEmailLocale, status: BookingEmailStatus): BookingStatusEmailCopy {
@@ -246,19 +221,25 @@ function buildEmailShell(heading: string, intro: string, details: Array<[string,
     };
 }
 
-async function sendEmail(to: string, subject: string, html: string, text: string): Promise<MailResult> {
+async function sendEmail(
+    profile: MailProfile,
+    to: string,
+    subject: string,
+    html: string,
+    text: string
+): Promise<MailResult> {
     const email = to.trim();
 
     if (!email) {
         return { sent: false, reason: "missing_email" };
     }
 
-    if (!hasBookingEmailConfig()) {
+    if (!hasBookingEmailConfig(profile)) {
         return { sent: false, reason: "smtp_not_configured" };
     }
 
-    const config = getSmtpConfig();
-    const transporter = createTransporter();
+    const config = getMailConfig(profile);
+    const transporter = createMailTransporter(profile);
 
     await transporter.sendMail({
         from: config.from,
@@ -274,6 +255,7 @@ async function sendEmail(to: string, subject: string, html: string, text: string
 export async function sendBookingConfirmationEmail(input: BookingEmailInput): Promise<MailResult> {
     const locale = resolveLocale(input.locale);
     const copy = pickStatusCopy(locale, input.status);
+    const profile: MailProfile = input.status === "confirmed" ? "mongolia" : "kr";
     const { html, text } = buildEmailShell(
         copy.heading,
         copy.intro,
@@ -286,7 +268,7 @@ export async function sendBookingConfirmationEmail(input: BookingEmailInput): Pr
         copy.footer
     );
 
-    return sendEmail(input.email, copy.subject, html, text);
+    return sendEmail(profile, input.email, copy.subject, html, text);
 }
 
 export async function sendBookingCancellationEmail(
@@ -309,5 +291,5 @@ export async function sendBookingCancellationEmail(
         copy.footer
     );
 
-    return sendEmail(input.email, copy.subject, html, text);
+    return sendEmail("kr", input.email, copy.subject, html, text);
 }

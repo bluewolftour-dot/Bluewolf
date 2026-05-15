@@ -1,7 +1,7 @@
 import { randomBytes, randomInt } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import nodemailer from "nodemailer";
+import { createMailTransporter, getMailConfig, hasMailConfig } from "@/lib/mail-config";
 import {
     isSupabaseDatabaseEnabled,
     supabaseDelete,
@@ -100,28 +100,8 @@ function pruneRecords(records: EmailVerificationRecord[]) {
     });
 }
 
-function getSmtpConfig() {
-    const host = process.env.SMTP_HOST?.trim() || "smtp.gmail.com";
-    const port = Number(process.env.SMTP_PORT ?? 465);
-    const user = process.env.SMTP_USER?.trim() ?? "";
-    const pass = process.env.SMTP_PASS?.trim() ?? "";
-    const from = process.env.SMTP_FROM?.trim() || user;
-    const secureEnv = process.env.SMTP_SECURE?.trim() ?? "";
-    const secure = secureEnv ? secureEnv.toLowerCase() === "true" : port === 465;
-
-    return {
-        host,
-        port,
-        user,
-        pass,
-        from,
-        secure,
-    };
-}
-
 function hasVerificationMailConfig() {
-    const config = getSmtpConfig();
-    return Boolean(config.host && config.user && config.pass && config.from);
+    return hasMailConfig("kr");
 }
 
 function createCode() {
@@ -164,17 +144,9 @@ async function sendVerificationMail(email: string, code: string, locale: Verific
         throw new Error("SMTP_NOT_CONFIGURED");
     }
 
-    const config = getSmtpConfig();
+    const config = getMailConfig("kr");
     const copy = getCopy(locale);
-    const transporter = nodemailer.createTransport({
-        host: config.host,
-        port: config.port,
-        secure: config.secure,
-        auth: {
-            user: config.user,
-            pass: config.pass,
-        },
-    });
+    const transporter = createMailTransporter("kr");
 
     await transporter.sendMail({
         from: config.from,
