@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { readOptionalEnv, readRequiredEnv } from "@/lib/env";
 import { isSupabaseUploadStorageEnabled } from "@/lib/upload-storage";
 
@@ -34,6 +36,18 @@ function getCacheRevalidateSeconds() {
     return Number.isFinite(seconds) && seconds > 0 ? Math.floor(seconds) : 3600;
 }
 
+async function getNullImageResponse() {
+    const file = await readFile(path.join(process.cwd(), "public", "images", "null.png"));
+
+    return new Response(new Uint8Array(file), {
+        status: 200,
+        headers: {
+            "Content-Type": "image/png",
+            "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+        },
+    });
+}
+
 export async function GET(_request: Request, context: { params: Promise<{ path?: string[] }> }) {
     const params = await context.params;
     const pathParts = params.path ?? [];
@@ -43,7 +57,7 @@ export async function GET(_request: Request, context: { params: Promise<{ path?:
     }
 
     if (!isSupabaseUploadStorageEnabled()) {
-        return NextResponse.json({ error: "UPLOAD_NOT_FOUND" }, { status: 404 });
+        return getNullImageResponse();
     }
 
     const supabaseUrl = readRequiredEnv("SUPABASE_URL").replace(/\/+$/, "");
@@ -60,7 +74,7 @@ export async function GET(_request: Request, context: { params: Promise<{ path?:
     });
 
     if (!response.ok || !response.body) {
-        return NextResponse.json({ error: "UPLOAD_NOT_FOUND" }, { status: response.status === 404 ? 404 : 502 });
+        return getNullImageResponse();
     }
 
     const decodedObjectPath = pathParts.join("/");

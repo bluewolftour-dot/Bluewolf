@@ -160,7 +160,7 @@ function PaymentContent() {
     const [email, setEmail] = useState("");
     const [departDate, setDepartDate] = useState("");
     const [memo, setMemo] = useState("");
-    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
+    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("bank");
     const [simpleProvider, setSimpleProvider] = useState<SimpleProvider>("toss");
     const [error, setError] = useState("");
     const [submitting, setSubmitting] = useState(false);
@@ -193,7 +193,7 @@ function PaymentContent() {
                 setEmail("");
                 setDepartDate("");
                 setMemo("");
-                setPaymentMethod("card");
+                setPaymentMethod("bank");
                 setSimpleProvider("toss");
                 setDraftReady(true);
                 return;
@@ -206,9 +206,11 @@ function PaymentContent() {
             setDepartDate(typeof parsed.departDate === "string" ? parsed.departDate : "");
             setMemo(typeof parsed.memo === "string" ? parsed.memo : "");
             setPaymentMethod(
-                typeof parsed.paymentMethod === "string" && isPaymentMethod(parsed.paymentMethod)
+                typeof parsed.paymentMethod === "string" &&
+                    isPaymentMethod(parsed.paymentMethod) &&
+                    parsed.paymentMethod === "bank"
                     ? parsed.paymentMethod
-                    : "card"
+                    : "bank"
             );
             setSimpleProvider(
                 typeof parsed.simpleProvider === "string" && isSimpleProvider(parsed.simpleProvider)
@@ -271,7 +273,9 @@ function PaymentContent() {
         desc: pick(lang, "상품 정보와 신청자 정보를 확인하고 플랜료를 결제하거나 플랜 신청을 접수하세요.", "商品情報と申請者情報を確認し、プランパッケージ利用料を決済するかプラン申請を送信してください。", "Review the trip details, then pay the plan package fee or submit your application."),
         travelerDesc: pick(lang, "신청자 정보를 입력해주세요", "申請者情報を入力してください", "Enter the applicant details"),
         extraDesc: pick(lang, "선택한 옵션과 요청 사항을 마지막으로 확인합니다.", "選択したオプションとご要望を最後に確認します。", "Review selected options and special requests."),
-        methodDesc: pick(lang, "카드와 간편결제는 토스 결제창으로, 계좌 이체는 수동 확인 예약으로 진행됩니다.", "カードと簡単決済はトス決済画面で、銀行振込は手動確認予約として進行します。", "Card and simple pay open Toss Payments. Bank transfer stays as a manual confirmation flow."),
+        methodDesc: pick(lang, "현재는 무통장 입금만 이용할 수 있습니다. 입금 확인 후 신청 상태가 갱신됩니다.", "現在は銀行振込のみご利用いただけます。入金確認後に申請状況が更新されます。", "Only bank transfer is currently available. The application status updates after payment confirmation."),
+        unavailableMethod: pick(lang, "준비 중", "準備中", "Coming soon"),
+        bankOnlyError: pick(lang, "현재는 무통장 입금만 이용할 수 있습니다.", "現在は銀行振込のみご利用いただけます。", "Only bank transfer is currently available."),
         requiredError: pick(lang, "이름, 연락처, 출발일을 모두 입력해주세요.", "名前、連絡先、出発日をすべて入力してください。", "Please enter your name, phone number, and departure date."),
         sdkError: pick(lang, "결제창을 아직 불러오지 못했습니다. 잠시 후 다시 시도해주세요.", "決済画面をまだ読み込めていません。しばらくしてからもう一度お試しください。", "The payment window is still loading. Please try again in a moment."),
         sdkLoading: pick(lang, "결제창을 불러오는 중입니다.", "決済画面を読み込み中です。", "Loading the payment window."),
@@ -316,6 +320,12 @@ function PaymentContent() {
     const handleSubmit = async () => {
         if (!tour || !customerName.trim() || !phone.trim() || !departDate) {
             setError(text.requiredError);
+            return;
+        }
+
+        if (paymentMethod !== "bank") {
+            setPaymentMethod("bank");
+            setError(text.bankOnlyError);
             return;
         }
 
@@ -562,10 +572,35 @@ function PaymentContent() {
                             <div className="mt-5 grid gap-3 sm:grid-cols-3">
                                 {([
                                     ["card", pick(lang, "카드 결제", "カード決済", "Card")],
-                                    ["bank", pick(lang, "계좌 이체", "銀行振込", "Bank transfer")],
+                                    ["bank", pick(lang, "무통장 입금", "銀行振込", "Bank transfer")],
                                     ["simple", pick(lang, "간편 결제", "簡単決済", "Simple pay")],
                                 ] as const).map(([value, label]) => (
-                                    <button key={value} type="button" onClick={() => setPaymentMethod(value)} className={`rounded-2xl border px-4 py-3 text-sm font-bold transition ${paymentMethod === value ? "border-blue-600 bg-blue-600 text-white shadow-[0_12px_24px_rgba(37,99,235,0.2)]" : isDark ? "border-white/10 bg-slate-900 text-slate-200 hover:bg-slate-800" : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"}`}>{label}</button>
+                                    <button
+                                        key={value}
+                                        type="button"
+                                        onClick={() => {
+                                            if (value === "bank") setPaymentMethod(value);
+                                        }}
+                                        disabled={value !== "bank"}
+                                        className={`relative rounded-2xl border px-4 py-3 text-sm font-bold transition ${
+                                            paymentMethod === value
+                                                ? "border-blue-600 bg-blue-600 text-white shadow-[0_12px_24px_rgba(37,99,235,0.2)]"
+                                                : value !== "bank"
+                                                  ? isDark
+                                                      ? "cursor-not-allowed border-white/10 bg-slate-900/60 text-slate-500"
+                                                      : "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
+                                                  : isDark
+                                                    ? "border-white/10 bg-slate-900 text-slate-200 hover:bg-slate-800"
+                                                    : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
+                                        }`}
+                                    >
+                                        <span>{label}</span>
+                                        {value !== "bank" ? (
+                                            <span className={`ml-2 rounded-full px-2 py-0.5 text-[10px] font-black ${isDark ? "bg-slate-800 text-slate-400" : "bg-white text-slate-400"}`}>
+                                                {text.unavailableMethod}
+                                            </span>
+                                        ) : null}
+                                    </button>
                                 ))}
                             </div>
                             {paymentMethod === "simple" ? (

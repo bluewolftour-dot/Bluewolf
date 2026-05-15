@@ -912,21 +912,21 @@ export function ToursCustomizeContent() {
                                                 >
                                                     {copy.detailsLabel}
                                                 </button>
-                                                <span className={`hidden h-10 min-w-10 items-center justify-center rounded-full px-4 text-sm font-black transition sm:inline-flex ${active ? "bg-blue-600 text-white" : isDark ? "bg-slate-800 text-slate-200" : "bg-slate-200 text-slate-700"}`}>
-                                                    {active ? copy.selectedLabel : "+"}
-                                                </span>
-                                            </div>
-                                            <div className="mt-4 hidden flex-wrap gap-2 sm:flex">
-                                                <button
-                                                    type="button"
-                                                    onClick={(event) => {
-                                                        event.stopPropagation();
-                                                        setDetailOption(option);
-                                                    }}
-                                                    className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${isDark ? "bg-slate-800 text-slate-200 hover:bg-slate-700" : "bg-white text-slate-700 hover:bg-slate-100"}`}
-                                                >
-                                                    {copy.detailsLabel}
-                                                </button>
+                                                <div className="hidden shrink-0 items-center gap-2 sm:flex">
+                                                    <button
+                                                        type="button"
+                                                        onClick={(event) => {
+                                                            event.stopPropagation();
+                                                            setDetailOption(option);
+                                                        }}
+                                                        className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${isDark ? "bg-slate-800 text-slate-200 hover:bg-slate-700" : "bg-white text-slate-700 hover:bg-slate-100"}`}
+                                                    >
+                                                        {copy.detailsLabel}
+                                                    </button>
+                                                    <span className={`inline-flex h-10 min-w-10 items-center justify-center rounded-full px-4 text-sm font-black transition ${active ? "bg-blue-600 text-white" : isDark ? "bg-slate-800 text-slate-200" : "bg-slate-200 text-slate-700"}`}>
+                                                        {active ? copy.selectedLabel : "+"}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     );

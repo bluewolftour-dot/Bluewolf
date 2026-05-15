@@ -56,3 +56,5 @@ next-env.d.ts
 # secrets / api key notes (do not commit raw keys)
 open*api*key*
 *.api-key.txt
+
+.vercel

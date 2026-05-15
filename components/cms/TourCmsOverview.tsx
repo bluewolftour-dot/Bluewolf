@@ -43,13 +43,6 @@ function OverviewCard({
                     </span>
                 ) : null}
             </div>
-            <p
-                className={`mt-5 text-sm font-bold ${
-                    isDark ? "text-slate-300" : "text-slate-600"
-                }`}
-            >
-                편집 화면으로 이동
-            </p>
         </Link>
     );
 }

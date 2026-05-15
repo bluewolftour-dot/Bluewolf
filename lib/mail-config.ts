@@ -17,14 +17,13 @@ function readProfileValue(profile: MailProfile, key: string) {
 }
 
 export function getMailConfig(profile: MailProfile): MailConfig {
-    const fallbackAllowed = profile === "kr";
-    const host = readProfileValue(profile, "HOST") || (fallbackAllowed ? process.env.SMTP_HOST?.trim() : "") || "smtp.gmail.com";
-    const portValue = readProfileValue(profile, "PORT") || (fallbackAllowed ? process.env.SMTP_PORT?.trim() : "");
+    const host = readProfileValue(profile, "HOST") || "smtp.gmail.com";
+    const portValue = readProfileValue(profile, "PORT");
     const port = Number(portValue || 465);
-    const user = readProfileValue(profile, "USER") || (fallbackAllowed ? process.env.SMTP_USER?.trim() : "") || "";
-    const pass = readProfileValue(profile, "PASS") || (fallbackAllowed ? process.env.SMTP_PASS?.trim() : "") || "";
-    const from = readProfileValue(profile, "FROM") || (fallbackAllowed ? process.env.SMTP_FROM?.trim() : "") || user;
-    const secureEnv = readProfileValue(profile, "SECURE") || (fallbackAllowed ? process.env.SMTP_SECURE?.trim() : "") || "";
+    const user = readProfileValue(profile, "USER") || "";
+    const pass = readProfileValue(profile, "PASS") || "";
+    const from = readProfileValue(profile, "FROM") || user;
+    const secureEnv = readProfileValue(profile, "SECURE") || "";
     const secure = secureEnv ? secureEnv.toLowerCase() === "true" : port === 465;
 
     return {
