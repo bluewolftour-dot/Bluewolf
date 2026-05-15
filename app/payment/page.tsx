@@ -257,6 +257,18 @@ function PaymentContent() {
 
         try {
             const raw = window.sessionStorage.getItem(draftStorageKey);
+            if (isCustomPlanFlow && customPlan) {
+                setCustomerName(customPlan.customerName);
+                setPhone(customPlan.phone);
+                setEmail(customPlan.email);
+                setDepartDate(customPlan.departDate);
+                setMemo(customPlan.memo);
+                setPaymentMethod("bank");
+                setSimpleProvider("toss");
+                setDraftReady(true);
+                return;
+            }
+
             if (!raw) {
                 setCustomerName(isCustomPlanFlow ? customPlan?.customerName ?? "" : "");
                 setPhone(isCustomPlanFlow ? customPlan?.phone ?? "" : "");

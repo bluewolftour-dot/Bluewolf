@@ -26,6 +26,7 @@ type SelectOption = {
 
 type CustomerRecord = {
     key: string;
+    userId: string;
     name: string;
     email: string;
     phone: string;
@@ -205,7 +206,11 @@ function isLaterThan(current: string, next: string) {
     return new Date(next).getTime() > new Date(current).getTime();
 }
 
-function buildCustomerRecords(bookings: CrmBookingRecord[], inquiries: CrmInquiryRecord[]) {
+function buildCustomerRecords(
+    bookings: CrmBookingRecord[],
+    inquiries: CrmInquiryRecord[],
+    userIdByEmail: Map<string, string>
+) {
     const customers = new Map<string, CustomerRecord>();
 
     for (const booking of bookings) {
@@ -214,6 +219,7 @@ function buildCustomerRecords(bookings: CrmBookingRecord[], inquiries: CrmInquir
             customers.get(key) ??
             ({
                 key,
+                userId: userIdByEmail.get(normalizeContactValue(booking.email).toLowerCase()) ?? "",
                 name: normalizeContactValue(booking.customerName) || "이름 없음",
                 email: normalizeContactValue(booking.email),
                 phone: normalizeContactValue(booking.phone),
@@ -247,6 +253,7 @@ function buildCustomerRecords(bookings: CrmBookingRecord[], inquiries: CrmInquir
             customers.get(key) ??
             ({
                 key,
+                userId: userIdByEmail.get(normalizeContactValue(inquiry.email).toLowerCase()) ?? "",
                 name: normalizeContactValue(inquiry.name) || "이름 없음",
                 email: normalizeContactValue(inquiry.email),
                 phone: normalizeContactValue(inquiry.phone),
@@ -311,6 +318,7 @@ function CrmContent() {
     const [inquiries, setInquiries] = useState<CrmInquiryRecord[]>([]);
     const [bookings, setBookings] = useState<CrmBookingRecord[]>([]);
     const [orders, setOrders] = useState<CrmPaymentOrderRecord[]>([]);
+    const [customerUsers, setCustomerUsers] = useState<Array<{ email: string; userId: string }>>([]);
     const [loading, setLoading] = useState(true);
     const [savingKey, setSavingKey] = useState("");
     const [error, setError] = useState("");
@@ -325,14 +333,15 @@ function CrmContent() {
         setError("");
 
         try {
-            const [overviewResponse, inquiriesResponse, bookingsResponse, ordersResponse] = await Promise.all([
+            const [overviewResponse, inquiriesResponse, bookingsResponse, ordersResponse, customerUsersResponse] = await Promise.all([
                 fetch("/api/crm/overview", { cache: "no-store" }),
                 fetch("/api/crm/inquiries", { cache: "no-store" }),
                 fetch("/api/crm/bookings", { cache: "no-store" }),
                 fetch("/api/crm/payment-orders", { cache: "no-store" }),
+                fetch("/api/crm/customer-users", { cache: "no-store" }),
             ]);
 
-            if (!overviewResponse.ok || !inquiriesResponse.ok || !bookingsResponse.ok || !ordersResponse.ok) {
+            if (!overviewResponse.ok || !inquiriesResponse.ok || !bookingsResponse.ok || !ordersResponse.ok || !customerUsersResponse.ok) {
                 throw new Error("CRM 데이터를 불러오지 못했습니다.");
             }
 
@@ -340,11 +349,13 @@ function CrmContent() {
             const inquiriesData = (await inquiriesResponse.json()) as { inquiries: CrmInquiryRecord[] };
             const bookingsData = (await bookingsResponse.json()) as { bookings: CrmBookingRecord[] };
             const ordersData = (await ordersResponse.json()) as { orders: CrmPaymentOrderRecord[] };
+            const customerUsersData = (await customerUsersResponse.json()) as { users: Array<{ email: string; userId: string }> };
 
             setOverview(overviewData.overview);
             setInquiries(inquiriesData.inquiries);
             setBookings(bookingsData.bookings);
             setOrders(ordersData.orders);
+            setCustomerUsers(customerUsersData.users);
         } catch (loadError) {
             setError(loadError instanceof Error ? loadError.message : "CRM 데이터를 불러오지 못했습니다.");
         } finally {
@@ -375,14 +386,22 @@ function CrmContent() {
         return bookings.filter((booking) => getMonthKey(booking.createdAt) === selectedMonth);
     }, [bookings, selectedMonth]);
 
-    const customers = useMemo(() => buildCustomerRecords(bookings, inquiries), [bookings, inquiries]);
+    const userIdByEmail = useMemo(
+        () => new Map(customerUsers.map((user) => [user.email.trim().toLowerCase(), user.userId])),
+        [customerUsers]
+    );
+
+    const customers = useMemo(
+        () => buildCustomerRecords(bookings, inquiries, userIdByEmail),
+        [bookings, inquiries, userIdByEmail]
+    );
 
     const filteredCustomers = useMemo(() => {
         const query = customerSearch.trim().toLowerCase();
         if (!query) return customers;
 
         return customers.filter((customer) =>
-            [customer.name, customer.email, customer.phone, customer.latestTour].some((value) =>
+            [customer.userId, customer.name, customer.email, customer.phone, customer.latestTour].some((value) =>
                 value.toLowerCase().includes(query)
             )
         );
@@ -715,7 +734,7 @@ function CrmContent() {
                                         <div className="flex items-start justify-between gap-3">
                                             <div>
                                                 <p className={`text-xs font-black ${mutedTone}`}>오늘 처리해야 할 일</p>
-                                                <h2 className="mt-2 text-xl font-black">처리 대기 큐</h2>
+                                                <h2 className="mt-2 text-lg font-black">처리 대기 큐</h2>
                                             </div>
                                             <span className="rounded-full bg-blue-600 px-3 py-1 text-xs font-black text-white">
                                                 {followUpItems.length}건
@@ -729,7 +748,7 @@ function CrmContent() {
                                                             <span className={`rounded-full px-3 py-1 text-xs font-black ${getFollowUpToneClass(item.tone, isDark)}`}>
                                                                 {item.label}
                                                             </span>
-                                                            <h3 className="mt-3 text-sm font-black">{item.title}</h3>
+                                                            <h3 className="mt-3 text-[13px] font-black">{item.title}</h3>
                                                             <p className={`mt-1 text-xs font-semibold ${mutedTone}`}>{item.desc}</p>
                                                         </div>
                                                     </div>
@@ -743,7 +762,7 @@ function CrmContent() {
                                         <div className="flex items-start justify-between gap-3">
                                             <div>
                                                 <p className={`text-xs font-black ${mutedTone}`}>고객 운영 요약</p>
-                                                <h2 className="mt-2 text-xl font-black">최근 고객</h2>
+                                                <h2 className="mt-2 text-lg font-black">최근 고객</h2>
                                             </div>
                                             <button
                                                 type="button"
@@ -758,9 +777,9 @@ function CrmContent() {
                                                 <article key={customer.key} className={`rounded-2xl border p-4 ${isDark ? "border-white/10 bg-slate-950" : "border-slate-200 bg-white"}`}>
                                                     <div className="flex flex-wrap items-center justify-between gap-3">
                                                         <div>
-                                                            <h3 className="text-sm font-black">{customer.name}</h3>
+                                                            <h3 className="text-[13px] font-black">{customer.userId || customer.name}</h3>
                                                             <p className={`mt-1 text-xs font-semibold ${mutedTone}`}>
-                                                                {customer.email || "이메일 없음"} · {customer.phone || "연락처 없음"}
+                                                                {customer.name} · {customer.email || "이메일 없음"} · {customer.phone || "연락처 없음"}
                                                             </p>
                                                         </div>
                                                         <span className={`rounded-full px-3 py-1 text-xs font-black ${getCustomerStatusClass(customer.status, isDark)}`}>
@@ -807,9 +826,9 @@ function CrmContent() {
                                             <article key={customer.key} className={`rounded-3xl border p-4 ${surfaceTone}`}>
                                                 <div className="flex flex-wrap items-start justify-between gap-3">
                                                     <div>
-                                                        <h3 className="text-lg font-black">{customer.name}</h3>
+                                                        <h3 className="text-lg font-black">{customer.userId || customer.name}</h3>
                                                         <p className={`mt-2 text-sm leading-6 ${strongMutedTone}`}>
-                                                            {customer.email || "이메일 없음"} · {customer.phone || "연락처 없음"}
+                                                            {customer.name} · {customer.email || "이메일 없음"} · {customer.phone || "연락처 없음"}
                                                         </p>
                                                     </div>
                                                     <span className={`rounded-full px-3 py-1 text-xs font-black ${getCustomerStatusClass(customer.status, isDark)}`}>
