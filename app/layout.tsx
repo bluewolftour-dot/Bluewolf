@@ -1,6 +1,7 @@
-﻿import "./globals.css";
+import "./globals.css";
 import localFont from "next/font/local";
 import Script from "next/script";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { CmsBootstrapProvider, type CmsBootstrapPayload } from "@/components/cms/CmsBootstrapProvider";
 import { ScrollRestorer } from "@/components/layout/ScrollRestorer";
@@ -99,6 +100,7 @@ export default async function RootLayout({
                         {children}
                     </CmsBootstrapProvider>
                 </AuthProvider>
+                <SpeedInsights />
             </body>
         </html>
     );
