@@ -46,6 +46,26 @@ type PaymentDraft = {
     simpleProvider: SimpleProvider;
 };
 
+type CustomPlanPaymentDraft = {
+    title: string;
+    summary: string;
+    totalAmount: number;
+    baseAmount: number;
+    optionAmount: number;
+    depositAmount: number;
+    image: string;
+    durationLabel: string;
+    departDate: string;
+    guests: number;
+    optionKeys: string[];
+    customerName: string;
+    phone: string;
+    email: string;
+    memo: string;
+};
+
+const CUSTOM_PLAN_PAYMENT_STORAGE_KEY = "custom-plan-payment";
+
 type TossPaymentRequest = {
     method: "CARD";
     amount: { currency: "KRW"; value: number };
@@ -126,9 +146,10 @@ function PaymentContent() {
     const { tourItems, loaded: toursLoaded } = useCmsTours();
     const { localizedOptions, loaded: optionsLoaded } = useCmsTourOptions(lang);
 
+    const isCustomPlanFlow = searchParams.get("custom") === "1";
     const tourId = Number(searchParams.get("tour"));
-    const guests = Math.max(1, Number(searchParams.get("guests")) || 1);
-    const optionKeys = useMemo(
+    const queryGuests = Math.max(1, Number(searchParams.get("guests")) || 1);
+    const queryOptionKeys = useMemo(
         () =>
             (searchParams.get("options") ?? "")
                 .split(",")
@@ -141,19 +162,31 @@ function PaymentContent() {
         () => tourItems.find((item) => item.id === tourId) ?? null,
         [tourId, tourItems]
     );
+    const [customPlan, setCustomPlan] = useState<CustomPlanPaymentDraft | null>(null);
+    const [customPlanReady, setCustomPlanReady] = useState(!isCustomPlanFlow);
+    const guests = isCustomPlanFlow ? customPlan?.guests ?? queryGuests : queryGuests;
+    const optionKeys = useMemo(
+        () => (isCustomPlanFlow ? customPlan?.optionKeys ?? [] : queryOptionKeys),
+        [customPlan?.optionKeys, isCustomPlanFlow, queryOptionKeys]
+    );
     const selectedOptions = useMemo(
         () => localizedOptions.filter((option) => optionKeys.includes(option.key)),
         [localizedOptions, optionKeys]
     );
     const draftStorageKey = useMemo(
-        () => `payment-draft:${tourId}:${guests}:${optionKeys.join(",")}:${lang}`,
-        [guests, lang, optionKeys, tourId]
+        () =>
+            isCustomPlanFlow
+                ? `payment-draft:custom:${lang}`
+                : `payment-draft:${tourId}:${guests}:${optionKeys.join(",")}:${lang}`,
+        [guests, isCustomPlanFlow, lang, optionKeys, tourId]
     );
 
-    const baseFare = tour ? tour.price * guests : 0;
-    const optionTotal = selectedOptions.reduce((sum, option) => sum + option.price * guests, 0);
-    const estimatedTotal = baseFare + optionTotal;
-    const depositDue = tour ? tour.deposit * guests : 0;
+    const baseFare = isCustomPlanFlow ? customPlan?.baseAmount ?? 0 : tour ? tour.price * guests : 0;
+    const optionTotal = isCustomPlanFlow
+        ? customPlan?.optionAmount ?? 0
+        : selectedOptions.reduce((sum, option) => sum + option.price * guests, 0);
+    const estimatedTotal = isCustomPlanFlow ? customPlan?.totalAmount ?? 0 : baseFare + optionTotal;
+    const depositDue = isCustomPlanFlow ? customPlan?.depositAmount ?? 0 : tour ? tour.deposit * guests : 0;
 
     const [customerName, setCustomerName] = useState("");
     const [phone, setPhone] = useState("");
@@ -173,6 +206,43 @@ function PaymentContent() {
     } | null>(null);
 
     useEffect(() => {
+        if (!isCustomPlanFlow || typeof window === "undefined") return;
+
+        try {
+            const raw = window.sessionStorage.getItem(CUSTOM_PLAN_PAYMENT_STORAGE_KEY);
+            if (!raw) {
+                setCustomPlan(null);
+                return;
+            }
+
+            const parsed = JSON.parse(raw) as Partial<CustomPlanPaymentDraft>;
+            const valid =
+                typeof parsed.title === "string" &&
+                typeof parsed.summary === "string" &&
+                typeof parsed.image === "string" &&
+                typeof parsed.durationLabel === "string" &&
+                typeof parsed.departDate === "string" &&
+                typeof parsed.customerName === "string" &&
+                typeof parsed.phone === "string" &&
+                typeof parsed.email === "string" &&
+                typeof parsed.memo === "string" &&
+                Number.isFinite(parsed.totalAmount) &&
+                Number.isFinite(parsed.baseAmount) &&
+                Number.isFinite(parsed.optionAmount) &&
+                Number.isFinite(parsed.depositAmount) &&
+                Number.isFinite(parsed.guests) &&
+                Array.isArray(parsed.optionKeys);
+
+            setCustomPlan(valid ? parsed as CustomPlanPaymentDraft : null);
+        } catch {
+            window.sessionStorage.removeItem(CUSTOM_PLAN_PAYMENT_STORAGE_KEY);
+            setCustomPlan(null);
+        } finally {
+            setCustomPlanReady(true);
+        }
+    }, [isCustomPlanFlow]);
+
+    useEffect(() => {
         if (typeof window === "undefined") return;
         if (window.TossPayments) {
             setSdkReady(true);
@@ -188,11 +258,11 @@ function PaymentContent() {
         try {
             const raw = window.sessionStorage.getItem(draftStorageKey);
             if (!raw) {
-                setCustomerName("");
-                setPhone("");
-                setEmail("");
-                setDepartDate("");
-                setMemo("");
+                setCustomerName(isCustomPlanFlow ? customPlan?.customerName ?? "" : "");
+                setPhone(isCustomPlanFlow ? customPlan?.phone ?? "" : "");
+                setEmail(isCustomPlanFlow ? customPlan?.email ?? "" : "");
+                setDepartDate(isCustomPlanFlow ? customPlan?.departDate ?? "" : "");
+                setMemo(isCustomPlanFlow ? customPlan?.memo ?? "" : "");
                 setPaymentMethod("bank");
                 setSimpleProvider("toss");
                 setDraftReady(true);
@@ -222,7 +292,7 @@ function PaymentContent() {
         } finally {
             setDraftReady(true);
         }
-    }, [draftStorageKey]);
+    }, [customPlan, draftStorageKey, isCustomPlanFlow]);
 
     useEffect(() => {
         if (!draftReady || typeof window === "undefined" || createdBooking) return;
@@ -266,8 +336,8 @@ function PaymentContent() {
 
     const text = {
         badge: pick(lang, "결제", "決済", "Payment"),
-        invalidTitle: pick(lang, "선택한 상품을 찾을 수 없어요", "選択した商品が見つかりません", "We couldn't find that tour"),
-        invalidDesc: pick(lang, "투어 페이지에서 다시 예약을 시작해주세요.", "ツアーページから予約を始めてください。", "Please restart the booking flow from the tours page."),
+        invalidTitle: pick(lang, "선택한 플랜을 찾을 수 없어요", "選択したプランが見つかりません", "We couldn't find that plan"),
+        invalidDesc: pick(lang, "이전 페이지에서 다시 신청을 시작해주세요.", "前のページから申請をやり直してください。", "Please restart the application from the previous page."),
         backToTours: pick(lang, "투어로 돌아가기", "ツアーへ戻る", "Back to tours"),
         title: pick(lang, "플랜 패키지 결제", "プランパッケージ決済", "Plan package payment"),
         desc: pick(lang, "상품 정보와 신청자 정보를 확인하고 플랜료를 결제하거나 플랜 신청을 접수하세요.", "商品情報と申請者情報を確認し、プランパッケージ利用料を決済するかプラン申請を送信してください。", "Review the trip details, then pay the plan package fee or submit your application."),
@@ -315,10 +385,14 @@ function PaymentContent() {
             : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-blue-300"
     }`;
 
-    const detailHref = tour ? withLocaleQuery(`/tours/${tour.id}`, lang) : withLocaleQuery("/tours", lang);
+    const detailHref = isCustomPlanFlow
+        ? withLocaleQuery("/tours/customize", lang)
+        : tour
+          ? withLocaleQuery(`/tours/${tour.id}`, lang)
+          : withLocaleQuery("/tours", lang);
 
     const handleSubmit = async () => {
-        if (!tour || !customerName.trim() || !phone.trim() || !departDate) {
+        if ((!tour && !customPlan) || !customerName.trim() || !phone.trim() || !departDate) {
             setError(text.requiredError);
             return;
         }
@@ -338,7 +412,14 @@ function PaymentContent() {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        tourId: tour.id,
+                        tourId: tour?.id,
+                        customPlan: customPlan
+                            ? {
+                                  title: customPlan.title,
+                                  summary: customPlan.summary,
+                                  totalAmount: customPlan.totalAmount,
+                              }
+                            : undefined,
                         customerName,
                         email,
                         phone,
@@ -363,6 +444,10 @@ function PaymentContent() {
 
             if (!sdkReady || !window.TossPayments) {
                 throw new Error(sdkLoadFailed ? text.sdkLoadFail : text.sdkError);
+            }
+
+            if (!tour) {
+                throw new Error(text.failedError);
             }
 
             const response = await fetch("/api/payments/toss/prepare", {
@@ -423,7 +508,7 @@ function PaymentContent() {
         }
     };
 
-    if ((!toursLoaded || !optionsLoaded) && !tour) {
+    if ((!toursLoaded || !optionsLoaded || !customPlanReady) && !tour && !customPlan) {
         return (
             <section className={shellClass}>
                 <div className={`border-b px-6 py-4 ${isDark ? "border-white/10 bg-slate-950" : "border-slate-100 bg-slate-50"}`} />
@@ -435,7 +520,7 @@ function PaymentContent() {
         );
     }
 
-    if (!tour) {
+    if (!tour && !customPlan) {
         return (
             <section className={`${shellClass} p-8 text-center`}>
                 <div className="inline-flex rounded-full bg-blue-50 px-4 py-1.5 text-sm font-bold text-blue-600">{text.badge}</div>
@@ -502,13 +587,21 @@ function PaymentContent() {
                             <StepTitle step={1} title={pick(lang, "상품 정보", "商品情報", "Product info")} isDark={isDark} />
                             <div className="mt-5 flex flex-col gap-4 sm:flex-row">
                                 <div className={`relative h-28 overflow-hidden rounded-[24px] sm:h-24 sm:w-28 ${isDark ? "bg-slate-800" : "bg-slate-100"}`}>
-                                    <Image src={tour.heroImage} alt={tour.title[lang]} fill className="object-cover" sizes="112px" />
+                                    <Image
+                                        src={customPlan?.image ?? tour?.heroImage ?? "/images/null.png"}
+                                        alt={customPlan?.title ?? tour?.title[lang] ?? ""}
+                                        fill
+                                        className="object-cover"
+                                        sizes="112px"
+                                    />
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                    <h3 className={`text-lg font-black ${isDark ? "text-white" : "text-slate-900"}`}>{tour.title[lang]}</h3>
-                                    <p className={`mt-2 text-sm leading-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{tour.desc[lang]}</p>
+                                    <h3 className={`text-lg font-black ${isDark ? "text-white" : "text-slate-900"}`}>{customPlan?.title ?? tour?.title[lang]}</h3>
+                                    <p className={`mt-2 whitespace-pre-line text-sm leading-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                                        {customPlan?.summary ?? tour?.desc[lang]}
+                                    </p>
                                     <div className="mt-4 flex flex-wrap gap-2">
-                                        <span className={`rounded-full px-3 py-1.5 text-xs font-bold ${isDark ? "bg-slate-800 text-slate-200" : "bg-slate-100 text-slate-700"}`}>{pick(lang, "여행 기간", "旅行期間", "Duration")} · {tour.duration[lang]}</span>
+                                        <span className={`rounded-full px-3 py-1.5 text-xs font-bold ${isDark ? "bg-slate-800 text-slate-200" : "bg-slate-100 text-slate-700"}`}>{pick(lang, "여행 기간", "旅行期間", "Duration")} · {customPlan?.durationLabel ?? tour?.duration[lang]}</span>
                                         <span className={`rounded-full px-3 py-1.5 text-xs font-bold ${isDark ? "bg-slate-800 text-slate-200" : "bg-slate-100 text-slate-700"}`}>{pick(lang, "여행 인원", "旅行人数", "Guests")} · {guests}</span>
                                     </div>
                                 </div>

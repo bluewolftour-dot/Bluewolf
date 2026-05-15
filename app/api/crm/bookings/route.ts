@@ -4,7 +4,7 @@ import { createCrmBooking, getCmsTourById, getCrmBookings, updateCrmBookingStatu
 import { getSessionUser } from "@/lib/auth-server";
 import { sendBookingConfirmationEmail } from "@/lib/booking-email";
 import { requireAdminResponse } from "@/lib/admin-auth";
-import { validateBookingAvailability } from "@/lib/booking-rules";
+import { validateBookingAvailability, validateDepartDate } from "@/lib/booking-rules";
 
 const SESSION_COOKIE = "bluewolf_session";
 
@@ -36,6 +36,11 @@ export async function GET() {
 export async function POST(request: NextRequest) {
     const body = (await request.json()) as Partial<{
         tourId: number;
+        customPlan: {
+            title?: string;
+            summary?: string;
+            totalAmount?: number;
+        };
         customerName: string;
         email: string;
         phone: string;
@@ -46,6 +51,10 @@ export async function POST(request: NextRequest) {
     }>;
 
     const tourId = Number(body.tourId);
+    const customPlanTitle = body.customPlan?.title?.trim() ?? "";
+    const customPlanSummary = body.customPlan?.summary?.trim() ?? "";
+    const customPlanTotalAmount = Math.max(0, Math.round(Number(body.customPlan?.totalAmount ?? 0)));
+    const isCustomPlan = customPlanTitle.length > 0;
     const customerName = body.customerName?.trim() ?? "";
     const requestedEmail = body.email?.trim().toLowerCase() ?? "";
     const phone = body.phone?.trim() ?? "";
@@ -59,9 +68,9 @@ export async function POST(request: NextRequest) {
     const user = await getSessionUser(token);
     const email = user?.email?.trim().toLowerCase() || requestedEmail;
 
-    if (!tour) {
+    if (!tour && !isCustomPlan) {
         return NextResponse.json(
-            { error: "A valid tour is required." },
+            { error: "A valid plan is required." },
             { status: 400 }
         );
     }
@@ -73,12 +82,14 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    const availability = validateBookingAvailability({
-        tourId,
-        departDate,
-        guests,
-        bookings: await getCrmBookings(),
-    });
+    const availability = isCustomPlan
+        ? validateDepartDate(departDate)
+        : validateBookingAvailability({
+              tourId,
+              departDate,
+              guests,
+              bookings: await getCrmBookings(),
+          });
 
     if (!availability.ok) {
         return NextResponse.json(
@@ -93,9 +104,11 @@ export async function POST(request: NextRequest) {
     }
 
     const booking = await createCrmBooking({
-        tourId,
-        totalAmount: tour.price * guests,
-        depositAmount: tour.deposit * guests,
+        tourId: tour?.id ?? 0,
+        customTitle: isCustomPlan ? customPlanTitle : "",
+        customSummary: isCustomPlan ? customPlanSummary : "",
+        totalAmount: isCustomPlan ? customPlanTotalAmount : (tour?.price ?? 0) * guests,
+        depositAmount: isCustomPlan ? 50000 * guests : (tour?.deposit ?? 0) * guests,
         customerName,
         email,
         phone,
@@ -117,7 +130,13 @@ export async function POST(request: NextRequest) {
             email,
             bookingNo: booking.bookingNo,
             customerName: booking.customerName,
-            tourTitle: locale === "ja" ? tour.title.ja : locale === "en" ? tour.title.en : tour.title.ko,
+            tourTitle: isCustomPlan
+                ? customPlanTitle
+                : locale === "ja"
+                  ? tour?.title.ja ?? ""
+                  : locale === "en"
+                    ? tour?.title.en ?? ""
+                    : tour?.title.ko ?? "",
             departDate: booking.departDate,
             guests: booking.guests,
             locale,
